@@ -1,25 +1,39 @@
+async function fetchFont(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer()).toString("base64");
+  } catch {
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
   const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
   const title = searchParams.get("title") || "Devajith";
   const subtitle =
     searchParams.get("subtitle") || "Student · Developer · Gamer";
 
-  const [regularRes, boldRes] = await Promise.all([
-    fetch(
+  const [regularB64, boldB64] = await Promise.all([
+    fetchFont(
       "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8Cm8qZG40F9JadbnoEwA_JxhTg.ttf",
     ),
-    fetch(
+    fetchFont(
       "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8Cl0qZG40F9JadbnoEwA_JxhTg.ttf",
     ),
   ]);
 
-  const [regularData, boldData] = await Promise.all([
-    regularRes.arrayBuffer(),
-    boldRes.arrayBuffer(),
-  ]);
-
-  const regularB64 = Buffer.from(regularData).toString("base64");
-  const boldB64 = Buffer.from(boldData).toString("base64");
+  if (!regularB64 || !boldB64) {
+    res
+      .status(500)
+      .send(
+        "Font fetch failed — check Vercel outbound network permissions. regular=" +
+          !!regularB64 +
+          " bold=" +
+          !!boldB64,
+      );
+    return;
+  }
 
   const { Resvg } = await import("@resvg/resvg-js");
 
