@@ -51,25 +51,36 @@ export default async function handler(req, res) {
         <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
       </radialGradient>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
       </pattern>
     </defs>
+
     <rect width="1200" height="630" fill="url(#bgGrad)"/>
     <rect width="1200" height="630" fill="url(#glow1)"/>
     <rect width="1200" height="630" fill="url(#glow2)"/>
     <rect width="1200" height="630" fill="url(#grid)"/>
-    <rect x="80" y="48" width="36" height="36" rx="8" fill="none" stroke="rgba(59,130,246,0.6)" stroke-width="1.5"/>
+
+    <!-- Logo box -->
+    <rect x="80" y="48" width="36" height="36" rx="8" fill="none" stroke="#3b82f6" stroke-opacity="0.6" stroke-width="1.5"/>
     <text x="98" y="71" text-anchor="middle" font-family="DM Sans" font-size="13" font-weight="700" fill="#3b82f6">&lt;/&gt;</text>
-    <text x="128" y="72" font-family="DM Sans" font-size="18" font-weight="400" fill="rgba(255,255,255,0.45)">devajuice.vercel.app</text>
-    <rect x="80" y="460" width="198" height="36" rx="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+    <!-- Domain -->
+    <text x="128" y="72" font-family="DM Sans" font-size="18" font-weight="400" fill="#ffffff" fill-opacity="0.45">devajuice.vercel.app</text>
+
+    <!-- Available badge -->
+    <rect x="80" y="460" width="198" height="36" rx="18" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
     <circle cx="104" cy="478" r="5" fill="#22c55e"/>
-    <text x="118" y="483" font-family="DM Sans" font-size="15" font-weight="400" fill="rgba(255,255,255,0.7)">Available for work</text>
+    <text x="118" y="483" font-family="DM Sans" font-size="15" font-weight="400" fill="#ffffff" fill-opacity="0.7">Available for work</text>
+
+    <!-- Title -->
     <text x="80" y="560" font-family="DM Sans" font-size="96" font-weight="700" letter-spacing="-2" fill="url(#titleGrad)">${escapeXml(title)}</text>
-    <text x="80" y="600" font-family="DM Sans" font-size="26" font-weight="400" fill="rgba(255,255,255,0.5)">${escapeXml(subtitle)}</text>
+
+    <!-- Subtitle -->
+    <text x="80" y="600" font-family="DM Sans" font-size="26" font-weight="400" fill="#ffffff" fill-opacity="0.5">${escapeXml(subtitle)}</text>
+
     ${renderTags(["Python", "JavaScript", "React", "Data Analysis"])}
   </svg>`;
 
-  // Pass fonts directly to resvg via fontBuffers — more reliable than @font-face in SVG
   const resvg = new Resvg(svg, {
     fontBuffers: [regularBuf, boldBuf],
     defaultFontFamily: "DM Sans",
@@ -105,7 +116,7 @@ function renderTags(tags) {
     const w = Math.ceil(tags[i].length * cw) + py * 2;
     x -= w;
     out += `<rect x="${x}" y="526" width="${w}" height="${h}" rx="8"
-      fill="rgba(59,130,246,0.12)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
+      fill="#3b82f6" fill-opacity="0.12" stroke="#3b82f6" stroke-opacity="0.25" stroke-width="1"/>
     <text x="${x + py}" y="547" font-family="DM Sans" font-size="${fs}" font-weight="700"
       fill="#60a5fa">${escapeXml(tags[i])}</text>`;
     x -= gap;
