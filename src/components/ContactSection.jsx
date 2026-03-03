@@ -74,7 +74,7 @@ export default function ContactSection() {
                 <i className={s.icon} aria-hidden="true" /><span>{s.label}</span>
               </a>
             ))}
-            <a href="/public/assets/docs/Devajith_Resume.pdf" download="Devajith_Resume.pdf"
+            <a href="/assets/docs/Devajith_Resume.pdf" download="Devajith_Resume.pdf"
               className="social-btn social-btn--resume" aria-label="Download my Resume">
               <i className="fas fa-file-arrow-down" aria-hidden="true" /><span>Download Resume</span>
             </a>

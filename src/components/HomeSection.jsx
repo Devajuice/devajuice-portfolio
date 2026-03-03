@@ -65,7 +65,7 @@ export default function HomeSection({ onNavigate, musicData }) {
         <button onClick={() => onNavigate('contact')} className="btn-secondary" data-magnetic>
           <i className="fas fa-paper-plane" aria-hidden="true" /><span>Contact Me</span>
         </button>
-        <a href="/public/assets/docs/Devajith_Resume.pdf" download="Devajith_Resume.pdf"
+        <a href="assets/docs/Devajith_Resume.pdf" download="Devajith_Resume.pdf"
           className="btn-resume" id="resumeBtn" data-magnetic aria-label="Download Resume"
           onClick={handleResumeClick}>
           <i className="fas fa-file-arrow-down" aria-hidden="true" /><span>Resume</span>
