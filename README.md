@@ -109,33 +109,25 @@ A modern, responsive single-page portfolio website featuring a clean monochrome 
 ## 📂 Project Structure
 
 ```
-devajuice-portfolio/
-├── assets/
-│   ├── icons/
-│   │   ├── favicon-16x16.png
-│   │   ├── favicon-32x32.png
-│   │   ├── apple-touch-icon.png
-│   │   ├── android-chrome-192x192.png
-│   │   └── android-chrome-512x512.png
-│   ├── images/
-│   │   └── og-image.png
-│   └── docs/
-│       └── resume.pdf
-├── css/
-│   ├── styles.css          # Main stylesheet — layout, animations, themes, components
-│   └── 404.css             # 404 page specific styles
-├── js/
-│   ├── script.js           # Main site JavaScript — nav, music, particles, effects
-│   └── 404.js              # 404 page JavaScript — theme, spotlight, magnetic buttons
-├── 404.html                # Custom 404 error page
-├── index.html              # Main HTML entry point
-├── manifest.json           # PWA manifest — icons, shortcuts, display mode
-├── robots.txt              # Crawler directives
-├── sitemap.xml             # Single canonical URL for search engines
-├── vercel.json             # Vercel routing configuration
-├── .gitignore
-├── LICENSE.md
-└── README.md
+devajith-portfolio/
+├── index.html            # Entry point with pre-render theme init
+├── vite.config.js        # Vite bundling configuration
+├── vercel.json           # Vercel deployment & 404 routing logic
+├── public/               # Static assets & standalone pages
+│   ├── 404.html          # Custom error page
+│   ├── 404.css           # Error page styles
+│   ├── global.css        # Shared Design System (Variables & Resets)
+│   └── js/404.js         # Vanilla JS for 404 page theme sync
+├── src/
+│   ├── main.jsx          # React DOM mounting
+│   ├── App.jsx           # Core Logic: Section state, Theme listeners, Swipe gestures
+│   ├── components/       # UI Sections (Home, About, Projects, etc.)
+│   ├── hooks/            # Custom Hooks (useTheme, useParticleCanvas, useNowPlaying)
+│   ├── utils/
+│   │   ├── audio.js      # Audio engine & Ambient music controller
+│   │   ├── theme.js      # Ink blot animation & Theme application
+│   │   └── lastfm.js     # API service for music data
+│   └── styles/           # Component-specific styling
 ```
 
 > **Note:** The browser favicon is generated at runtime via a JavaScript canvas animation — no static `favicon.ico` is required. `manifest.json` must stay at the root so browsers and PWA installers can find it automatically.

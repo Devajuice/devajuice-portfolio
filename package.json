@@ -1,24 +1,21 @@
 {
-  "name": "devajuice-portfolio",
+  "name": "devajith-portfolio",
+  "private": true,
   "version": "1.0.0",
-  "description": "A modern, responsive single-page portfolio website featuring a clean monochrome design, smooth animations, glass-effect navigation, light/dark theme switching, dynamic music integration, particle constellation background, and interactive easter eggs. Built with vanilla HTML, CSS, and JavaScript.",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Devajuice/devajuice-portfolio.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Devajuice/devajuice-portfolio/issues"
-  },
-  "homepage": "https://github.com/Devajuice/devajuice-portfolio#readme",
   "dependencies": {
-    "@resvg/resvg-js": "^2.6.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^5.0.0"
   }
 }
