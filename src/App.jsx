@@ -27,18 +27,6 @@ const EXIT_MS = 220,
   ENTER_MS = 350;
 
 function AppInner() {
-  <Helmet>
-    <meta property="og:title" content="Devajith — Portfolio" />
-    <meta
-      property="og:description"
-      content="Building cool things on the web."
-    />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content={ogImage} />
-  </Helmet>;
   const [activeSection, setActiveSection] = useState(() => {
     const hash = window.location.hash.slice(1);
     return SECTIONS.includes(hash) ? hash : "home";
@@ -84,10 +72,7 @@ function AppInner() {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleSystemThemeChange = (e) => {
-      // Check if the user has manually locked a theme in
       const manualPreference = localStorage.getItem("theme");
-
-      // ONLY auto-switch if there is no manual preference
       if (!manualPreference) {
         const newTheme = e.matches ? "dark" : "light";
         if (newTheme !== theme) {
@@ -100,7 +85,6 @@ function AppInner() {
     return () =>
       mediaQuery.removeEventListener("change", handleSystemThemeChange);
   }, [updateTheme, theme]);
-  // ------------------------------------
 
   // Splash screen
   useEffect(() => {
@@ -527,6 +511,20 @@ function AppInner() {
 
   return (
     <>
+      {/* OG / Twitter meta tags */}
+      <Helmet>
+        <meta property="og:title" content="Devajith — Portfolio" />
+        <meta
+          property="og:description"
+          content="Building cool things on the web."
+        />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={ogImage} />
+      </Helmet>
+
       {/* Splash */}
       <div
         ref={splashRef}

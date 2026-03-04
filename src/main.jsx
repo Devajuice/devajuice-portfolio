@@ -5,13 +5,9 @@ import "./styles/global.css";
 import { HelmetProvider } from "react-helmet-async";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <HelmetProvider>
-    <App />
-  </HelmetProvider>,
-);
-
-ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
   </React.StrictMode>,
 );

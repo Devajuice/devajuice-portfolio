@@ -1,24 +1,22 @@
 {
-  "functions": {
-    "api/og.jsx": {
-      "runtime": "@vercel/og@0.6.2"
-    }
-  },
   "routes": [
     { "src": "^/$", "dest": "/index.html" },
     { "src": "^/index\\.html$", "dest": "/index.html" },
     { "src": "^/404\\.html$", "dest": "/404.html" },
-    { "src": "^/api/og$", "dest": "/api/og.jsx" },
-    { "src": "^/api/og\\.png$", "dest": "/api/og.jsx" },
+    { "src": "^/api/og$", "dest": "/api/og.png.js" },
+    { "src": "^/api/og\\.png$", "dest": "/api/og.png.js" },
+
     { "src": "^/global\\.css$", "dest": "/global.css" },
     { "src": "^/404\\.css$", "dest": "/404.css" },
     { "src": "^/css/(.*)$", "dest": "/css/$1" },
     { "src": "^/js/(.*)$", "dest": "/js/$1" },
     { "src": "^/assets/(.*)$", "dest": "/assets/$1" },
+
     { "src": "^/manifest\\.json$", "dest": "/manifest.json" },
     { "src": "^/robots\\.txt$", "dest": "/robots.txt" },
     { "src": "^/sitemap\\.xml$", "dest": "/sitemap.xml" },
     { "src": "^/favicon\\.ico$", "dest": "/favicon.ico" },
+
     {
       "src": "^/(?!.*\\.).*$",
       "dest": "/404.html",
