@@ -19,12 +19,26 @@ import {
   isBgMusicPlaying,
 } from "./utils/audio";
 import { triggerInkBlot } from "./utils/theme";
+import { Helmet } from "react-helmet-async";
+import { useOgImage } from "./hooks/useOgImage";
 
 const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
 const EXIT_MS = 220,
   ENTER_MS = 350;
 
 function AppInner() {
+  <Helmet>
+    <meta property="og:title" content="Devajith — Portfolio" />
+    <meta
+      property="og:description"
+      content="Building cool things on the web."
+    />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+  </Helmet>;
   const [activeSection, setActiveSection] = useState(() => {
     const hash = window.location.hash.slice(1);
     return SECTIONS.includes(hash) ? hash : "home";
@@ -53,6 +67,11 @@ function AppInner() {
   const { theme, updateTheme } = useTheme();
   const musicData = useNowPlaying();
   const showToast = useToast();
+  const ogImage = useOgImage({
+    title: "Devajith — Portfolio",
+    description: "Building cool things on the web.",
+    author: "Devajith",
+  });
   const canvasRef = useRef(null);
   const spotlightRef = useRef(null);
   const splashRef = useRef(null);
