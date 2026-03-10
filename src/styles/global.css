@@ -1792,7 +1792,7 @@ li {
 }
 .timeline-dot {
     position: absolute;
-    left: -42px;
+    left: -50px;
     top: 20px;
     width: 36px;
     height: 36px;
@@ -2749,7 +2749,7 @@ button[type="button"].btn-primary {
         padding-left: 44px;
     }
     .timeline-dot {
-        left: -36px;
+        left: -39px;
         width: 30px;
         height: 30px;
     }
@@ -2823,7 +2823,7 @@ button[type="button"].btn-primary {
         left: 14px;
     }
     .timeline-dot {
-        left: -32px;
+        left: -35px;
         width: 26px;
         height: 26px;
     }
