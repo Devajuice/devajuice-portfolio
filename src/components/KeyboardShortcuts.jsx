@@ -1,48 +1,143 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
-const SECTIONS = ['home','about','projects','skills','hobbies','contact'];
+const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
+
+// Same focus trap used in EasterEgg — keeps keyboard/screen-reader focus inside the modal while open
+function useFocusTrap(ref, active) {
+  useEffect(() => {
+    if (!active || !ref.current) return;
+    const panel = ref.current;
+    const focusable = panel.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    first?.focus();
+    const trap = (e) => {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    panel.addEventListener("keydown", trap);
+    return () => panel.removeEventListener("keydown", trap);
+  }, [active, ref]);
+}
 
 export default function KeyboardShortcuts({ open, onClose, activeSection }) {
-  const closeRef = useRef(null);
+  const panelRef = useRef(null);
+  useFocusTrap(panelRef, open);
 
+  // Escape to close
   useEffect(() => {
-    if (open) closeRef.current?.focus();
-  }, [open]);
+    const handler = (e) => {
+      if (e.key === "Escape" && open) onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open, onClose]);
 
   return (
-    <div id="kbdOverlay" className={`kbd-overlay${open?' open':''}`}
-      role="dialog" aria-modal="true" aria-labelledby="kbdOverlayTitle"
-      onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kbd-panel">
+    <div
+      id="kbdOverlay"
+      className={`kbd-overlay${open ? " open" : ""}`}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="kbdOverlayTitle"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="kbd-panel" ref={panelRef}>
         <div className="kbd-header">
           <div className="kbd-title" id="kbdOverlayTitle">
-            <i className="fas fa-keyboard" aria-hidden="true" /><span>Keyboard Shortcuts</span>
+            <i className="fas fa-keyboard" aria-hidden="true" />
+            <span>Keyboard Shortcuts</span>
           </div>
-          <button ref={closeRef} className="kbd-close" onClick={onClose} aria-label="Close shortcuts">
+          <button
+            className="kbd-close"
+            onClick={onClose}
+            aria-label="Close shortcuts"
+          >
             <i className="fas fa-xmark" aria-hidden="true" />
           </button>
         </div>
         <p className="kbd-section-label">Navigation</p>
         <ul className="kbd-list">
           {SECTIONS.map((s, i) => {
-            const icons = { home:'fa-house', about:'fa-user-circle', projects:'fa-folder-open', skills:'fa-chart-line', hobbies:'fa-heart', contact:'fa-envelope' };
+            const icons = {
+              home: "fa-house",
+              about: "fa-user-circle",
+              projects: "fa-folder-open",
+              skills: "fa-chart-line",
+              hobbies: "fa-heart",
+              contact: "fa-envelope",
+            };
             return (
-              <li key={s} className={`kbd-item${activeSection===s?' is-active':''}`} data-section={s}>
-                <span className="kbd-desc"><i className={`fas ${icons[s]}`} aria-hidden="true" />{s.charAt(0).toUpperCase()+s.slice(1)}</span>
-                <span className="kbd-keys"><kbd id={`kk-${i+1}`}>{i+1}</kbd></span>
+              <li
+                key={s}
+                className={`kbd-item${activeSection === s ? " is-active" : ""}`}
+                data-section={s}
+              >
+                <span className="kbd-desc">
+                  <i className={`fas ${icons[s]}`} aria-hidden="true" />
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </span>
+                <span className="kbd-keys">
+                  <kbd id={`kk-${i + 1}`}>{i + 1}</kbd>
+                </span>
               </li>
             );
           })}
         </ul>
         <p className="kbd-section-label">Actions</p>
         <ul className="kbd-list">
-          <li className="kbd-item"><span className="kbd-desc"><i className="fas fa-moon" aria-hidden="true" />Toggle theme</span><span className="kbd-keys"><kbd id="kk-t">T</kbd></span></li>
-          <li className="kbd-item"><span className="kbd-desc"><i className="fas fa-arrow-up" aria-hidden="true" />Back to top</span><span className="kbd-keys"><kbd id="kk-b">B</kbd></span></li>
-          <li className="kbd-item"><span className="kbd-desc"><i className="fas fa-keyboard" aria-hidden="true" />Toggle shortcuts</span><span className="kbd-keys"><kbd id="kk-q">?</kbd></span></li>
-          <li className="kbd-item"><span className="kbd-desc"><i className="fas fa-xmark" aria-hidden="true" />Close / dismiss</span><span className="kbd-keys"><kbd id="kk-esc">Esc</kbd></span></li>
+          <li className="kbd-item">
+            <span className="kbd-desc">
+              <i className="fas fa-moon" aria-hidden="true" />
+              Toggle theme
+            </span>
+            <span className="kbd-keys">
+              <kbd id="kk-t">T</kbd>
+            </span>
+          </li>
+          <li className="kbd-item">
+            <span className="kbd-desc">
+              <i className="fas fa-arrow-up" aria-hidden="true" />
+              Back to top
+            </span>
+            <span className="kbd-keys">
+              <kbd id="kk-b">B</kbd>
+            </span>
+          </li>
+          <li className="kbd-item">
+            <span className="kbd-desc">
+              <i className="fas fa-keyboard" aria-hidden="true" />
+              Toggle shortcuts
+            </span>
+            <span className="kbd-keys">
+              <kbd id="kk-q">?</kbd>
+            </span>
+          </li>
+          <li className="kbd-item">
+            <span className="kbd-desc">
+              <i className="fas fa-xmark" aria-hidden="true" />
+              Close / dismiss
+            </span>
+            <span className="kbd-keys">
+              <kbd id="kk-esc">Esc</kbd>
+            </span>
+          </li>
         </ul>
         <p className="kbd-footer">
-          <i className="fas fa-circle-info" aria-hidden="true" />Shortcuts are disabled while typing in a form field.
+          <i className="fas fa-circle-info" aria-hidden="true" />
+          Shortcuts are disabled while typing in a form field.
         </p>
       </div>
     </div>

@@ -39,11 +39,10 @@ export default function Navigation({
     if (!btn || !navList) return;
     const listRect = navList.getBoundingClientRect();
     const btnRect = btn.getBoundingClientRect();
+    // Position as a slim underline below the active button
     setIndicatorStyle({
-      width: btnRect.width,
-      height: btnRect.height,
-      left: btnRect.left - listRect.left,
-      top: btnRect.top - listRect.top,
+      width: btnRect.width - 16, // slightly inset for elegance
+      left: btnRect.left - listRect.left + 8,
       opacity: 1,
     });
   }, [activeSection]);

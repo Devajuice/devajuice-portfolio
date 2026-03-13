@@ -42,14 +42,16 @@ function SkillBar({ icon, name, pct, animate }) {
     setWidth(pct);
     const duration = 1100,
       start = performance.now();
+    let rafId;
     const update = (now) => {
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setCurrent(Math.round(eased * pct));
-      if (progress < 1) requestAnimationFrame(update);
+      if (progress < 1) rafId = requestAnimationFrame(update);
       else setCurrent(pct);
     };
-    requestAnimationFrame(update);
+    rafId = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(rafId);
   }, [animate, pct]);
 
   return (

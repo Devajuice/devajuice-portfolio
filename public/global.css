@@ -84,6 +84,9 @@ i {
     --toast-shadow: rgba(0, 0, 0, 0.12);
     --btt-bg: #2563eb;
     --btt-color: #ffffff;
+    /* Card glow for light mode */
+    --card-glow-color: rgba(37, 99, 235, 0.1);
+    --card-glow-border: rgba(37, 99, 235, 0.35);
 }
 [data-theme="dark"] {
     --bg-primary: #0a0a0a;
@@ -122,6 +125,9 @@ i {
     --toast-shadow: rgba(0, 0, 0, 0.4);
     --btt-bg: #3b82f6;
     --btt-color: #ffffff;
+    /* Enhanced card glow for dark mode */
+    --card-glow-color: rgba(59, 130, 246, 0.22);
+    --card-glow-border: rgba(59, 130, 246, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -436,13 +442,15 @@ i {
     position: fixed;
     inset: 0;
     z-index: 9998;
+    /* Position driven by --sx/--sy CSS vars updated via JS — no gradient string rebuild per frame */
     background: radial-gradient(
-        600px circle at -9999px -9999px,
+        600px circle at var(--sx, -9999px) var(--sy, -9999px),
         var(--spotlight-color),
         transparent 80%
     );
     transition: opacity 0.4s ease;
     opacity: 0;
+    will-change: background;
 }
 .cursor-spotlight.visible {
     opacity: 1;
@@ -790,6 +798,32 @@ i {
 }
 
 /* ═══════════════════════════════════════════════════
+   SCROLL PROGRESS BAR
+═══════════════════════════════════════════════════ */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2.5px;
+    z-index: 9999;
+    background: linear-gradient(
+        90deg,
+        var(--accent) 0%,
+        var(--accent-hover) 40%,
+        #818cf8 70%,
+        #a78bfa 100%
+    );
+    background-size: 200% 100%;
+    animation: navUnderlineShimmer 3s ease infinite;
+    transform-origin: left center;
+    transform: scaleX(var(--scroll-progress, 0));
+    transition: transform 0.08s linear;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════
    BODY
 ═══════════════════════════════════════════════════ */
 body {
@@ -902,22 +936,48 @@ body {
     align-items: center;
     position: relative;
 }
+
+/* ── Animated travelling underline ── */
 .nav-indicator {
     position: absolute;
     z-index: 0;
-    border-radius: 50px;
-    background: var(--glass-active-bg);
-    border: 1px solid var(--glass-active-border);
-    box-shadow: 0 2px 10px var(--shadow);
+    bottom: 2px;
+    height: 2px;
+    border-radius: 99px;
+    /* Rich accent gradient that shifts */
+    background: linear-gradient(
+        90deg,
+        var(--accent),
+        var(--accent-hover),
+        var(--accent)
+    );
+    background-size: 200% 100%;
+    animation: navUnderlineShimmer 2.5s ease infinite;
     pointer-events: none;
     opacity: 0;
+    /* Smooth slide between items */
     transition:
-        left 0.3s cubic-bezier(0.34, 1.3, 0.64, 1),
-        top 0.3s cubic-bezier(0.34, 1.3, 0.64, 1),
-        width 0.3s cubic-bezier(0.34, 1.3, 0.64, 1),
-        height 0.3s cubic-bezier(0.34, 1.3, 0.64, 1),
-        opacity 0.2s ease;
+        left 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
+        width 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
+        opacity 0.25s ease;
+    /* Glow */
+    box-shadow:
+        0 0 8px rgba(59, 130, 246, 0.55),
+        0 0 2px rgba(59, 130, 246, 0.9);
+    top: auto;
 }
+@keyframes navUnderlineShimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 .nav-btn {
     position: relative;
     z-index: 1;
@@ -944,18 +1004,12 @@ body {
     color: var(--text-primary);
     font-weight: 600;
 }
+
+/* Remove the old dot — the underline replaces it */
 .nav-btn.active::after {
-    content: "";
-    position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: dotPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    display: none;
 }
+
 .nav-btn:active {
     transform: scale(0.95);
 }
@@ -1167,27 +1221,52 @@ h2:focus {
 .page-section {
     display: none;
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateX(32px);
     min-height: calc(100vh - 220px);
 }
 .page-section.active {
     display: block;
 }
+
+/* ── Entering from the right (going forward) — default ── */
 .page-section.entering {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
     transition:
-        opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* ── Pre-position: off-screen left before entering-from-left fires ── */
+.page-section.from-left-init {
+    display: block;
+    opacity: 0;
+    transform: translateX(-32px);
+}
+
+/* ── Entering from the left (going backward) ── */
+.page-section.entering.from-left {
+    opacity: 1;
+    transform: translateX(0);
+    transition:
+        opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Exiting forward: slide out to left ── */
 .page-section.exiting {
     display: block;
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(-24px);
     pointer-events: none;
     transition:
-        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Exiting backward: slide out to right ── */
+.page-section.exiting.to-right {
+    transform: translateX(24px);
 }
 
 /* Staggered section entry animations */
@@ -1281,17 +1360,68 @@ h2:focus {
 ═══════════════════════════════════════════════════ */
 .section-title {
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text-primary);
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: none;
     display: flex;
     align-items: center;
     gap: 15px;
+    position: relative;
+    letter-spacing: -0.02em;
 }
-.section-title i {
-    font-size: 2rem;
+
+/* Gradient text on the label span */
+.section-title span {
+    background: var(--hero-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+}
+
+/* Gradient accent icon */
+.section-title > i {
+    font-size: 1.9rem;
+    background: var(--hero-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+    opacity: 0.85;
+}
+
+/* Animated underline replacing the solid border-bottom */
+.section-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(
+        90deg,
+        var(--accent) 0%,
+        var(--accent-hover) 35%,
+        transparent 70%
+    );
+    background-size: 200% 100%;
+    border-radius: 2px;
+    animation: sectionUnderlineShift 4s ease infinite;
+}
+@keyframes sectionUnderlineShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 .subsection-title {
     font-size: 1.8rem;
@@ -1571,6 +1701,21 @@ li {
     position: relative;
     overflow: hidden;
 }
+.now-playing-pill--skeleton {
+    opacity: 0.5;
+    pointer-events: none;
+    animation: pillPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pillPulse {
+    0%,
+    100% {
+        opacity: 0.35;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
 .now-playing-pill::before {
     content: "";
     position: absolute;
@@ -1634,20 +1779,50 @@ li {
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 24px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.32s ease;
     box-shadow: 0 1px 3px var(--shadow);
+    position: relative;
+    /* Promote to compositor layer only during hover — avoids constant GPU layer for every card */
+    will-change: auto;
 }
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px var(--hover-shadow);
-    border-color: var(--text-muted);
+    will-change: transform;
+    transform: translateY(-6px);
+    border-color: var(--card-glow-border);
+    box-shadow:
+        0 0 0 1px var(--card-glow-color),
+        0 8px 24px var(--card-glow-color),
+        0 20px 40px var(--hover-shadow);
 }
+
+/* Subtle inner shimmer line on hover — top edge */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.06) 0%,
+        transparent 60%
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.32s ease;
+}
+.card:hover::before {
+    opacity: 1;
+}
+
 .card-icon {
     width: 50px;
     height: 50px;
-    border-radius: 10px;
+    border-radius: 12px;
     background: linear-gradient(
         135deg,
         var(--bg-secondary) 0%,
@@ -1658,14 +1833,24 @@ li {
     align-items: center;
     justify-content: center;
     margin-bottom: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.32s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 .card:not(.project-card):hover .card-icon {
-    transform: rotate(5deg) scale(1.1);
+    transform: rotate(8deg) scale(1.12);
+    background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.15) 0%,
+        rgba(129, 140, 248, 0.1) 100%
+    );
+    border-color: rgba(59, 130, 246, 0.3);
 }
 .card-icon i {
     font-size: 1.5rem;
     color: var(--text-primary);
+    transition: color 0.3s;
+}
+.card:not(.project-card):hover .card-icon i {
+    color: var(--accent);
 }
 .card-content h3 {
     margin-top: 0.5rem;
@@ -1683,7 +1868,11 @@ li {
     position: relative;
 }
 .project-card:hover {
-    border-color: var(--accent);
+    border-color: var(--card-glow-border);
+    box-shadow:
+        0 0 0 1px var(--card-glow-color),
+        0 8px 28px var(--card-glow-color),
+        0 20px 40px var(--hover-shadow);
 }
 .project-card:hover .card-icon {
     background: linear-gradient(
@@ -1691,6 +1880,7 @@ li {
         var(--accent) 0%,
         var(--accent-hover) 100%
     );
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
 }
 .project-card:hover .card-icon i {
     color: white;

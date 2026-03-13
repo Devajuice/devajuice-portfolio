@@ -61,8 +61,9 @@ export default function EasterEgg({ open, onClose }) {
   useFocusTrap(panelRef, open);
 
   useEffect(() => {
+    if (!open) return; // only register when visible — avoids dangling no-op handler
     const handler = (e) => {
-      if (e.key === "Escape" && open) onClose();
+      if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTypewriter, useTimezone } from "../hooks";
-import { useToast } from "./Toast";
+import { useToast } from "./useToast";
 import { playSound } from "../utils/audio";
 
 // Fix #14: show a subtle skeleton while musicData is still loading (null)

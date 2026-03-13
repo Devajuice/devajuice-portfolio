@@ -9,7 +9,8 @@ import ContactSection from "./components/ContactSection";
 import EasterEgg, { triggerConfetti } from "./components/EasterEgg";
 import KeyboardShortcuts from "./components/KeyboardShortcuts";
 import Footer from "./components/Footer";
-import { ToastProvider, useToast } from "./components/Toast";
+import { ToastProvider } from "./components/Toast";
+import { useToast } from "./components/useToast";
 import { useTheme, useNowPlaying, useParticleCanvas } from "./hooks";
 import {
   playSound,
@@ -36,10 +37,6 @@ function AppInner() {
   const initialSection = getInitialSection(); // Fix #1: single source of truth
 
   const [activeSection, setActiveSection] = useState(initialSection);
-  // Fix #9: activeSectionRef was written but never read — replaced with a
-  // plain currentSection local inside navigate via closure over activeSection.
-  const [prevSection, setPrevSection] = useState(null);
-  const [transitioning, setTransitioning] = useState(false);
   const [sectionState, setSectionState] = useState(() =>
     Object.fromEntries(
       SECTIONS.map((s) => [
@@ -78,25 +75,37 @@ function AppInner() {
     const current = activeSectionRef.current; // Fix #9: now actually used here
     if (sectionId === current) return;
 
+    // Determine direction: going forward (right→left slide) or backward (left→right slide)
+    const goingForward =
+      SECTIONS.indexOf(sectionId) > SECTIONS.indexOf(current);
+
     activeSectionRef.current = sectionId;
     playSound("nav");
     window.location.hash = sectionId;
     window.scrollTo({ top: 0, behavior: "instant" });
     isTransitioningRef.current = true;
 
-    setSectionState((prev) => ({ ...prev, [current]: "exiting" }));
+    // Exit: forward → slide out left; backward → slide out right
+    setSectionState((prev) => ({
+      ...prev,
+      [current]: goingForward ? "exiting" : "exiting to-right",
+    }));
 
     setTimeout(() => {
       setSectionState(() => ({
         ...Object.fromEntries(SECTIONS.map((s) => [s, "hidden"])),
-        [sectionId]: "active",
+        // Pre-position incoming section off-screen in the correct direction
+        [sectionId]: goingForward ? "active" : "active from-left-init",
       }));
       setActiveSection(sectionId);
 
       requestAnimationFrame(() => {
         setSectionState((prev) => ({
           ...prev,
-          [sectionId]: "active entering",
+          // Enter: forward → from right (default); backward → from left
+          [sectionId]: goingForward
+            ? "active entering"
+            : "active entering from-left",
         }));
       });
 
@@ -141,7 +150,8 @@ function AppInner() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Cursor spotlight
+  // Cursor spotlight — uses CSS custom properties + transform instead of
+  // rebuilding a radial-gradient string on every mousemove frame
   useEffect(() => {
     const spotlight = spotlightRef.current;
     if (
@@ -149,17 +159,19 @@ function AppInner() {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     )
       return;
-    let mx = -9999,
-      my = -9999,
-      raf = null,
+    let raf = null,
       visible = false;
+    let pendingX = -9999,
+      pendingY = -9999;
+
     const update = () => {
-      spotlight.style.background = `radial-gradient(600px circle at ${mx}px ${my}px,var(--spotlight-color),transparent 80%)`;
+      spotlight.style.setProperty("--sx", `${pendingX}px`);
+      spotlight.style.setProperty("--sy", `${pendingY}px`);
       raf = null;
     };
     const onMove = (e) => {
-      mx = e.clientX;
-      my = e.clientY;
+      pendingX = e.clientX;
+      pendingY = e.clientY;
       if (!visible) {
         spotlight.classList.add("visible");
         visible = true;
@@ -175,6 +187,7 @@ function AppInner() {
     return () => {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
 
@@ -204,9 +217,20 @@ function AppInner() {
     };
   }, [activeSection]);
 
-  // Scroll -> back to top button
+  // Scroll → back-to-top button + progress bar (single listener for perf)
   useEffect(() => {
-    const onScroll = () => setShowBackToTop(window.scrollY > 0);
+    const progressEl = document.getElementById("scrollProgress");
+    const onScroll = () => {
+      const scrollY = window.scrollY;
+      setShowBackToTop(scrollY > 0);
+      // Update CSS custom property for the progress bar transform
+      if (progressEl) {
+        const maxScroll =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const pct = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0;
+        progressEl.style.setProperty("--scroll-progress", pct);
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -241,7 +265,7 @@ function AppInner() {
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [soundEnabled]);
 
-  // Animated favicon
+  // Animated favicon — throttled to ~10 fps; paused when tab is hidden
   useEffect(() => {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 32;
@@ -253,8 +277,16 @@ function AppInner() {
       document.head.appendChild(link);
     }
     let frame = 0,
-      rafId;
-    const draw = () => {
+      rafId,
+      lastDraw = 0;
+    const INTERVAL = 100; // ~10 fps — favicon doesn't need 60 fps
+
+    const draw = (now) => {
+      rafId = requestAnimationFrame(draw);
+      if (document.hidden) return; // skip entirely when tab is backgrounded
+      if (now - lastDraw < INTERVAL) return; // throttle
+      lastDraw = now;
+
       const t = frame / 120,
         isDark = document.documentElement.getAttribute("data-theme") === "dark";
       ctx.clearRect(0, 0, 32, 32);
@@ -283,9 +315,8 @@ function AppInner() {
       ctx.fill();
       link.href = canvas.toDataURL("image/png");
       frame = (frame + 1) % 120;
-      rafId = requestAnimationFrame(draw);
     };
-    draw();
+    rafId = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafId);
   }, [theme]);
 
@@ -320,7 +351,7 @@ function AppInner() {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  // Swipe gestures
+  // Swipe gestures — reads activeSectionRef so listeners are registered ONCE
   useEffect(() => {
     const MIN_X = 55,
       MAX_Y = 80,
@@ -336,7 +367,8 @@ function AppInner() {
     document.body.appendChild(hint);
     const ha = hint.querySelector(".swipe-hint-arrow"),
       hl = hint.querySelector(".swipe-hint-label");
-    const idx = () => SECTIONS.indexOf(activeSection);
+    // Use the ref so this closure never goes stale — no re-registration needed
+    const idx = () => SECTIONS.indexOf(activeSectionRef.current);
     const showHint = (d, n) => {
       ha.textContent = d === "left" ? "→" : "←";
       hl.textContent = n[0].toUpperCase() + n.slice(1);
@@ -413,7 +445,8 @@ function AppInner() {
       document.removeEventListener("touchend", onEnd);
       hint.remove();
     };
-  }, [activeSection, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // stable: reads activeSectionRef + navigate (useCallback, stable ref)
 
   // Fix #2: keyboard shortcuts — navigate is now defined above this effect
   useEffect(() => {
@@ -516,7 +549,9 @@ function AppInner() {
 
   const getStateClasses = (section) => {
     const s = sectionState[section];
-    if (s === "hidden") return "page-section";
+    if (!s || s === "hidden") return "page-section";
+    // s can be: "active", "active entering", "active entering from-left",
+    //           "active from-left-init", "exiting", "exiting to-right"
     return `page-section ${s}`;
   };
 
@@ -553,6 +588,14 @@ function AppInner() {
           </div>
         </div>
       </div>
+
+      {/* Scroll Progress Bar */}
+      <div
+        id="scrollProgress"
+        className="scroll-progress"
+        aria-hidden="true"
+        style={{ "--scroll-progress": 0 }}
+      />
 
       {/* Canvas + Spotlight */}
       <canvas ref={canvasRef} id="particleCanvas" aria-hidden="true" />
