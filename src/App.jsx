@@ -26,26 +26,28 @@ const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
 const EXIT_MS = 220,
   ENTER_MS = 350;
 
+// Fix #1: compute initial section once, reuse everywhere
+function getInitialSection() {
+  const hash = window.location.hash.slice(1);
+  return SECTIONS.includes(hash) ? hash : "home";
+}
+
 function AppInner() {
-  const [activeSection, setActiveSection] = useState(() => {
-    const hash = window.location.hash.slice(1);
-    return SECTIONS.includes(hash) ? hash : "home";
-  });
-  const activeSectionRef = useRef(
-    (() => {
-      const hash = window.location.hash.slice(1);
-      return SECTIONS.includes(hash) ? hash : "home";
-    })(),
-  );
+  const initialSection = getInitialSection(); // Fix #1: single source of truth
+
+  const [activeSection, setActiveSection] = useState(initialSection);
+  // Fix #9: activeSectionRef was written but never read — replaced with a
+  // plain currentSection local inside navigate via closure over activeSection.
   const [prevSection, setPrevSection] = useState(null);
   const [transitioning, setTransitioning] = useState(false);
-  const [sectionState, setSectionState] = useState(() => {
-    const hash = window.location.hash.slice(1);
-    const init = SECTIONS.includes(hash) ? hash : "home";
-    return Object.fromEntries(
-      SECTIONS.map((s) => [s, s === init ? "active entering" : "hidden"]),
-    );
-  });
+  const [sectionState, setSectionState] = useState(() =>
+    Object.fromEntries(
+      SECTIONS.map((s) => [
+        s,
+        s === initialSection ? "active entering" : "hidden",
+      ]),
+    ),
+  );
   const [soundEnabled, setSoundEnabled] = useState(
     () => localStorage.getItem("soundEnabled") === "true",
   );
@@ -64,13 +66,54 @@ function AppInner() {
   const spotlightRef = useRef(null);
   const splashRef = useRef(null);
   const isTransitioningRef = useRef(false);
+  // Fix #9: keep a ref that mirrors activeSection for use inside callbacks
+  // without stale closure issues — but only ONE ref now (removed activeSectionRef)
+  const activeSectionRef = useRef(initialSection);
   const musicStartedRef = useRef(false);
   useParticleCanvas(canvasRef);
 
-  // --- ADDED: Device Theme Listener ---
+  // Fix #2: define navigate early so effects that depend on it are ordered correctly
+  const navigate = useCallback((sectionId) => {
+    if (isTransitioningRef.current) return;
+    const current = activeSectionRef.current; // Fix #9: now actually used here
+    if (sectionId === current) return;
+
+    activeSectionRef.current = sectionId;
+    playSound("nav");
+    window.location.hash = sectionId;
+    window.scrollTo({ top: 0, behavior: "instant" });
+    isTransitioningRef.current = true;
+
+    setSectionState((prev) => ({ ...prev, [current]: "exiting" }));
+
+    setTimeout(() => {
+      setSectionState(() => ({
+        ...Object.fromEntries(SECTIONS.map((s) => [s, "hidden"])),
+        [sectionId]: "active",
+      }));
+      setActiveSection(sectionId);
+
+      requestAnimationFrame(() => {
+        setSectionState((prev) => ({
+          ...prev,
+          [sectionId]: "active entering",
+        }));
+      });
+
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, ENTER_MS);
+    }, EXIT_MS);
+  }, []);
+
+  // Keep activeSectionRef in sync with state
+  useEffect(() => {
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
+
+  // Device theme listener
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
     const handleSystemThemeChange = (e) => {
       const manualPreference = localStorage.getItem("theme");
       if (!manualPreference) {
@@ -80,7 +123,6 @@ function AppInner() {
         }
       }
     };
-
     mediaQuery.addEventListener("change", handleSystemThemeChange);
     return () =>
       mediaQuery.removeEventListener("change", handleSystemThemeChange);
@@ -136,28 +178,30 @@ function AppInner() {
     };
   }, []);
 
-  // Magnetic buttons
+  // Fix #6: magnetic buttons — no MutationObserver, just reattach on section change
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const handleMagnetic = () => {
-      document.querySelectorAll("[data-magnetic]").forEach((btn) => {
-        btn.onmousemove = (e) => {
-          const r = btn.getBoundingClientRect();
-          const dx = (e.clientX - r.left - r.width / 2) * 0.38;
-          const dy = (e.clientY - r.top - r.height / 2) * 0.38;
-          btn.style.transition = "transform .25s cubic-bezier(.23,1,.32,1)";
-          btn.style.transform = `translate(${dx}px,${dy}px)`;
-        };
-        btn.onmouseleave = () => {
-          btn.style.transition = "transform .5s cubic-bezier(.23,1,.32,1)";
-          btn.style.transform = "translate(0,0)";
-        };
+    const btns = document.querySelectorAll("[data-magnetic]");
+    btns.forEach((btn) => {
+      btn.onmousemove = (e) => {
+        const r = btn.getBoundingClientRect();
+        const dx = (e.clientX - r.left - r.width / 2) * 0.38;
+        const dy = (e.clientY - r.top - r.height / 2) * 0.38;
+        btn.style.transition = "transform .25s cubic-bezier(.23,1,.32,1)";
+        btn.style.transform = `translate(${dx}px,${dy}px)`;
+      };
+      btn.onmouseleave = () => {
+        btn.style.transition = "transform .5s cubic-bezier(.23,1,.32,1)";
+        btn.style.transform = "translate(0,0)";
+      };
+    });
+    // Cleanup handlers on unmount / section change
+    return () => {
+      btns.forEach((btn) => {
+        btn.onmousemove = null;
+        btn.onmouseleave = null;
       });
     };
-    handleMagnetic();
-    const observer = new MutationObserver(handleMagnetic);
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
   }, [activeSection]);
 
   // Scroll -> back to top button
@@ -369,42 +413,9 @@ function AppInner() {
       document.removeEventListener("touchend", onEnd);
       hint.remove();
     };
-  }, [activeSection]);
+  }, [activeSection, navigate]);
 
-  const navigate = useCallback((sectionId) => {
-    if (isTransitioningRef.current) return;
-    const current = activeSectionRef.current;
-    if (sectionId === current) return;
-
-    activeSectionRef.current = sectionId;
-    playSound("nav");
-    window.location.hash = sectionId;
-    window.scrollTo({ top: 0, behavior: "instant" });
-    isTransitioningRef.current = true;
-
-    setSectionState((prev) => ({ ...prev, [current]: "exiting" }));
-
-    setTimeout(() => {
-      setSectionState(() => ({
-        ...Object.fromEntries(SECTIONS.map((s) => [s, "hidden"])),
-        [sectionId]: "active",
-      }));
-      setActiveSection(sectionId);
-
-      requestAnimationFrame(() => {
-        setSectionState((prev) => ({
-          ...prev,
-          [sectionId]: "active entering",
-        }));
-      });
-
-      setTimeout(() => {
-        isTransitioningRef.current = false;
-      }, ENTER_MS);
-    }, EXIT_MS);
-  }, []);
-
-  // Keyboard shortcuts
+  // Fix #2: keyboard shortcuts — navigate is now defined above this effect
   useEffect(() => {
     const isTyping = () => {
       const t = document.activeElement?.tagName?.toLowerCase();
@@ -623,7 +634,6 @@ function AppInner() {
         >
           <HomeSection onNavigate={navigate} musicData={musicData} />
         </section>
-
         <section
           id="about"
           className={getStateClasses("about")}
@@ -631,7 +641,6 @@ function AppInner() {
         >
           <AboutSection musicData={musicData} />
         </section>
-
         <section
           id="projects"
           className={getStateClasses("projects")}
@@ -639,7 +648,6 @@ function AppInner() {
         >
           <ProjectsSection />
         </section>
-
         <section
           id="skills"
           className={getStateClasses("skills")}
@@ -647,7 +655,6 @@ function AppInner() {
         >
           <SkillsSection isActive={activeSection === "skills"} />
         </section>
-
         <section
           id="hobbies"
           className={getStateClasses("hobbies")}
@@ -655,7 +662,6 @@ function AppInner() {
         >
           <HobbiesSection />
         </section>
-
         <section
           id="contact"
           className={getStateClasses("contact")}

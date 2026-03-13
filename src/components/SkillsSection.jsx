@@ -1,17 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
 const SKILL_GROUPS = [
   {
-    icon: 'fab fa-python', title: 'Programming Languages',
-    skills: [['fab fa-python','Python',85],['fab fa-js','JavaScript',75],['fab fa-html5','HTML/CSS',90],['fas fa-database','SQL',70]],
+    icon: "fab fa-python",
+    title: "Programming Languages",
+    skills: [
+      ["fab fa-python", "Python", 85],
+      ["fab fa-js", "JavaScript", 75],
+      ["fab fa-html5", "HTML/CSS", 90],
+      ["fas fa-database", "SQL", 70],
+    ],
   },
   {
-    icon: 'fas fa-tools', title: 'Frameworks & Tools',
-    skills: [['fab fa-react','React',70],['fab fa-node-js','Node.js',60],['fab fa-git-alt','Git/GitHub',80],['fas fa-terminal','VS Code',95]],
+    icon: "fas fa-tools",
+    title: "Frameworks & Tools",
+    skills: [
+      ["fab fa-react", "React", 70],
+      ["fab fa-node-js", "Node.js", 60],
+      ["fab fa-git-alt", "Git/GitHub", 80],
+      ["fas fa-terminal", "VS Code", 95],
+    ],
   },
   {
-    icon: 'fas fa-chart-bar', title: 'Data Science',
-    skills: [['fas fa-table','Pandas',80],['fas fa-square-root-alt','NumPy',75],['fas fa-chart-area','Matplotlib',70],['fas fa-brain','Scikit-learn',65]],
+    icon: "fas fa-chart-bar",
+    title: "Data Science",
+    skills: [
+      ["fas fa-table", "Pandas", 80],
+      ["fas fa-square-root-alt", "NumPy", 75],
+      ["fas fa-chart-area", "Matplotlib", 70],
+      ["fas fa-brain", "Scikit-learn", 65],
+    ],
   },
 ];
 
@@ -22,7 +40,8 @@ function SkillBar({ icon, name, pct, animate }) {
   useEffect(() => {
     if (!animate) return;
     setWidth(pct);
-    const duration = 1100, start = performance.now();
+    const duration = 1100,
+      start = performance.now();
     const update = (now) => {
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
@@ -36,11 +55,22 @@ function SkillBar({ icon, name, pct, animate }) {
   return (
     <li className="skill-bar-item">
       <div className="skill-bar-header">
-        <span className="skill-bar-name"><i className={icon} aria-hidden="true" />{name}</span>
-        <span className={`skill-bar-pct${animate && current===pct?' counting-done':''}`}>{animate ? current : 0}%</span>
+        <span className="skill-bar-name">
+          <i className={icon} aria-hidden="true" />
+          {name}
+        </span>
+        <span
+          className={`skill-bar-pct${animate && current === pct ? " counting-done" : ""}`}
+        >
+          {animate ? current : 0}%
+        </span>
       </div>
       <div className="skill-bar-track">
-        <div className="skill-bar-fill" style={{ width: animate ? width + '%' : '0%' }} data-pct={pct} />
+        <div
+          className="skill-bar-fill"
+          style={{ width: animate ? width + "%" : "0%" }}
+          data-pct={pct}
+        />
       </div>
     </li>
   );
@@ -59,17 +89,27 @@ export default function SkillsSection({ isActive }) {
   return (
     <>
       <h2 id="skills-heading" className="section-title">
-        <i className="fas fa-chart-line" aria-hidden="true" /><span>Skills &amp; Technologies</span>
+        <i className="fas fa-chart-line" aria-hidden="true" />
+        <span>Skills &amp; Technologies</span>
       </h2>
       <div className="skills-grid">
-        {SKILL_GROUPS.map(group => (
+        {SKILL_GROUPS.map((group) => (
           <div className="card" key={group.title}>
-            <div className="card-icon"><i className={group.icon} aria-hidden="true" /></div>
+            <div className="card-icon">
+              <i className={group.icon} aria-hidden="true" />
+            </div>
             <div className="card-content">
               <h3>{group.title}</h3>
               <ul className="skill-bars-list">
-                {group.skills.map(([icon, name, pct], i) => (
-                  <SkillBar key={name} icon={icon} name={name} pct={pct} animate={animated} />
+                {/* Fix #12: removed unused `i` from destructuring */}
+                {group.skills.map(([icon, name, pct]) => (
+                  <SkillBar
+                    key={name}
+                    icon={icon}
+                    name={name}
+                    pct={pct}
+                    animate={animated}
+                  />
                 ))}
               </ul>
             </div>

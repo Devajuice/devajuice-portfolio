@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { triggerInkBlot } from "../utils/theme";
+// Fix #10: removed duplicate import of saveThemePreference — consolidated here
+import { triggerInkBlot, saveThemePreference } from "../utils/theme";
 import { playSound } from "../utils/audio";
-import { saveThemePreference } from "../utils/theme";
 
 const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
 const SECTION_LABELS = {
@@ -50,13 +50,11 @@ export default function Navigation({
 
   const handleThemeToggle = () => {
     if (themeRef.current?.classList.contains("spinning")) return;
-
     const nextTheme = theme === "light" ? "dark" : "light";
     themeRef.current?.classList.add("spinning");
-
     triggerInkBlot(nextTheme, (t) => {
       onThemeChange(t);
-      saveThemePreference(t); // <--- Save the manual choice here
+      saveThemePreference(t);
       playSound("click");
     });
   };

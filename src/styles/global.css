@@ -1571,6 +1571,21 @@ li {
     position: relative;
     overflow: hidden;
 }
+.now-playing-pill--skeleton {
+    opacity: 0.5;
+    pointer-events: none;
+    animation: pillPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pillPulse {
+    0%,
+    100% {
+        opacity: 0.35;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
 .now-playing-pill::before {
     content: "";
     position: absolute;
