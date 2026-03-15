@@ -24,8 +24,8 @@ import { Helmet } from "react-helmet-async";
 import { useOgImage } from "./hooks/useOgImage";
 
 const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
-const EXIT_MS = 220,
-  ENTER_MS = 350;
+const EXIT_MS = 180,
+  ENTER_MS = 300;
 
 // Fix #1: compute initial section once, reuse everywhere
 function getInitialSection() {
@@ -60,7 +60,6 @@ function AppInner() {
     author: "Devajith",
   });
   const canvasRef = useRef(null);
-  const spotlightRef = useRef(null);
   const splashRef = useRef(null);
   const isTransitioningRef = useRef(false);
   // Fix #9: keep a ref that mirrors activeSection for use inside callbacks
@@ -148,47 +147,6 @@ function AppInner() {
       });
     }, 700);
     return () => clearTimeout(timer);
-  }, []);
-
-  // Cursor spotlight — uses CSS custom properties + transform instead of
-  // rebuilding a radial-gradient string on every mousemove frame
-  useEffect(() => {
-    const spotlight = spotlightRef.current;
-    if (
-      !spotlight ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
-    let raf = null,
-      visible = false;
-    let pendingX = -9999,
-      pendingY = -9999;
-
-    const update = () => {
-      spotlight.style.setProperty("--sx", `${pendingX}px`);
-      spotlight.style.setProperty("--sy", `${pendingY}px`);
-      raf = null;
-    };
-    const onMove = (e) => {
-      pendingX = e.clientX;
-      pendingY = e.clientY;
-      if (!visible) {
-        spotlight.classList.add("visible");
-        visible = true;
-      }
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    const onLeave = () => {
-      spotlight.classList.remove("visible");
-      visible = false;
-    };
-    document.addEventListener("mousemove", onMove, { passive: true });
-    document.addEventListener("mouseleave", onLeave);
-    return () => {
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseleave", onLeave);
-      if (raf) cancelAnimationFrame(raf);
-    };
   }, []);
 
   // Fix #6: magnetic buttons — no MutationObserver, just reattach on section change
@@ -597,14 +555,8 @@ function AppInner() {
         style={{ "--scroll-progress": 0 }}
       />
 
-      {/* Canvas + Spotlight */}
+      {/* Canvas */}
       <canvas ref={canvasRef} id="particleCanvas" aria-hidden="true" />
-      <div
-        ref={spotlightRef}
-        className="cursor-spotlight"
-        id="cursorSpotlight"
-        aria-hidden="true"
-      />
 
       {/* Easter Egg */}
       <EasterEgg open={easterEggOpen} onClose={() => setEasterEggOpen(false)} />
