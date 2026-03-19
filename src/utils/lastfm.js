@@ -1,3 +1,12 @@
+const LASTFM_USERNAME = "Devajuice";
+const LASTFM_PH = "2a96cbd8b46e442fc41c2b86b821562f";
+
+// In development (vite dev), call Last.fm directly so we don't need a
+// running serverless runtime. In production (Vercel), route through the
+// /api/nowplaying serverless function so the API key stays server-side.
+const IS_DEV = import.meta.env.DEV;
+const LASTFM_API_KEY_DEV = import.meta.env.VITE_LASTFM_API_KEY;
+
 // ─── In-memory cache ─────────────────────────────────────────────────────────
 // Live tracks:    cache 30 s  (user might change song soon)
 // Non-live tracks: cache 120 s (won't change until next play)
@@ -130,7 +139,15 @@ export async function fetchNowPlaying() {
 
 async function _doFetch() {
   try {
-    const res = await fetchWithTimeout(`/api/nowplaying`);
+    // Dev: call Last.fm directly (no serverless runtime needed for vite dev)
+    // Prod: route through /api/nowplaying so the key never hits the browser
+    const recentTracksUrl = IS_DEV
+      ? `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks` +
+        `&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY_DEV}` +
+        `&format=json&limit=1&extended=1`
+      : `/api/nowplaying`;
+
+    const res = await fetchWithTimeout(recentTracksUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.message);
@@ -159,11 +176,15 @@ async function _doFetch() {
     const [infoResult, itunesResult] = await Promise.allSettled([
       needsInfo
         ? fetchWithTimeout(
-            `https://ws.audioscrobbler.com/2.0/?method=track.getInfo` +
-              `&api_key=${LASTFM_API_KEY}` +
-              `&artist=${encodeURIComponent(artist)}` +
-              `&track=${encodeURIComponent(name)}` +
-              `&format=json&username=${LASTFM_USERNAME}`,
+            IS_DEV
+              ? `https://ws.audioscrobbler.com/2.0/?method=track.getInfo` +
+                  `&api_key=${LASTFM_API_KEY_DEV}` +
+                  `&artist=${encodeURIComponent(artist)}` +
+                  `&track=${encodeURIComponent(name)}` +
+                  `&format=json&username=${LASTFM_USERNAME}`
+              : `/api/nowplaying?method=track.getInfo` +
+                  `&artist=${encodeURIComponent(artist)}` +
+                  `&track=${encodeURIComponent(name)}`,
           )
             .then((r) => r.json())
             .catch(() => null)
