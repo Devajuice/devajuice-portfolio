@@ -5,18 +5,16 @@
     { "src": "^/404\\.html$", "dest": "/404.html" },
     { "src": "^/api/og$", "dest": "/api/og.png.js" },
     { "src": "^/api/og\\.png$", "dest": "/api/og.png.js" },
-
+    { "src": "^/api/nowplaying$", "dest": "/api/nowplaying.js" },
     { "src": "^/global\\.css$", "dest": "/global.css" },
     { "src": "^/404\\.css$", "dest": "/404.css" },
     { "src": "^/css/(.*)$", "dest": "/css/$1" },
     { "src": "^/js/(.*)$", "dest": "/js/$1" },
     { "src": "^/assets/(.*)$", "dest": "/assets/$1" },
-
     { "src": "^/manifest\\.json$", "dest": "/manifest.json" },
     { "src": "^/robots\\.txt$", "dest": "/robots.txt" },
     { "src": "^/sitemap\\.xml$", "dest": "/sitemap.xml" },
     { "src": "^/favicon\\.ico$", "dest": "/favicon.ico" },
-
     {
       "src": "^/(?!.*\\.).*$",
       "dest": "/404.html",
