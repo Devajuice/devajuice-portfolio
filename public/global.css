@@ -215,7 +215,7 @@ i {
 @keyframes staggerFadeUp {
     from {
         opacity: 0;
-        transform: translateY(22px);
+        transform: translateY(12px);
     }
     to {
         opacity: 1;
@@ -258,11 +258,11 @@ i {
 @keyframes navSlideDown {
     from {
         opacity: 0;
-        transform: translateY(-20px) scaleX(0.96);
+        transform: translateY(-12px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scaleX(1);
+        transform: translateY(0);
     }
 }
 @keyframes dotPop {
@@ -484,8 +484,8 @@ i {
     transform: translateX(110%);
     opacity: 0;
     transition:
-        transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1),
-        opacity 0.35s ease;
+        transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        opacity 0.25s ease;
     will-change: transform;
 }
 .toast.toast-in {
@@ -520,8 +520,8 @@ i {
     margin-left: 4px;
     border-radius: 4px;
     transition:
-        color 0.2s,
-        background 0.2s;
+        color 0.1s,
+        background 0.1s;
     flex-shrink: 0;
 }
 .toast-close:hover {
@@ -573,11 +573,11 @@ i {
     visibility: hidden;
     transform: translateY(16px) scale(0.85);
     transition:
-        opacity 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
-        visibility 0.35s ease,
-        transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
-        background 0.2s,
-        box-shadow 0.2s;
+        opacity 0.25s ease,
+        visibility 0.25s ease,
+        transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        background 0.1s,
+        box-shadow 0.1s;
     will-change: transform;
 }
 .back-to-top {
@@ -657,8 +657,8 @@ i {
     box-shadow:
         0 32px 80px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-    transform: scale(0.85) translateY(20px);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(0.92) translateY(16px);
+    transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: relative;
     overflow: hidden;
 }
@@ -752,9 +752,9 @@ i {
     background: var(--accent);
     color: white;
     transition:
-        background 0.2s,
-        transform 0.15s,
-        box-shadow 0.2s;
+        background 0.1s,
+        transform 0.1s,
+        box-shadow 0.1s;
     box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
 }
 .easter-egg-close:hover {
@@ -818,7 +818,7 @@ i {
     animation: navUnderlineShimmer 3s ease infinite;
     transform-origin: left center;
     transform: scaleX(var(--scroll-progress, 0));
-    transition: transform 0.08s linear;
+    transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
     pointer-events: none;
 }
@@ -885,7 +885,8 @@ body {
     pointer-events: none;
 }
 .topnav-pill {
-    animation: navSlideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: navSlideDown 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    will-change: transform;
     pointer-events: all;
     display: flex;
     align-items: center;
@@ -907,6 +908,11 @@ body {
         box-shadow 0.3s;
 }
 .logo {
+    /* Reset <button> defaults — Fix #8 changed this from div to button */
+    background: none;
+    border: none;
+    padding: 0;
+    /* Visual styles (unchanged) */
     font-size: 1rem;
     font-weight: 700;
     color: var(--text-primary);
@@ -918,12 +924,12 @@ body {
     flex-shrink: 0;
     margin-right: 8px;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.12s;
 }
 .logo i {
     font-size: 0.85rem;
     color: var(--text-muted);
-    transition: color 0.3s;
+    transition: color 0.12s;
 }
 .logo:hover i {
     color: var(--accent);
@@ -957,9 +963,9 @@ body {
     opacity: 0;
     /* Smooth slide between items */
     transition:
-        left 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
-        width 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
-        opacity 0.25s ease;
+        left 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        width 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        opacity 0.2s ease;
     /* Glow */
     box-shadow:
         0 0 8px rgba(59, 130, 246, 0.55),
@@ -993,8 +999,8 @@ body {
     background: transparent;
     white-space: nowrap;
     transition:
-        color 0.2s,
-        transform 0.15s;
+        color 0.1s,
+        transform 0.1s;
 }
 .nav-btn:hover {
     color: var(--text-primary);
@@ -1033,10 +1039,10 @@ body {
     justify-content: center;
     font-size: 0.82rem;
     transition:
-        background 0.2s,
-        border-color 0.2s,
-        transform 0.2s,
-        box-shadow 0.2s;
+        background 0.1s,
+        border-color 0.1s,
+        transform 0.1s,
+        box-shadow 0.1s;
 }
 .theme-toggle-btn:hover {
     background: var(--bg-secondary);
@@ -1071,7 +1077,7 @@ body {
     background: var(--text-primary);
     border-radius: 2px;
     display: block;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s ease;
 }
 .mobile-menu-btn.is-open span:nth-child(1) {
     transform: rotate(45deg) translate(4px, 4px);
@@ -1105,16 +1111,16 @@ body {
 }
 .mobile-dropdown.open {
     display: block;
-    animation: dropdownOpen 0.3s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+    animation: dropdownOpen 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 @keyframes dropdownOpen {
     from {
         opacity: 0;
-        transform: translateY(-8px) scaleY(0.95);
+        transform: translateY(-6px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scaleY(1);
+        transform: translateY(0);
     }
 }
 .mobile-nav-header {
@@ -1170,9 +1176,9 @@ body {
     align-items: center;
     gap: 10px;
     transition:
-        background 0.18s,
-        color 0.18s,
-        transform 0.18s;
+        background 0.1s,
+        color 0.1s,
+        transform 0.1s;
 }
 .mobile-nav-btn i {
     font-size: 0.78rem;
@@ -1180,7 +1186,7 @@ body {
     text-align: center;
     flex-shrink: 0;
     color: var(--text-muted);
-    transition: color 0.18s;
+    transition: color 0.1s;
 }
 .mobile-nav-btn:hover {
     background: var(--glass-active-bg);
@@ -1221,8 +1227,9 @@ h2:focus {
 .page-section {
     display: none;
     opacity: 0;
-    transform: translateX(32px);
+    transform: translateX(18px);
     min-height: calc(100vh - 220px);
+    will-change: transform, opacity;
 }
 .page-section.active {
     display: block;
@@ -1233,15 +1240,15 @@ h2:focus {
     opacity: 1;
     transform: translateX(0);
     transition:
-        opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* ── Pre-position: off-screen left before entering-from-left fires ── */
 .page-section.from-left-init {
     display: block;
     opacity: 0;
-    transform: translateX(-32px);
+    transform: translateX(-18px);
 }
 
 /* ── Entering from the left (going backward) ── */
@@ -1249,24 +1256,24 @@ h2:focus {
     opacity: 1;
     transform: translateX(0);
     transition:
-        opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* ── Exiting forward: slide out to left ── */
 .page-section.exiting {
     display: block;
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(-14px);
     pointer-events: none;
     transition:
-        opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* ── Exiting backward: slide out to right ── */
 .page-section.exiting.to-right {
-    transform: translateX(24px);
+    transform: translateX(14px);
 }
 
 /* Staggered section entry animations */
@@ -1290,69 +1297,89 @@ h2:focus {
 }
 
 .page-section.entering .section-title {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.03s
+        both;
 }
 .page-section.entering .hero-badge {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.03s
+        both;
 }
 .page-section.entering .hero-title {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.08s
+        both;
 }
 .page-section.entering .hero-subtitle {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.19s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.13s
+        both;
 }
 .page-section.entering .hero-description {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.26s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.18s
+        both;
 }
 .page-section.entering .timezone-display {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.21s
+        both;
 }
 .page-section.entering .hero-actions {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.24s
+        both;
 }
 .page-section.entering .now-playing {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.28s
+        both;
 }
 .page-section.entering .about-text:nth-of-type(1) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.08s
+        both;
 }
 .page-section.entering .about-text:nth-of-type(2) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.14s
+        both;
 }
 .page-section.entering .education-section {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s
+        both;
 }
 .page-section.entering .subsection-title {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.07s
+        both;
 }
 .page-section.entering .contact-intro {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.08s
+        both;
 }
 .page-section.entering .contact-grid {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s
+        both;
 }
 .page-section.entering .social-links {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.22s
+        both;
 }
 .page-section.entering .grid-container .card:nth-child(1),
 .page-section.entering .skills-grid .card:nth-child(1) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.08s
+        both;
 }
 .page-section.entering .grid-container .card:nth-child(2),
 .page-section.entering .skills-grid .card:nth-child(2) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.14s
+        both;
 }
 .page-section.entering .grid-container .card:nth-child(3),
 .page-section.entering .skills-grid .card:nth-child(3) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s
+        both;
 }
 .page-section.entering .grid-container .card:nth-child(4),
 .page-section.entering .skills-grid .card:nth-child(4) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.26s
+        both;
 }
 .page-section.entering .grid-container .card:nth-child(n + 5),
 .page-section.entering .skills-grid .card:nth-child(n + 5) {
-    animation: staggerFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.44s both;
+    animation: staggerFadeUp 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s
+        both;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1589,10 +1616,10 @@ li {
     will-change: transform;
     position: relative;
     transition:
-        background 0.25s,
-        box-shadow 0.25s,
-        border-color 0.25s,
-        color 0.25s;
+        background 0.1s,
+        box-shadow 0.1s,
+        border-color 0.1s,
+        color 0.1s;
 }
 .btn-primary {
     background: var(--accent);
@@ -1782,22 +1809,20 @@ li {
     border-radius: 16px;
     padding: 24px;
     transition:
-        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 0.32s ease;
+        transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
     box-shadow: 0 1px 3px var(--shadow);
     position: relative;
-    /* Promote to compositor layer only during hover — avoids constant GPU layer for every card */
-    will-change: auto;
+    will-change: transform;
 }
 .card:hover {
-    will-change: transform;
-    transform: translateY(-6px);
+    transform: translateY(-5px);
     border-color: var(--card-glow-border);
     box-shadow:
         0 0 0 1px var(--card-glow-color),
         0 8px 24px var(--card-glow-color),
-        0 20px 40px var(--hover-shadow);
+        0 16px 32px var(--hover-shadow);
 }
 
 /* Subtle inner shimmer line on hover — top edge */
@@ -1813,7 +1838,7 @@ li {
     );
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.32s ease;
+    transition: opacity 0.15s ease;
 }
 .card:hover::before {
     opacity: 1;
@@ -1833,7 +1858,7 @@ li {
     align-items: center;
     justify-content: center;
     margin-bottom: 1rem;
-    transition: all 0.32s cubic-bezier(0.34, 1.3, 0.64, 1);
+    transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .card:not(.project-card):hover .card-icon {
     transform: rotate(8deg) scale(1.12);
@@ -1847,7 +1872,7 @@ li {
 .card-icon i {
     font-size: 1.5rem;
     color: var(--text-primary);
-    transition: color 0.3s;
+    transition: color 0.12s;
 }
 .card:not(.project-card):hover .card-icon i {
     color: var(--accent);
@@ -1895,7 +1920,7 @@ li {
     font-size: 0.9rem;
     opacity: 0;
     transform: translateX(-5px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.12s ease;
 }
 .project-card:hover .project-link-icon {
     opacity: 1;
@@ -1933,7 +1958,7 @@ li {
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
 }
 .tag:hover {
     background: var(--bg-card);
@@ -2202,7 +2227,7 @@ li {
     height: 90px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s ease;
     object-fit: cover;
 }
 .album-art:hover {
@@ -2313,7 +2338,7 @@ li {
     color: var(--text-primary);
     text-decoration: none;
     font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.12s ease;
 }
 .social-btn:hover {
     background: var(--bg-card);
@@ -2363,7 +2388,7 @@ li {
     color: var(--text-primary);
     font-size: 1rem;
     outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.12s ease;
 }
 .form-group input:focus,
 .form-group textarea:focus {
@@ -2392,7 +2417,7 @@ button[type="button"].btn-primary {
     padding: 0;
     position: relative;
     z-index: 1;
-    transition: background 0.3s;
+    transition: background 0.12s;
 }
 .footer-glow-line {
     height: 1px;
@@ -2583,10 +2608,10 @@ button[type="button"].btn-primary {
     cursor: pointer;
     font-family: inherit;
     transition:
-        color 0.2s,
-        background 0.2s,
-        transform 0.2s,
-        box-shadow 0.2s;
+        color 0.1s,
+        background 0.1s,
+        transform 0.1s,
+        box-shadow 0.1s;
     animation: hintFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.4s both;
 }
 .kbd-hint-badge:hover {
@@ -2644,7 +2669,7 @@ button[type="button"].btn-primary {
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
     transform: translateY(16px) scale(0.97);
-    transition: transform 0.3s cubic-bezier(0.34, 1.3, 0.64, 1);
+    transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: relative;
     overflow: hidden;
 }

@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+// Fix #11: useFocusTrap extracted to shared hook — no more duplication
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export function triggerConfetti() {
   const colors = [
@@ -17,41 +19,6 @@ export function triggerConfetti() {
     document.body.appendChild(el);
     el.addEventListener("animationend", () => el.remove());
   }
-}
-
-// Fix #13: focus trap — keep keyboard focus inside the overlay while open
-function useFocusTrap(ref, active) {
-  useEffect(() => {
-    if (!active || !ref.current) return;
-
-    const panel = ref.current;
-    const focusable = panel.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-
-    // Move focus into the panel
-    first?.focus();
-
-    const trap = (e) => {
-      if (e.key !== "Tab") return;
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-
-    panel.addEventListener("keydown", trap);
-    return () => panel.removeEventListener("keydown", trap);
-  }, [active, ref]);
 }
 
 export default function EasterEgg({ open, onClose }) {

@@ -159,14 +159,34 @@ export function triggerInkBlot(newTheme, onComplete) {
   path.style.cssText = `transform-origin:${cx}px ${cy}px;transform:scale(0);transition:transform .55s cubic-bezier(.34,1.05,.64,1);`;
   svg.appendChild(path);
   document.body.appendChild(svg);
+
+  // Fix #4: if the tab goes hidden mid-animation, rAF is throttled and the SVG
+  // can get orphaned in the DOM. Fast-forward to completion immediately instead.
+  let completed = false;
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    document.removeEventListener("visibilitychange", onHide);
+    applyTheme(newTheme);
+    onComplete?.(newTheme);
+    svg.remove();
+  };
+  const onHide = () => {
+    if (document.hidden) finish();
+  };
+  document.addEventListener("visibilitychange", onHide);
+
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       path.style.transform = "scale(1)";
     }),
   );
   setTimeout(() => {
+    if (completed) return; // already finished via visibilitychange
     applyTheme(newTheme);
     onComplete?.(newTheme);
+    document.removeEventListener("visibilitychange", onHide);
+    completed = true;
     setTimeout(() => {
       path.style.transition = "transform .45s cubic-bezier(.4,0,.2,1)";
       path.style.transform = "scale(0)";

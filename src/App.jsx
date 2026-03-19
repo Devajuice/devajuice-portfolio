@@ -11,13 +11,14 @@ import KeyboardShortcuts from "./components/KeyboardShortcuts";
 import Footer from "./components/Footer";
 import { ToastProvider } from "./components/Toast";
 import { useToast } from "./components/useToast";
-import { useTheme, useNowPlaying, useParticleCanvas } from "./hooks";
+import { useTheme, useNowPlaying, useParticleCanvas, useSound } from "./hooks";
 import {
   playSound,
   startBgMusic,
   stopBgMusic,
   getAudioCtx,
   isBgMusicPlaying,
+  setSoundEnabled,
 } from "./utils/audio";
 import { triggerInkBlot } from "./utils/theme";
 import { Helmet } from "react-helmet-async";
@@ -27,27 +28,24 @@ const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
 const EXIT_MS = 180,
   ENTER_MS = 300;
 
-// Fix #1: compute initial section once, reuse everywhere
-function getInitialSection() {
-  const hash = window.location.hash.slice(1);
-  return SECTIONS.includes(hash) ? hash : "home";
-}
-
 function AppInner() {
-  const initialSection = getInitialSection(); // Fix #1: single source of truth
-
-  const [activeSection, setActiveSection] = useState(initialSection);
-  const [sectionState, setSectionState] = useState(() =>
-    Object.fromEntries(
+  // Fix #10: compute initial section inside the lazy initializer — safe in all render environments
+  const [activeSection, setActiveSection] = useState(() => {
+    const hash = window.location.hash.slice(1);
+    return SECTIONS.includes(hash) ? hash : "home";
+  });
+  const [sectionState, setSectionState] = useState(() => {
+    const hash = window.location.hash.slice(1);
+    const initialSection = SECTIONS.includes(hash) ? hash : "home";
+    return Object.fromEntries(
       SECTIONS.map((s) => [
         s,
         s === initialSection ? "active entering" : "hidden",
       ]),
-    ),
-  );
-  const [soundEnabled, setSoundEnabled] = useState(
-    () => localStorage.getItem("soundEnabled") === "true",
-  );
+    );
+  });
+  // Fix #2: use the existing useSound hook instead of re-implementing it inline
+  const { soundEnabled, toggle: toggleSound } = useSound();
   const [kbdOpen, setKbdOpen] = useState(false);
   const [easterEggOpen, setEasterEggOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -63,12 +61,23 @@ function AppInner() {
   const splashRef = useRef(null);
   const isTransitioningRef = useRef(false);
   // Fix #9: keep a ref that mirrors activeSection for use inside callbacks
-  // without stale closure issues — but only ONE ref now (removed activeSectionRef)
-  const activeSectionRef = useRef(initialSection);
+  // without stale closure issues
+  const activeSectionRef = useRef(
+    (() => {
+      const hash = window.location.hash.slice(1);
+      return SECTIONS.includes(hash) ? hash : "home";
+    })(),
+  );
   const musicStartedRef = useRef(false);
   useParticleCanvas(canvasRef);
 
-  // Fix #2: define navigate early so effects that depend on it are ordered correctly
+  // Fix #3: mirror theme in a ref so the keyboard handler can read the current
+  // value without being in its dependency array — avoids re-registering the
+  // listener on every theme change
+  const themeSnapshotRef = useRef(theme);
+  useEffect(() => {
+    themeSnapshotRef.current = theme;
+  }, [theme]);
   const navigate = useCallback((sectionId) => {
     if (isTransitioningRef.current) return;
     const current = activeSectionRef.current; // Fix #9: now actually used here
@@ -465,7 +474,8 @@ function AppInner() {
       if (e.key === "t" || e.key === "T") {
         e.preventDefault();
         flashKey("kk-t");
-        const next = theme === "light" ? "dark" : "light";
+        // Fix #3: read from ref — no stale closure, no re-registration on theme change
+        const next = themeSnapshotRef.current === "light" ? "dark" : "light";
         triggerInkBlot(next, updateTheme);
         playSound("click");
         return;
@@ -485,12 +495,14 @@ function AppInner() {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [kbdOpen, easterEggOpen, theme, navigate]);
+  }, [kbdOpen, easterEggOpen, navigate]); // Fix #3: removed `theme` — now read via themeSnapshotRef
 
+  // Fix #2: sound toggle now fully delegated to useSound hook
   const handleSoundToggle = () => {
-    const next = !soundEnabled;
+    const next = toggleSound();
+    // Fix #2: keep the audio module's internal cache in sync so playSound()
+    // doesn't have to re-read localStorage on every call
     setSoundEnabled(next);
-    localStorage.setItem("soundEnabled", next);
     if (next) {
       const ctx = getAudioCtx();
       if (ctx.state === "suspended")

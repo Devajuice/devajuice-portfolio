@@ -1,4 +1,5 @@
-// Fix #11: project data lives here — update without touching JSX
+// Fix #6: renamed from projects.jsx → projects.js (pure data, no JSX)
+// Fix #11 (original): project data lives here — update without touching JSX
 export const PROJECTS = [
   {
     href: "https://flixet.vercel.app",

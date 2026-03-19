@@ -75,9 +75,9 @@ export default function HomeSection({ onNavigate, musicData }) {
         Hi, I'm <span className="hero-name-gradient">Devajith</span>
       </h1>
       <p className="hero-subtitle">
-        <span id="typewriter" aria-label="Student | Developer | Gamer">
-          {typewriterText}
-        </span>
+        {/* Fix #4: removed stale aria-label — parent div already has aria-live="polite"
+            so screen readers will announce the changing text without a hardcoded label */}
+        <span id="typewriter">{typewriterText}</span>
         <span className="typewriter-cursor">|</span>
       </p>
       <p className="hero-description">

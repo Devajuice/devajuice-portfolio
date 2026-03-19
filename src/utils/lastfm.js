@@ -1,18 +1,28 @@
-const LASTFM_USERNAME = "Devajuice";
-const LASTFM_API_KEY = "a1947761da6f45ca8c47e50ebf1033c2";
-const LASTFM_PH = "2a96cbd8b46e442fc41c2b86b821562f";
-
 // ─── In-memory cache ─────────────────────────────────────────────────────────
 // Live tracks:    cache 30 s  (user might change song soon)
 // Non-live tracks: cache 120 s (won't change until next play)
-// Art lookups:    cache forever for the session (art never changes)
+// Art lookups:    capped at 100 entries — evicts oldest when full (Fix #3)
 let _cache = null; // { data, ts, isLive }
-let _artCache = new Map(); // "artist|album" → artUrl
+let _artCache = new Map(); // "artist|album" → artUrl  (max 100 entries)
 let _inflight = null; // deduplicates concurrent calls
 
 const LIVE_TTL = 30_000;
 const RECENT_TTL = 120_000;
 const FETCH_TIMEOUT = 6_000;
+const ART_CACHE_MAX = 100;
+
+// Fix #6: module-level track name so fetchiTunesCoverArt can use it in the
+// fallback search even when called with only artist + album args
+let _currentTrackName = "";
+
+// Fix #3: bounded art cache setter — evicts the oldest key once the cap is hit
+function setArtCache(key, url) {
+  if (_artCache.size >= ART_CACHE_MAX) {
+    // Map iteration order is insertion order, so .keys().next() is the oldest
+    _artCache.delete(_artCache.keys().next().value);
+  }
+  _artCache.set(key, url);
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function fetchWithTimeout(url, ms = FETCH_TIMEOUT) {
@@ -75,9 +85,10 @@ async function fetchiTunesCoverArt(artist, album) {
       }
     }
 
-    // Fallback: search by track name if album search found nothing useful
+    // Fix #6: fallback searches by artist + track NAME, not album — album may be
+    // empty or wrong at this point, but `name` (the track title) is always known
     if (!url && album !== artist) {
-      const qt = encodeURIComponent(`${artist} ${album}`);
+      const qt = encodeURIComponent(`${artist} ${_currentTrackName}`);
       const res2 = await fetchWithTimeout(
         `https://itunes.apple.com/search?term=${qt}&entity=musicTrack&limit=5`,
       );
@@ -94,7 +105,8 @@ async function fetchiTunesCoverArt(artist, album) {
       }
     }
 
-    _artCache.set(key, url);
+    // Fix #3: use bounded setter instead of direct Map.set
+    setArtCache(key, url);
     return url;
   } catch {
     return "";
@@ -118,11 +130,7 @@ export async function fetchNowPlaying() {
 
 async function _doFetch() {
   try {
-    const res = await fetchWithTimeout(
-      `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks` +
-        `&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}` +
-        `&format=json&limit=1&extended=1`,
-    );
+    const res = await fetchWithTimeout(`/api/nowplaying`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.message);
@@ -140,6 +148,10 @@ async function _doFetch() {
       track.artist?.name || track.artist?.["#text"] || "Unknown Artist";
     let album = track.album?.["#text"] || "";
     let lastfmArt = getBestImage(track.image);
+
+    // Fix #6: store track name at module level so fetchiTunesCoverArt fallback
+    // can search by track title instead of (possibly empty/wrong) album name
+    _currentTrackName = name;
 
     const needsInfo = !album || !lastfmArt;
 

@@ -3,6 +3,18 @@ let _audioCtx = null;
 let _clickBuf = null; // cached noise buffer — generated once, reused on every click
 let _hihatBuf = null; // same pattern — allocated once for the ambient scheduler
 
+// Fix #2: cache soundEnabled at module level — avoids a synchronous localStorage
+// read on every single playSound() call (nav clicks, keystrokes, success toasts…)
+let _soundEnabled = localStorage.getItem("soundEnabled") === "true";
+
+/**
+ * Call this whenever the user toggles sound so the module cache stays in sync.
+ * App.jsx should call setSoundEnabled(next) alongside toggleSound().
+ */
+export function setSoundEnabled(val) {
+  _soundEnabled = Boolean(val);
+}
+
 function _getCtx() {
   if (!_audioCtx)
     _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -11,8 +23,8 @@ function _getCtx() {
 }
 
 export function playSound(type) {
-  const soundEnabled = localStorage.getItem("soundEnabled") === "true";
-  if (!soundEnabled) return;
+  // Fix #2: read from module-level cache, not localStorage
+  if (!_soundEnabled) return;
   try {
     const ctx = _getCtx();
     if (type === "nav") {
@@ -75,7 +87,10 @@ export function playSound(type) {
         osc.stop(t + 0.35);
       });
     }
-  } catch (e) {}
+  } catch (e) {
+    // Fix #5: surface errors in development so real bugs aren't silently swallowed
+    if (import.meta.env?.DEV) console.warn("playSound error:", e);
+  }
 }
 
 // ── AMBIENT MUSIC ─────────────────────────────────────────────
@@ -300,8 +315,10 @@ function buildSharedGraph() {
 }
 
 function teardownSharedGraph() {
-  if (!bgMaster) return;
-  const ctx = _getCtx();
+  if (!bgMaster || !_audioCtx) return;
+  // Fix #7: use the existing context ref directly — calling _getCtx() here would
+  // create a brand-new AudioContext if one didn't exist, which is pointless on teardown
+  const ctx = _audioCtx;
   bgMaster.gain.setValueAtTime(bgMaster.gain.value, ctx.currentTime);
   bgMaster.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
   setTimeout(() => {

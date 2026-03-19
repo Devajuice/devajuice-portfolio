@@ -70,19 +70,16 @@ export default function Navigation({
       aria-label="Main navigation"
     >
       <nav className="topnav-pill">
-        <div
+        {/* Fix #8: use <button> instead of <div role="button"> — natively focusable,
+            fires on Enter/Space without manual onKeyPress handler */}
+        <button
           className="logo"
-          role="button"
-          tabIndex={0}
           aria-label="Go to home page"
           onClick={() => handleNav("home")}
-          onKeyPress={(e) =>
-            (e.key === "Enter" || e.key === " ") && handleNav("home")
-          }
         >
           <i className="fas fa-code" aria-hidden="true" />
           <span>Devajith</span>
-        </div>
+        </button>
 
         <ul className="nav-links" ref={navLinksRef}>
           <span

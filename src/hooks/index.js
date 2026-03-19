@@ -40,8 +40,13 @@ export function useNowPlaying() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const result = await fetchNowPlaying();
-      if (!cancelled) setData(result);
+      // Fix #7: catch fetch/network errors so the pill never gets stuck on "Loading…"
+      try {
+        const result = await fetchNowPlaying();
+        if (!cancelled) setData(result);
+      } catch {
+        if (!cancelled) setData({ error: true });
+      }
     }
     load();
     const interval = setInterval(load, 30000);

@@ -83,9 +83,12 @@ export default function SkillsSection({ isActive }) {
 
   useEffect(() => {
     if (isActive && !animated) {
+      // Slight delay lets the section entrance transition finish first
       const timer = setTimeout(() => setAnimated(true), 50);
       return () => clearTimeout(timer);
     }
+    // Fix #5: reset when leaving so bars re-animate next time the section is visited
+    if (!isActive) setAnimated(false);
   }, [isActive, animated]);
 
   return (

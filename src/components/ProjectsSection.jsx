@@ -1,5 +1,5 @@
 import React from "react";
-// Fix #11: data is now in projects.js — add/edit projects there without touching this file
+// Fix #6: import from projects.js (renamed from .jsx — it's pure data, no JSX)
 import { PROJECTS } from "./projects";
 
 export default function ProjectsSection() {
