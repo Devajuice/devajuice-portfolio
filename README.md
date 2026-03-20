@@ -17,29 +17,30 @@ A modern, responsive single-page portfolio website featuring a clean monochrome 
 - **Responsive Design** — Seamlessly adapts to desktop, tablet, and mobile devices
 - **Floating Pill Navbar** — Centered glassmorphism navigation bar on desktop with clickable logo, compact dropdown on mobile
 - **DM Sans Typography** — Modern, clean font used across the entire site
-- **Site Footer** — Persistent footer with logo, copyright, and social icon links; stacks and centers on mobile
+- **Site Footer** — Persistent footer with logo, copyright, tech stack chips, social icon links, and a keyboard shortcuts hint; stacks and centers on mobile
 - **Custom 404 Page** — Styled error page matching the portfolio design with glitch animation, served via Vercel routing
 - **Locale-Aware Timezone Display** — Hero section shows the current IST time and how far ahead/behind it is from the visitor's local timezone, updating every 30 seconds
 - **No-JS Fallback** — A `<noscript>` banner informs users if JavaScript is disabled and reveals the home section statically
 
 ### 🎭 Animations & Interactions
 
-- **Smooth Page Transitions** — Sections fade and slide out before the next one fades in, with a locked transition state to prevent glitches
+- **Smooth Page Transitions** — Sections fade and slide in the correct direction (forward or backward) before the next one fades in, with a locked transition state to prevent glitches
+- **Browser Back/Forward Support** — `hashchange` listener keeps the active section in sync with the browser's navigation history so the back and forward buttons work correctly
 - **Staggered Content Animations** — Cards, headings, and text elements cascade in with a delay when a section becomes active
 - **Typewriter Effect** — Hero subtitle cycles through "Student", "Developer", and "Gamer" with a blinking accent cursor
 - **Navbar Entrance** — Navigation pill springs down into view on page load
-- **Ink-Blot Theme Transition** — Organic blob SVG animation wipes across the screen when switching themes
+- **Ink-Blot Theme Transition** — Organic blob SVG animation wipes across the screen when switching themes; fast-forwards instantly if the tab goes hidden mid-animation
 - **Hover Effects** — Interactive lift animations on cards, nav items, and buttons
-- **Magnetic Buttons** — Hero CTA buttons subtly follow the cursor on hover
+- **Magnetic Buttons** — Hero CTA buttons subtly follow the cursor on hover; reattached automatically on each section change without a MutationObserver
 - **Theme Icon Spin** — Sun/moon icon rotates 360° when switching themes
-- **Active Nav Indicator** — Sliding pill indicator tracks the active nav item
+- **Active Nav Indicator** — Sliding underline indicator tracks the active nav item
 - **Mobile Swipe Gestures** — Swipe left/right on touch devices to navigate between sections, with a live edge hint pill showing the destination
 
 ### 🌌 Visual Effects
 
 - **Particle Constellation Background** — Canvas-rendered floating particles that connect with lines when close, gently repel from the cursor, and pulse with the current theme color. Pauses automatically when the tab is hidden to save CPU/battery
 - **Cursor Spotlight** — Subtle radial gradient follows the cursor across the page
-- **Animated Favicon** — Canvas-drawn `</>` logo with an orbiting glow dot, updates colors automatically with the active theme
+- **Animated Favicon** — Canvas-drawn `</>` logo with an orbiting glow dot that plays for 3 seconds on load then stops to avoid ongoing repaints; colors update automatically with the active theme
 
 ### 🐣 Easter Eggs
 
@@ -49,17 +50,20 @@ A modern, responsive single-page portfolio website featuring a clean monochrome 
 
 - **Live Now-Playing Pill** — Hero section displays a loading skeleton while data is fetching, then shows a green pill with animated equalizer bars when actively scrobbling, or grey when showing the last played track
 - **Last.fm API** — Track name, artist, and album fetched in real-time from Last.fm
-- **iTunes Cover Art** — Album artwork fetched from the iTunes Search API (CORS-friendly, no key required) at 600×600 resolution, with Last.fm image as fallback
-- **Smart Art Caching** — iTunes is only called when the artist/album changes; repeated 30-second polls reuse the cached artwork URL
+- **iTunes Cover Art** — Album artwork fetched from the iTunes Search API (CORS-friendly, no key required) at up to 3000×3000 resolution, with Last.fm image as fallback
+- **Smart Art Caching** — Bounded in-memory cache (max 100 entries, oldest evicted first) so iTunes is only called when the artist/album changes; repeated polls reuse cached art
+- **Parallel Fetching** — `track.getInfo` and iTunes cover art lookups fire in parallel using `Promise.allSettled`, not sequentially
 - **Animated Equalizer Bars** — 4 bars animate when live, sit flat when idle — appear in both the hero pill and the About section music widget
 - **Live/Recent Badge** — About section shows a green "Live" or grey "Recent" badge next to the track name
-- **Auto-Refresh** — Updates every 30 seconds automatically
+- **Auto-Refresh** — Updates every 30 seconds (live tracks) or 120 seconds (last played)
 - **Background Ambient Music** — Optional procedurally generated ambient piano music using the Web Audio API, with a look-ahead scheduler. Pauses automatically when the tab is hidden
 
 ### 📬 Contact Features
 
-- **Functional Contact Form** — Web3Forms integration (no backend needed)
-- **Form Validation** — Client-side validation for all fields including email format
+- **Functional Contact Form** — Web3Forms integration with honeypot spam protection (no backend needed)
+- **Double-Submit Guard** — A `ref`-based guard prevents concurrent or accidental duplicate submissions
+- **Form Validation** — Client-side validation for all fields including email format check
+- **Copy Email Button** — One-click button copies your email address to the clipboard with a success toast, alongside the social links
 - **Toast Notifications** — Non-intrusive slide-in toasts for form success, errors, and navigation feedback
 - **Social Media Links** — Quick access to LinkedIn, GitHub, and Instagram
 
@@ -79,9 +83,10 @@ A modern, responsive single-page portfolio website featuring a clean monochrome 
 - **Theme Color** — `theme-color` meta tag updates the browser chrome to match your accent color (light and dark variants)
 - **Fast Loading** — Vite-bundled output, deferred script loading, preconnect hints for all external origins, and no render-blocking resources
 - **SEO Optimised** — Full meta tags, Open Graph (with image dimensions), Twitter Card, canonical URL, and a clean `sitemap.xml`
-- **Accessibility** — Skip link, ARIA labels, keyboard navigation, focus traps on overlays (`role="dialog"`), and `aria-live` regions for dynamic content
+- **Accessibility** — Skip link, ARIA labels, keyboard navigation, focus traps on overlays (`role="dialog"`), `aria-live` regions for dynamic content, and `aria-hidden` on the mobile nav dropdown when closed so hidden buttons are invisible to screen readers and excluded from the tab order
 - **Reduced Motion** — Respects `prefers-reduced-motion` — disables particle canvas, transitions, and animations
 - **Tab Visibility** — Particle canvas and ambient music both pause when the tab is hidden, resuming when you return
+- **Deduplicated Init** — Initial section is computed once at module level from `window.location.hash` and shared across all state initialisers, avoiding redundant hash reads
 - **Auto Footer Year** — Copyright year updates automatically
 
 ## 🎨 Color Theme
@@ -120,33 +125,35 @@ devajith-portfolio/
 │   └── js/404.js            # Vanilla JS for 404 page theme sync
 ├── src/
 │   ├── main.jsx             # React DOM mounting
-│   ├── App.jsx              # Core logic: section state, theme, swipe gestures
+│   ├── App.jsx              # Core logic: section state, theme, swipe gestures, hashchange
 │   ├── components/
 │   │   ├── AboutSection.jsx
-│   │   ├── ContactSection.jsx
+│   │   ├── ContactSection.jsx   # Contact form + copy-email button
 │   │   ├── EasterEgg.jsx
 │   │   ├── Footer.jsx
 │   │   ├── HomeSection.jsx
 │   │   ├── HobbiesSection.jsx
 │   │   ├── KeyboardShortcuts.jsx
-│   │   ├── Navigation.jsx
+│   │   ├── Navigation.jsx       # aria-hidden on mobile dropdown when closed
 │   │   ├── ProjectsSection.jsx
-│   │   ├── projects.js      # Project data config — edit here to add/update projects
+│   │   ├── projects.js          # Project data config — edit here to add/update projects
 │   │   ├── SkillsSection.jsx
-│   │   └── Toast.jsx
+│   │   ├── Toast.jsx
+│   │   ├── ToastContext.js
+│   │   └── useToast.js
 │   ├── hooks/
-│   │   ├── index.js         # useTheme, useNowPlaying, useParticleCanvas, useTypewriter, useTimezone
+│   │   ├── index.js         # useTheme, useNowPlaying, useParticleCanvas, useTypewriter, useTimezone, useSound
+│   │   ├── useFocusTrap.js  # Shared focus-trap hook used by overlays
 │   │   └── useOgImage.js    # OG image URL builder
 │   ├── utils/
 │   │   ├── audio.js         # Audio engine & ambient music controller
 │   │   ├── lastfm.js        # Last.fm metadata + iTunes cover art fetching
 │   │   └── theme.js         # Ink-blot animation & theme application
 │   └── styles/
-│       ├── global.css       # Design system: variables, resets, shared components
-│       └── 404.css          # 404 page styles
+│       └── global.css       # Design system: variables, resets, shared components
 ```
 
-> **Note:** The browser favicon is generated at runtime via a JavaScript canvas animation — no static `favicon.ico` is required. `manifest.json` must stay at the root so browsers and PWA installers can find it automatically.
+> **Note:** The browser favicon is generated at runtime via a JavaScript canvas animation that runs for 3 seconds on load — no static `favicon.ico` is required. `manifest.json` must stay at the root so browsers and PWA installers can find it automatically.
 
 ## 🚀 Quick Start
 
@@ -173,19 +180,29 @@ devajith-portfolio/
    npm install
    ```
 
-3. **Start the dev server**
+3. **Set up environment variables**
+
+   Create a `.env` file in the project root:
+
+   ```env
+   VITE_LASTFM_API_KEY=your_lastfm_api_key_here
+   ```
+
+   > In production on Vercel, add this as an environment variable in the dashboard. The `/api/nowplaying` serverless function keeps the key server-side so it never reaches the browser.
+
+4. **Start the dev server**
 
    ```bash
    npm run dev
    ```
 
-4. **Build for production**
+5. **Build for production**
 
    ```bash
    npm run build
    ```
 
-5. **Customize your information**
+6. **Customize your information**
 
    In `src/App.jsx`:
    - Update your name in the hero section and OG meta tags
@@ -195,19 +212,20 @@ devajith-portfolio/
    - Update the typewriter `words` array in `useTypewriter`
 
    In `src/utils/lastfm.js`:
-   - Replace `LASTFM_USERNAME` and `LASTFM_API_KEY` with your own
+   - Replace `LASTFM_USERNAME` with your own Last.fm username
 
    In `src/components/projects.js`:
    - Add or edit your project entries — no JSX changes needed
 
    In `src/components/ContactSection.jsx`:
    - Replace the `access_key` value with your Web3Forms key
+   - Replace the placeholder email in `handleCopyEmail` with your real address
 
-6. **Get API Keys**
+7. **Get API Keys**
 
    **Last.fm API (Free):**
    - Visit [last.fm/api/account/create](https://www.last.fm/api/account/create)
-   - Create an application and copy your API key
+   - Create an application and copy your API key into `.env`
 
    **Web3Forms (Free):**
    - Visit [web3forms.com](https://web3forms.com/)
@@ -220,15 +238,18 @@ devajith-portfolio/
 1. Push your code to GitHub
 2. Go to [vercel.com](https://vercel.com) and sign in
 3. Click **New Project** → **Import Git Repository**
-4. Select your repository and click **Deploy**
+4. Select your repository, add `VITE_LASTFM_API_KEY` under **Environment Variables**, and click **Deploy**
 5. Your site will be live at `your-project.vercel.app`
 
-> The included `vercel.json` handles routing so unknown URLs correctly show the 404 page instead of a blank Vercel error.
+> The included `vercel.json` handles routing so unknown URLs correctly show the 404 page instead of a blank Vercel error. The `/api/nowplaying` serverless function proxies Last.fm requests so the API key is never exposed in the browser bundle.
 
 ### Deploy to Netlify
 
 1. Run `npm run build` and drag the `dist/` folder to [netlify.com/drop](https://app.netlify.com/drop)
 2. Or connect your GitHub repository for automatic deployments on push
+3. Add `VITE_LASTFM_API_KEY` under **Site settings → Environment variables**
+
+> Note: The `/api/nowplaying` serverless function is Vercel-specific. On Netlify you can recreate it as a Netlify Function, or set `IS_DEV = true` to call Last.fm directly from the browser (exposes your API key).
 
 ### Deploy to GitHub Pages
 
@@ -245,9 +266,9 @@ devajith-portfolio/
 | **Home** | Hero with typewriter subtitle, locale-aware timezone display, CTA buttons, and live Last.fm now-playing pill |
 | **About** | Personal bio, education timeline, and currently listening music widget with album art and live badge |
 | **Projects** | Clickable project cards — data lives in `src/components/projects.js` |
-| **Skills** | Animated progress bars for programming languages, frameworks & tools, and data science technologies |
+| **Skills** | Animated progress bars for programming languages, frameworks & tools, and data science technologies. Bars re-animate every time the section is visited |
 | **Hobbies** | Gaming, music, and tech exploration |
-| **Contact** | Contact form via Web3Forms and social media links |
+| **Contact** | Contact form via Web3Forms, copy-email button, and social media links |
 
 ## 🛠️ Customization Guide
 
@@ -357,6 +378,16 @@ No JSX changes needed — `ProjectsSection.jsx` renders the array automatically.
    const SECTION_KEYS = { ..., 7: "newpage" };
    ```
 
+### Updating the Copy-Email Address
+
+Find `handleCopyEmail` in `src/components/ContactSection.jsx`:
+
+```js
+navigator.clipboard.writeText("devajith@example.com")
+```
+
+Replace the string with your real email address.
+
 ## 🎯 Key Technologies
 
 | Technology | Purpose |
@@ -367,13 +398,14 @@ No JSX changes needed — `ProjectsSection.jsx` renders the array automatically.
 | Web Audio API | Procedurally generated ambient background music |
 | Canvas API | Particle constellation background + animated favicon |
 | Intl API | Locale-aware timezone comparison |
+| Clipboard API | One-click copy-email button in Contact section |
 | Last.fm API | Music metadata (track, artist, album) |
 | iTunes Search API | Album cover art (CORS-friendly, no key required) |
 | Font Awesome | Icons |
 | Google Fonts (DM Sans) | Typography |
 | Web3Forms | Contact form backend |
 | react-helmet-async | Dynamic `<head>` / OG meta tag management |
-| Vercel | Hosting and routing |
+| Vercel | Hosting, routing, and serverless API proxy |
 
 ## 📊 Browser Support
 
@@ -384,7 +416,7 @@ No JSX changes needed — `ProjectsSection.jsx` renders the array automatically.
 | Safari | Latest 2 versions |
 | Edge | Latest 2 versions |
 
-> The animated favicon and particle canvas use the HTML5 Canvas API, supported in all modern browsers. The ambient music uses the Web Audio API, available in all evergreen browsers. The timezone display uses `Intl.DateTimeFormat`, universally supported.
+> The animated favicon and particle canvas use the HTML5 Canvas API, supported in all modern browsers. The ambient music uses the Web Audio API, available in all evergreen browsers. The timezone display uses `Intl.DateTimeFormat`, universally supported. The copy-email button uses the Clipboard API, available in all modern browsers over HTTPS.
 
 ## 📄 License
 

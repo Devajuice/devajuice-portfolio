@@ -28,22 +28,23 @@ const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
 const EXIT_MS = 180,
   ENTER_MS = 300;
 
+// Fix: deduplicate initial section computation — evaluated once at module level,
+// shared by useState, sectionState initializer, and activeSectionRef.
+const _initialSection = (() => {
+  const hash = window.location.hash.slice(1);
+  return SECTIONS.includes(hash) ? hash : "home";
+})();
+
 function AppInner() {
-  // Fix #10: compute initial section inside the lazy initializer — safe in all render environments
-  const [activeSection, setActiveSection] = useState(() => {
-    const hash = window.location.hash.slice(1);
-    return SECTIONS.includes(hash) ? hash : "home";
-  });
-  const [sectionState, setSectionState] = useState(() => {
-    const hash = window.location.hash.slice(1);
-    const initialSection = SECTIONS.includes(hash) ? hash : "home";
-    return Object.fromEntries(
+  const [activeSection, setActiveSection] = useState(_initialSection);
+  const [sectionState, setSectionState] = useState(() =>
+    Object.fromEntries(
       SECTIONS.map((s) => [
         s,
-        s === initialSection ? "active entering" : "hidden",
+        s === _initialSection ? "active entering" : "hidden",
       ]),
-    );
-  });
+    ),
+  );
   // Fix #2: use the existing useSound hook instead of re-implementing it inline
   const { soundEnabled, toggle: toggleSound } = useSound();
   const [kbdOpen, setKbdOpen] = useState(false);
@@ -62,12 +63,7 @@ function AppInner() {
   const isTransitioningRef = useRef(false);
   // Fix #9: keep a ref that mirrors activeSection for use inside callbacks
   // without stale closure issues
-  const activeSectionRef = useRef(
-    (() => {
-      const hash = window.location.hash.slice(1);
-      return SECTIONS.includes(hash) ? hash : "home";
-    })(),
-  );
+  const activeSectionRef = useRef(_initialSection);
   const musicStartedRef = useRef(false);
   useParticleCanvas(canvasRef);
 
@@ -78,9 +74,10 @@ function AppInner() {
   useEffect(() => {
     themeSnapshotRef.current = theme;
   }, [theme]);
+
   const navigate = useCallback((sectionId) => {
     if (isTransitioningRef.current) return;
-    const current = activeSectionRef.current; // Fix #9: now actually used here
+    const current = activeSectionRef.current;
     if (sectionId === current) return;
 
     // Determine direction: going forward (right→left slide) or backward (left→right slide)
@@ -127,6 +124,19 @@ function AppInner() {
   useEffect(() => {
     activeSectionRef.current = activeSection;
   }, [activeSection]);
+
+  // Fix: handle browser Back/Forward — when the user presses back/forward,
+  // the hash changes but the section doesn't update without this listener.
+  useEffect(() => {
+    const handler = () => {
+      const hash = window.location.hash.slice(1);
+      if (SECTIONS.includes(hash) && hash !== activeSectionRef.current) {
+        navigate(hash);
+      }
+    };
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
+  }, [navigate]);
 
   // Device theme listener
   useEffect(() => {
@@ -232,7 +242,10 @@ function AppInner() {
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [soundEnabled]);
 
-  // Animated favicon — throttled to ~10 fps; paused when tab is hidden
+  // Animated favicon — throttled to ~10 fps; paused when tab is hidden.
+  // Fix: stop the animation after 3 seconds — the favicon doesn't need to
+  // spin forever and calling toDataURL() + setting link.href every 100ms
+  // causes unnecessary repaints for the lifetime of the page.
   useEffect(() => {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 32;
@@ -247,8 +260,15 @@ function AppInner() {
       rafId,
       lastDraw = 0;
     const INTERVAL = 100; // ~10 fps — favicon doesn't need 60 fps
+    const STOP_AFTER = 3000; // stop animating after 3 seconds
+    const startTime = performance.now();
 
     const draw = (now) => {
+      // Fix: stop the loop once the intro animation is done
+      if (now - startTime >= STOP_AFTER) {
+        cancelAnimationFrame(rafId);
+        return;
+      }
       rafId = requestAnimationFrame(draw);
       if (document.hidden) return; // skip entirely when tab is backgrounded
       if (now - lastDraw < INTERVAL) return; // throttle

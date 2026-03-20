@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useToast } from "./useToast";
 import { playSound } from "../utils/audio";
+import { useRef } from "react";
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -50,6 +51,23 @@ export default function ContactSection() {
       submittingRef.current = false;
       setSending(false);
     }
+  };
+
+  // Fix: one-click copy email button
+  const handleCopyEmail = () => {
+    navigator.clipboard
+      .writeText("devajuice@zohomail.in")
+      .then(() => {
+        playSound("success");
+        showToast(
+          '<i class="fas fa-copy" style="margin-right:6px"></i> Email address copied!',
+          "success",
+          2000,
+        );
+      })
+      .catch(() => {
+        showToast("Could not copy — please copy manually.", "error");
+      });
   };
 
   return (
@@ -162,6 +180,18 @@ export default function ContactSection() {
                 <span>{s.label}</span>
               </a>
             ))}
+
+            {/* Fix: copy-email button — lets visitors grab the address without filling the form */}
+            <button
+              type="button"
+              className="social-btn"
+              onClick={handleCopyEmail}
+              aria-label="Copy my email address to clipboard"
+            >
+              <i className="fas fa-copy" aria-hidden="true" />
+              <span>Copy Email</span>
+            </button>
+
             <a
               href="/assets/docs/Devajith_Resume.pdf"
               download="Devajith_Resume.pdf"

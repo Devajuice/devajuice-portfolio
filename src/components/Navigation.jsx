@@ -136,9 +136,12 @@ export default function Navigation({
         </div>
       </nav>
 
+      {/* Fix: aria-hidden when closed so screen readers skip the hidden menu,
+          and its buttons don't appear in the focus order when visually gone */}
       <div
         id="mobileDropdown"
         className={`mobile-dropdown${mobileOpen ? " open" : ""}`}
+        aria-hidden={!mobileOpen}
       >
         <div className="mobile-nav-header">
           <span className="mobile-nav-label">Navigation</span>
@@ -152,6 +155,7 @@ export default function Navigation({
               <button
                 className={`mobile-nav-btn${activeSection === s ? " active" : ""}`}
                 onClick={() => handleNav(s)}
+                tabIndex={mobileOpen ? 0 : -1}
               >
                 <i className={`fas ${SECTION_ICONS[s]}`} aria-hidden="true" />
                 <span>{SECTION_LABELS[s]}</span>
