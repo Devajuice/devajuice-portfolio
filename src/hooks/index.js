@@ -126,25 +126,40 @@ export function useTimezone() {
 }
 
 // ── useParticleCanvas ─────────────────────────────────────────
+// Optimized with spatial hashing to avoid O(n²) line rendering
 export function useParticleCanvas(canvasRef) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
+
     let W,
       H,
       particles,
-      rafId = null;
+      rafId = null,
+      isVisible = true;
+
     const mouse = { x: -9999, y: -9999 };
-    const COUNT = Math.min(80, Math.floor(window.innerWidth / 18));
+
+    // Detect device capabilities and adjust particle count
+    const isLowEnd =
+      /mobile|android|iPhone|iPad/i.test(navigator.userAgent) ||
+      (typeof navigator.deviceMemory !== "undefined" &&
+        navigator.deviceMemory <= 4);
+    const COUNT = isLowEnd
+      ? Math.min(40, Math.floor(window.innerWidth / 30))
+      : Math.min(80, Math.floor(window.innerWidth / 18));
+
     const MAX_DIST = 140,
-      MOUSE_DIST = 180;
+      MOUSE_DIST = 180,
+      GRID_SIZE = 180; // For spatial hashing
 
     const resize = () => {
       W = canvas.width = window.innerWidth;
       H = canvas.height = window.innerHeight;
     };
+
     const createParticles = () => {
       particles = Array.from({ length: COUNT }, () => ({
         x: Math.random() * W,
@@ -156,24 +171,52 @@ export function useParticleCanvas(canvasRef) {
         pulse: Math.random() * Math.PI * 2,
       }));
     };
+
     const getAccentColor = () =>
       document.documentElement.getAttribute("data-theme") === "dark"
         ? "59,130,246"
         : "37,99,235";
+
+    // Spatial hash grid to avoid O(n²) distance checks
+    const createGrid = () => {
+      const grid = new Map();
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const gx = Math.floor(p.x / GRID_SIZE);
+        const gy = Math.floor(p.y / GRID_SIZE);
+        const key = `${gx},${gy}`;
+        if (!grid.has(key)) grid.set(key, []);
+        grid.get(key).push(i);
+      }
+      return grid;
+    };
+
     const draw = () => {
+      if (!isVisible) {
+        rafId = requestAnimationFrame(draw);
+        return;
+      }
+
       ctx.clearRect(0, 0, W, H);
       const accent = getAccentColor();
+
+      // Update particles
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
         p.pulse += 0.012;
+
+        // Wrap around edges
         if (p.x < -10) p.x = W + 10;
         if (p.x > W + 10) p.x = -10;
         if (p.y < -10) p.y = H + 10;
         if (p.y > H + 10) p.y = -10;
+
+        // Mouse repulsion
         const mdx = p.x - mouse.x,
           mdy = p.y - mouse.y,
           md = Math.hypot(mdx, mdy);
+
         if (md < MOUSE_DIST) {
           const force = ((MOUSE_DIST - md) / MOUSE_DIST) * 0.015;
           p.vx += (mdx / md) * force;
@@ -187,28 +230,54 @@ export function useParticleCanvas(canvasRef) {
           p.vx *= 0.995;
           p.vy *= 0.995;
         }
-        const po = p.opacity * (0.7 + 0.3 * Math.sin(p.pulse)),
-          pr = p.r * (0.9 + 0.1 * Math.sin(p.pulse * 1.3));
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        const po = p.opacity * (0.7 + 0.3 * Math.sin(p.pulse));
+        const pr = p.r * (0.9 + 0.1 * Math.sin(p.pulse * 1.3));
         ctx.beginPath();
         ctx.arc(p.x, p.y, pr, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${accent},${po})`;
         ctx.fill();
       }
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i],
-            b = particles[j],
-            dist = Math.hypot(a.x - b.x, a.y - b.y);
-          if (dist < MAX_DIST) {
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(${accent},${(1 - dist / MAX_DIST) * 0.18})`;
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
+
+      // Draw connections using spatial hashing (O(n) instead of O(n²))
+      const grid = createGrid();
+      for (const [key, indices] of grid.entries()) {
+        const [gx, gy] = key.split(",").map(Number);
+
+        // Check neighboring grid cells
+        const neighbors = new Set(indices);
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            if (dx === 0 && dy === 0) continue;
+            const nkey = `${gx + dx},${gy + dy}`;
+            if (grid.has(nkey)) {
+              grid.get(nkey).forEach((i) => neighbors.add(i));
+            }
+          }
+        }
+
+        // Draw lines only to particles in neighboring cells
+        for (const i of indices) {
+          const a = particles[i];
+          for (const j of neighbors) {
+            if (j <= i) continue; // Avoid duplicate lines
+            const b = particles[j];
+            const dist = Math.hypot(a.x - b.x, a.y - b.y);
+            if (dist < MAX_DIST) {
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.strokeStyle = `rgba(${accent},${(1 - dist / MAX_DIST) * 0.18})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
           }
         }
       }
+
       rafId = requestAnimationFrame(draw);
     };
 
@@ -216,19 +285,22 @@ export function useParticleCanvas(canvasRef) {
       resize();
       createParticles();
     };
+
     const onMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     };
+
     const onMouseLeave = () => {
       mouse.x = -9999;
       mouse.y = -9999;
     };
+
     const onVisibility = () => {
-      if (document.hidden) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      } else if (!rafId) draw();
+      isVisible = !document.hidden;
+      if (isVisible && !rafId) {
+        draw();
+      }
     };
 
     window.addEventListener("resize", onResize, { passive: true });
@@ -239,6 +311,7 @@ export function useParticleCanvas(canvasRef) {
     resize();
     createParticles();
     draw();
+
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);

@@ -4,10 +4,16 @@ import App from "./App";
 import "./styles/global.css";
 import { HelmetProvider } from "react-helmet-async";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
-  </React.StrictMode>,
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+// Only enable StrictMode in development to catch bugs
+// In production, disable it to avoid double-rendering overhead
+const isDev = import.meta.env.DEV;
+
+const app = (
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>
 );
+
+root.render(isDev ? <React.StrictMode>{app}</React.StrictMode> : app);
