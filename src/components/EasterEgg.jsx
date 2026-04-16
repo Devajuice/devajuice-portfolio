@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-// Fix #11: useFocusTrap extracted to shared hook — no more duplication
 import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export function triggerConfetti() {
@@ -24,7 +23,6 @@ export function triggerConfetti() {
 export default function EasterEgg({ open, onClose }) {
   const panelRef = useRef(null);
 
-  // Fix #13: trap focus inside panel while open
   useFocusTrap(panelRef, open);
 
   useEffect(() => {

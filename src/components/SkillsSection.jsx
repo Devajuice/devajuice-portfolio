@@ -87,7 +87,6 @@ export default function SkillsSection({ isActive }) {
       const timer = setTimeout(() => setAnimated(true), 50);
       return () => clearTimeout(timer);
     }
-    // Fix #5: reset when leaving so bars re-animate next time the section is visited
     if (!isActive) setAnimated(false);
   }, [isActive, animated]);
 
@@ -106,7 +105,6 @@ export default function SkillsSection({ isActive }) {
             <div className="card-content">
               <h3>{group.title}</h3>
               <ul className="skill-bars-list">
-                {/* Fix #12: removed unused `i` from destructuring */}
                 {group.skills.map(([icon, name, pct]) => (
                   <SkillBar
                     key={name}

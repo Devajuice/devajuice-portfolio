@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-// Fix #10: removed duplicate import of saveThemePreference — consolidated here
 import { triggerInkBlot, saveThemePreference } from "../utils/theme";
 import { playSound } from "../utils/audio";
 
@@ -29,9 +28,17 @@ export default function Navigation({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState({});
+  const [scrolled, setScrolled] = useState(false); // ← scroll-shrink state
   const navLinksRef = useRef(null);
   const btnRefs = useRef({});
   const themeRef = useRef(null);
+
+  // Scroll-shrink: toggle `scrolled` class past a 20px threshold
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const btn = btnRefs.current[activeSection];
@@ -39,9 +46,8 @@ export default function Navigation({
     if (!btn || !navList) return;
     const listRect = navList.getBoundingClientRect();
     const btnRect = btn.getBoundingClientRect();
-    // Position as a slim underline below the active button
     setIndicatorStyle({
-      width: btnRect.width - 16, // slightly inset for elegance
+      width: btnRect.width - 16,
       left: btnRect.left - listRect.left + 8,
       opacity: 1,
     });
@@ -69,9 +75,8 @@ export default function Navigation({
       role="navigation"
       aria-label="Main navigation"
     >
-      <nav className="topnav-pill">
-        {/* Fix #8: use <button> instead of <div role="button"> — natively focusable,
-            fires on Enter/Space without manual onKeyPress handler */}
+      {/* `scrolled` class drives CSS shrink transition */}
+      <nav className={`topnav-pill${scrolled ? " scrolled" : ""}`}>
         <button
           className="logo"
           aria-label="Go to home page"
@@ -136,8 +141,6 @@ export default function Navigation({
         </div>
       </nav>
 
-      {/* Fix: aria-hidden when closed so screen readers skip the hidden menu,
-          and its buttons don't appear in the focus order when visually gone */}
       <div
         id="mobileDropdown"
         className={`mobile-dropdown${mobileOpen ? " open" : ""}`}

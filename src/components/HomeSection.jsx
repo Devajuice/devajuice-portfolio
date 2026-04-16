@@ -3,7 +3,6 @@ import { useTypewriter, useTimezone } from "../hooks";
 import { useToast } from "./useToast";
 import { playSound } from "../utils/audio";
 
-// Fix #14: show a subtle skeleton while musicData is still loading (null)
 function NowPlayingPill({ musicData }) {
   const isLoading = musicData === null;
   const isLive = musicData?.isLive;
@@ -75,8 +74,6 @@ export default function HomeSection({ onNavigate, musicData }) {
         Hi, I'm <span className="hero-name-gradient">Devajith</span>
       </h1>
       <p className="hero-subtitle">
-        {/* Fix #4: removed stale aria-label — parent div already has aria-live="polite"
-            so screen readers will announce the changing text without a hardcoded label */}
         <span id="typewriter">{typewriterText}</span>
         <span className="typewriter-cursor">|</span>
       </p>

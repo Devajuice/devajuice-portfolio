@@ -1,5 +1,4 @@
 import React from "react";
-// Fix #6: import from projects.js (renamed from .jsx — it's pure data, no JSX)
 import { PROJECTS } from "./projects";
 
 export default function ProjectsSection() {

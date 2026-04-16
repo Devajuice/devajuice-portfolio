@@ -19,19 +19,31 @@
         <link rel="canonical" href="https://devajuice.vercel.app" />
 
         <!-- Open Graph -->
-        <meta property="og:url" content="https://devajuice.vercel.app/">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="Devajith — Portfolio">
-        <meta property="og:description" content="Building cool things on the web.">
-        <meta property="og:image" content="https://devajuice.vercel.app/og-image-v2.png">
-        
+        <meta property="og:url" content="https://devajuice.vercel.app/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Devajith — Portfolio" />
+        <meta
+            property="og:description"
+            content="Building cool things on the web."
+        />
+        <meta
+            property="og:image"
+            content="https://devajuice.vercel.app/og-image-v2.png"
+        />
+
         <!-- Twitter Meta Tags -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta property="twitter:domain" content="devajuice.vercel.app">
-        <meta property="twitter:url" content="https://devajuice.vercel.app/">
-        <meta name="twitter:title" content="Devajith — Portfolio">
-        <meta name="twitter:description" content="Building cool things on the web.">
-        <meta name="twitter:image" content="https://devajuice.vercel.app/og-image-v2.png">
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="devajuice.vercel.app" />
+        <meta property="twitter:url" content="https://devajuice.vercel.app/" />
+        <meta name="twitter:title" content="Devajith — Portfolio" />
+        <meta
+            name="twitter:description"
+            content="Building cool things on the web."
+        />
+        <meta
+            name="twitter:image"
+            content="https://devajuice.vercel.app/og-image-v2.png"
+        />
 
         <!-- PWA -->
         <link rel="manifest" href="/manifest.json" />
@@ -101,6 +113,79 @@
         </style>
     </head>
     <body>
+        <noscript>
+            <div
+                style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    font-family: &quot;DM Sans&quot;, system-ui, sans-serif;
+                    background: #0a0a0a;
+                    color: #f1f5f9;
+                    text-align: center;
+                    padding: 2rem;
+                    gap: 1.25rem;
+                "
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="52"
+                    height="52"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#3b82f6"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <h1
+                    style="
+                        font-size: 1.6rem;
+                        font-weight: 700;
+                        margin: 0;
+                        letter-spacing: -0.02em;
+                    "
+                >
+                    JavaScript Required
+                </h1>
+                <p
+                    style="
+                        color: #94a3b8;
+                        max-width: 360px;
+                        margin: 0;
+                        line-height: 1.7;
+                        font-size: 1rem;
+                    "
+                >
+                    This portfolio is built with React and needs JavaScript to
+                    run. Please enable JavaScript in your browser settings and
+                    refresh the page.
+                </p>
+                <a
+                    href="https://www.enable-javascript.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="
+                        margin-top: 0.5rem;
+                        padding: 0.6rem 1.4rem;
+                        background: #3b82f6;
+                        color: #fff;
+                        border-radius: 9999px;
+                        text-decoration: none;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                    "
+                >
+                    How to enable JavaScript →
+                </a>
+            </div>
+        </noscript>
         <div id="root"></div>
         <script type="module" src="/src/main.jsx"></script>
     </body>

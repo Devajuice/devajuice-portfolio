@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-// Fix #11: useFocusTrap extracted to shared hook — no more duplication
 import { useFocusTrap } from "../hooks/useFocusTrap";
 
 const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];

@@ -82,9 +82,7 @@ export default function ContactSection() {
             <i className="fas fa-paper-plane" aria-hidden="true" />
             Send a Message
           </h3>
-          {/* Fix #1: real <form> so Enter-to-submit works natively */}
           <form onSubmit={handleSubmit} aria-label="Contact form" noValidate>
-            {/* Fix #12: honeypot field — Web3Forms ignores submissions where this is filled (bots do) */}
             <input
               type="checkbox"
               name="botcheck"
@@ -129,7 +127,6 @@ export default function ContactSection() {
                 onChange={handleChange}
               />
             </div>
-            {/* Fix #1: type="submit" — no onClick needed, onSubmit on <form> handles it */}
             <button type="submit" className="btn-primary" disabled={sending}>
               {sending ? (
                 <>
@@ -181,7 +178,6 @@ export default function ContactSection() {
               </a>
             ))}
 
-            {/* Fix: copy-email button — lets visitors grab the address without filling the form */}
             <button
               type="button"
               className="social-btn"
