@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
-import { useFocusTrap } from "../hooks/useFocusTrap";
+import React, { useEffect, useRef } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
-const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
+const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'contact'];
 
 export default function KeyboardShortcuts({ open, onClose, activeSection }) {
   const panelRef = useRef(null);
@@ -10,16 +10,16 @@ export default function KeyboardShortcuts({ open, onClose, activeSection }) {
   // Escape to close
   useEffect(() => {
     const handler = (e) => {
-      if (e.key === "Escape" && open) onClose();
+      if (e.key === 'Escape' && open) onClose();
     };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
   return (
     <div
       id="kbdOverlay"
-      className={`kbd-overlay${open ? " open" : ""}`}
+      className={`kbd-overlay${open ? ' open' : ''}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="kbdOverlayTitle"
@@ -31,11 +31,7 @@ export default function KeyboardShortcuts({ open, onClose, activeSection }) {
             <i className="fas fa-keyboard" aria-hidden="true" />
             <span>Keyboard Shortcuts</span>
           </div>
-          <button
-            className="kbd-close"
-            onClick={onClose}
-            aria-label="Close shortcuts"
-          >
+          <button className="kbd-close" onClick={onClose} aria-label="Close shortcuts">
             <i className="fas fa-xmark" aria-hidden="true" />
           </button>
         </div>
@@ -43,17 +39,17 @@ export default function KeyboardShortcuts({ open, onClose, activeSection }) {
         <ul className="kbd-list">
           {SECTIONS.map((s, i) => {
             const icons = {
-              home: "fa-house",
-              about: "fa-user-circle",
-              projects: "fa-folder-open",
-              skills: "fa-chart-line",
-              hobbies: "fa-heart",
-              contact: "fa-envelope",
+              home: 'fa-house',
+              about: 'fa-user-circle',
+              projects: 'fa-folder-open',
+              skills: 'fa-chart-line',
+              hobbies: 'fa-heart',
+              contact: 'fa-envelope',
             };
             return (
               <li
                 key={s}
-                className={`kbd-item${activeSection === s ? " is-active" : ""}`}
+                className={`kbd-item${activeSection === s ? ' is-active' : ''}`}
                 data-section={s}
               >
                 <span className="kbd-desc">

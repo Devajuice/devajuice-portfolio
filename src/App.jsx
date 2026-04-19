@@ -1,14 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
 import Navigation from "./components/Navigation";
 import HomeSection from "./components/HomeSection";
-import AboutSection from "./components/AboutSection";
-import ProjectsSection from "./components/ProjectsSection";
-import SkillsSection from "./components/SkillsSection";
-import HobbiesSection from "./components/HobbiesSection";
-import ContactSection from "./components/ContactSection";
-import EasterEgg, { triggerConfetti } from "./components/EasterEgg";
-import KeyboardShortcuts from "./components/KeyboardShortcuts";
-import Footer from "./components/Footer";
 import { ToastProvider } from "./components/Toast";
 import { useToast } from "./components/useToast";
 import { useTheme, useNowPlaying, useParticleCanvas, useSound } from "./hooks";
@@ -23,6 +15,52 @@ import {
 import { triggerInkBlot } from "./utils/theme";
 import { Helmet } from "react-helmet-async";
 import { useOgImage } from "./hooks/useOgImage";
+
+const AboutSection = lazy(() => import("./components/AboutSection"));
+const ProjectsSection = lazy(() => import("./components/ProjectsSection"));
+const SkillsSection = lazy(() => import("./components/SkillsSection"));
+const HobbiesSection = lazy(() => import("./components/HobbiesSection"));
+const ContactSection = lazy(() => import("./components/ContactSection"));
+const EasterEgg = lazy(() => import("./components/EasterEgg"));
+const KeyboardShortcuts = lazy(() => import("./components/KeyboardShortcuts"));
+const Footer = lazy(() => import("./components/Footer"));
+
+function LoadingFallback() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "50vh",
+      }}
+    >
+      <i
+        className="fas fa-spinner fa-spin"
+        style={{ fontSize: "2rem", color: "var(--accent)" }}
+      />
+    </div>
+  );
+}
+
+function triggerConfetti() {
+  const colors = [
+    "#3b82f6",
+    "#60a5fa",
+    "#818cf8",
+    "#34d399",
+    "#f59e0b",
+    "#f472b6",
+    "#a78bfa",
+  ];
+  for (let i = 0; i < 80; i++) {
+    const el = document.createElement("div");
+    el.className = "confetti-piece";
+    el.style.cssText = `left:${Math.random() * 100}vw;background:${colors[Math.floor(Math.random() * colors.length)]};width:${Math.random() * 8 + 4}px;height:${Math.random() * 8 + 4}px;border-radius:${Math.random() > 0.5 ? "50%" : "2px"};animation-delay:${Math.random() * 0.8}s;animation-duration:${Math.random() * 1.5 + 1.5}s;`;
+    document.body.appendChild(el);
+    el.addEventListener("animationend", () => el.remove());
+  }
+}
 
 const SECTIONS = ["home", "about", "projects", "skills", "hobbies", "contact"];
 const EXIT_MS = 180,
@@ -45,7 +83,6 @@ function AppInner() {
       ]),
     ),
   );
-  // Fix #2: use the existing useSound hook instead of re-implementing it inline
   const { soundEnabled, toggle: toggleSound } = useSound();
   const [kbdOpen, setKbdOpen] = useState(false);
   const [easterEggOpen, setEasterEggOpen] = useState(false);
@@ -61,14 +98,9 @@ function AppInner() {
   const canvasRef = useRef(null);
   const splashRef = useRef(null);
   const isTransitioningRef = useRef(false);
-  // Fix #9: keep a ref that mirrors activeSection for use inside callbacks
-  // without stale closure issues
   const activeSectionRef = useRef(_initialSection);
   const musicStartedRef = useRef(false);
   useParticleCanvas(canvasRef);
-
-  // Fix #3: mirror theme in a ref so the keyboard handler can read the current
-  // value without being in its dependency array — avoids re-registering the
   // listener on every theme change
   const themeSnapshotRef = useRef(theme);
   useEffect(() => {
@@ -168,7 +200,6 @@ function AppInner() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Fix #6: magnetic buttons — no MutationObserver, just reattach on section change
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const btns = document.querySelectorAll("[data-magnetic]");
@@ -590,15 +621,17 @@ function AppInner() {
       {/* Canvas */}
       <canvas ref={canvasRef} id="particleCanvas" aria-hidden="true" />
 
-      {/* Easter Egg */}
-      <EasterEgg open={easterEggOpen} onClose={() => setEasterEggOpen(false)} />
+      <Suspense fallback={null}>
+        {/* Easter Egg */}
+        <EasterEgg open={easterEggOpen} onClose={() => setEasterEggOpen(false)} />
 
-      {/* Keyboard Shortcuts */}
-      <KeyboardShortcuts
-        open={kbdOpen}
-        onClose={() => setKbdOpen(false)}
-        activeSection={activeSection}
-      />
+        {/* Keyboard Shortcuts */}
+        <KeyboardShortcuts
+          open={kbdOpen}
+          onClose={() => setKbdOpen(false)}
+          activeSection={activeSection}
+        />
+      </Suspense>
 
       {/* Back to Top */}
       <button
@@ -654,51 +687,55 @@ function AppInner() {
 
       {/* Main Content */}
       <main id="main-content" className="main-content">
-        <section
-          id="home"
-          className={getStateClasses("home")}
-          aria-labelledby="home-heading"
-        >
-          <HomeSection onNavigate={navigate} musicData={musicData} />
-        </section>
-        <section
-          id="about"
-          className={getStateClasses("about")}
-          aria-labelledby="about-heading"
-        >
-          <AboutSection musicData={musicData} />
-        </section>
-        <section
-          id="projects"
-          className={getStateClasses("projects")}
-          aria-labelledby="projects-heading"
-        >
-          <ProjectsSection />
-        </section>
-        <section
-          id="skills"
-          className={getStateClasses("skills")}
-          aria-labelledby="skills-heading"
-        >
-          <SkillsSection isActive={activeSection === "skills"} />
-        </section>
-        <section
-          id="hobbies"
-          className={getStateClasses("hobbies")}
-          aria-labelledby="hobbies-heading"
-        >
-          <HobbiesSection />
-        </section>
-        <section
-          id="contact"
-          className={getStateClasses("contact")}
-          aria-labelledby="contact-heading"
-        >
-          <ContactSection />
-        </section>
+        <Suspense fallback={<LoadingFallback />}>
+          <section
+            id="home"
+            className={getStateClasses("home")}
+            aria-labelledby="home-heading"
+          >
+            <HomeSection onNavigate={navigate} musicData={musicData} />
+          </section>
+          <section
+            id="about"
+            className={getStateClasses("about")}
+            aria-labelledby="about-heading"
+          >
+            <AboutSection musicData={musicData} />
+          </section>
+          <section
+            id="projects"
+            className={getStateClasses("projects")}
+            aria-labelledby="projects-heading"
+          >
+            <ProjectsSection />
+          </section>
+          <section
+            id="skills"
+            className={getStateClasses("skills")}
+            aria-labelledby="skills-heading"
+          >
+            <SkillsSection isActive={activeSection === "skills"} />
+          </section>
+          <section
+            id="hobbies"
+            className={getStateClasses("hobbies")}
+            aria-labelledby="hobbies-heading"
+          >
+            <HobbiesSection />
+          </section>
+          <section
+            id="contact"
+            className={getStateClasses("contact")}
+            aria-labelledby="contact-heading"
+          >
+            <ContactSection />
+          </section>
+        </Suspense>
       </main>
 
-      <Footer onOpenShortcuts={() => setKbdOpen(true)} />
+      <Suspense fallback={null}>
+        <Footer onOpenShortcuts={() => setKbdOpen(true)} />
+      </Suspense>
     </>
   );
 }

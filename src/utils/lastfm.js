@@ -1,5 +1,5 @@
-const LASTFM_USERNAME = "Devajuice";
-const LASTFM_PH = "2a96cbd8b46e442fc41c2b86b821562f";
+const LASTFM_USERNAME = 'Devajuice';
+const LASTFM_PH = '2a96cbd8b46e442fc41c2b86b821562f';
 
 // In development (vite dev), call Last.fm directly so we don't need a
 // running serverless runtime. In production (Vercel), route through the
@@ -22,7 +22,7 @@ const ART_CACHE_MAX = 100;
 
 // Fix #6: module-level track name so fetchiTunesCoverArt can use it in the
 // fallback search even when called with only artist + album args
-let _currentTrackName = "";
+let _currentTrackName = '';
 
 // Fix #3: bounded art cache setter — evicts the oldest key once the cap is hit
 function setArtCache(key, url) {
@@ -41,13 +41,12 @@ function fetchWithTimeout(url, ms = FETCH_TIMEOUT) {
 }
 
 function getBestImage(images) {
-  if (!images) return "";
-  for (const sz of ["extralarge", "large", "medium", "small"]) {
+  if (!images) return '';
+  for (const sz of ['extralarge', 'large', 'medium', 'small']) {
     const img = images.find((i) => i.size === sz);
-    if (img?.["#text"]?.trim() && !img["#text"].includes(LASTFM_PH))
-      return img["#text"];
+    if (img?.['#text']?.trim() && !img['#text'].includes(LASTFM_PH)) return img['#text'];
   }
-  return "";
+  return '';
 }
 
 // ─── iTunes cover art with session cache ─────────────────────────────────────
@@ -55,8 +54,8 @@ function getBestImage(images) {
 // Higher score = better match. Falls back to track search if album search misses.
 function _scoreResult(r, artist, album) {
   let score = 0;
-  const ra = (r.artistName || "").toLowerCase();
-  const rc = (r.collectionName || "").toLowerCase();
+  const ra = (r.artistName || '').toLowerCase();
+  const rc = (r.collectionName || '').toLowerCase();
   const al = artist.toLowerCase(),
     ab = album.toLowerCase();
   if (ra === al) score += 2;
@@ -68,7 +67,7 @@ function _scoreResult(r, artist, album) {
 
 function _toMaxResArt(url) {
   // iTunes serves artwork up to 3000×3000 — replace the size token for the best quality
-  return url ? url.replace(/\d+x\d+bb/, "3000x3000bb") : "";
+  return url ? url.replace(/\d+x\d+bb/, '3000x3000bb') : '';
 }
 
 async function fetchiTunesCoverArt(artist, album) {
@@ -78,19 +77,19 @@ async function fetchiTunesCoverArt(artist, album) {
     // Primary: album search
     const q = encodeURIComponent(`${artist} ${album}`);
     const res = await fetchWithTimeout(
-      `https://itunes.apple.com/search?term=${q}&entity=album&limit=8`,
+      `https://itunes.apple.com/search?term=${q}&entity=album&limit=8`
     );
-    if (!res.ok) return "";
+    if (!res.ok) return '';
     const data = await res.json();
 
-    let url = "";
+    let url = '';
     if (data.results?.length) {
       // Pick highest-scoring result; fall through to track search only on zero score
       const best = data.results
         .map((r) => ({ r, score: _scoreResult(r, artist, album) }))
         .sort((a, b) => b.score - a.score)[0];
       if (best.score > 0 || data.results.length === 1) {
-        url = _toMaxResArt(best.r.artworkUrl100 || "");
+        url = _toMaxResArt(best.r.artworkUrl100 || '');
       }
     }
 
@@ -99,16 +98,14 @@ async function fetchiTunesCoverArt(artist, album) {
     if (!url && album !== artist) {
       const qt = encodeURIComponent(`${artist} ${_currentTrackName}`);
       const res2 = await fetchWithTimeout(
-        `https://itunes.apple.com/search?term=${qt}&entity=musicTrack&limit=5`,
+        `https://itunes.apple.com/search?term=${qt}&entity=musicTrack&limit=5`
       );
       if (res2.ok) {
         const data2 = await res2.json();
         const hit =
           data2.results?.find((r) => {
-            const ra = (r.artistName || "").toLowerCase();
-            return (
-              ra === artist.toLowerCase() || ra.includes(artist.toLowerCase())
-            );
+            const ra = (r.artistName || '').toLowerCase();
+            return ra === artist.toLowerCase() || ra.includes(artist.toLowerCase());
           }) ?? data2.results?.[0];
         if (hit?.artworkUrl100) url = _toMaxResArt(hit.artworkUrl100);
       }
@@ -118,7 +115,7 @@ async function fetchiTunesCoverArt(artist, album) {
     setArtCache(key, url);
     return url;
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -154,16 +151,15 @@ async function _doFetch() {
 
     const track = data.recenttracks?.track?.[0];
     if (!track) {
-      const empty = { isLive: false, name: "", artist: "", album: "", art: "" };
+      const empty = { isLive: false, name: '', artist: '', album: '', art: '' };
       _cache = { data: empty, ts: Date.now(), isLive: false };
       return empty;
     }
 
-    const isLive = track["@attr"]?.nowplaying === "true";
-    const name = track.name || "Unknown Track";
-    const artist =
-      track.artist?.name || track.artist?.["#text"] || "Unknown Artist";
-    let album = track.album?.["#text"] || "";
+    const isLive = track['@attr']?.nowplaying === 'true';
+    const name = track.name || 'Unknown Track';
+    const artist = track.artist?.name || track.artist?.['#text'] || 'Unknown Artist';
+    let album = track.album?.['#text'] || '';
     let lastfmArt = getBestImage(track.image);
 
     // Fix #6: store track name at module level so fetchiTunesCoverArt fallback
@@ -184,7 +180,7 @@ async function _doFetch() {
                   `&format=json&username=${LASTFM_USERNAME}`
               : `/api/nowplaying?method=track.getInfo` +
                   `&artist=${encodeURIComponent(artist)}` +
-                  `&track=${encodeURIComponent(name)}`,
+                  `&track=${encodeURIComponent(name)}`
           )
             .then((r) => r.json())
             .catch(() => null)
@@ -193,17 +189,17 @@ async function _doFetch() {
       fetchiTunesCoverArt(artist, album || name),
     ]);
 
-    if (infoResult.status === "fulfilled" && infoResult.value?.track?.album) {
+    if (infoResult.status === 'fulfilled' && infoResult.value?.track?.album) {
       const info = infoResult.value.track.album;
-      album = album || info.title || "";
+      album = album || info.title || '';
       lastfmArt = lastfmArt || getBestImage(info.image);
     }
 
-    album = album || "Unknown Album";
+    album = album || 'Unknown Album';
 
     // If speculative iTunes used empty album, retry with resolved name
     let art =
-      itunesResult.status === "fulfilled" && itunesResult.value
+      itunesResult.status === 'fulfilled' && itunesResult.value
         ? itunesResult.value
         : await fetchiTunesCoverArt(artist, album);
 

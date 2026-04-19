@@ -5,7 +5,7 @@ let _hihatBuf = null; // same pattern — allocated once for the ambient schedul
 
 // Fix #2: cache soundEnabled at module level — avoids a synchronous localStorage
 // read on every single playSound() call (nav clicks, keystrokes, success toasts…)
-let _soundEnabled = localStorage.getItem("soundEnabled") === "true";
+let _soundEnabled = localStorage.getItem('soundEnabled') === 'true';
 
 /**
  * Call this whenever the user toggles sound so the module cache stays in sync.
@@ -16,9 +16,8 @@ export function setSoundEnabled(val) {
 }
 
 function _getCtx() {
-  if (!_audioCtx)
-    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (_audioCtx.state === "suspended") _audioCtx.resume().catch(() => {});
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
   return _audioCtx;
 }
 
@@ -27,17 +26,17 @@ export function playSound(type) {
   if (!_soundEnabled) return;
   try {
     const ctx = _getCtx();
-    if (type === "nav") {
+    if (type === 'nav') {
       const osc = ctx.createOscillator(),
         gain = ctx.createGain(),
         filt = ctx.createBiquadFilter();
-      filt.type = "bandpass";
+      filt.type = 'bandpass';
       filt.frequency.value = 800;
       filt.Q.value = 0.5;
       osc.connect(filt);
       filt.connect(gain);
       gain.connect(ctx.destination);
-      osc.type = "sine";
+      osc.type = 'sine';
       const t = ctx.currentTime;
       osc.frequency.setValueAtTime(300, t);
       osc.frequency.exponentialRampToValueAtTime(600, t + 0.12);
@@ -47,23 +46,18 @@ export function playSound(type) {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
       osc.start(t);
       osc.stop(t + 0.25);
-    } else if (type === "click") {
+    } else if (type === 'click') {
       // Generate the noise buffer once and reuse it (avoids Float32Array alloc + random fill on every click)
       if (!_clickBuf || _clickBuf.sampleRate !== ctx.sampleRate) {
-        _clickBuf = ctx.createBuffer(
-          1,
-          Math.floor(ctx.sampleRate * 0.05),
-          ctx.sampleRate,
-        );
+        _clickBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.05), ctx.sampleRate);
         const data = _clickBuf.getChannelData(0);
         for (let i = 0; i < data.length; i++)
-          data[i] =
-            (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.008));
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.008));
       }
       const src = ctx.createBufferSource(),
         gain = ctx.createGain(),
         filt = ctx.createBiquadFilter();
-      filt.type = "highpass";
+      filt.type = 'highpass';
       filt.frequency.value = 2000;
       src.buffer = _clickBuf;
       src.connect(filt);
@@ -71,13 +65,13 @@ export function playSound(type) {
       gain.connect(ctx.destination);
       gain.gain.value = 0.15;
       src.start();
-    } else if (type === "success") {
+    } else if (type === 'success') {
       [523.25, 783.99].forEach((freq, i) => {
         const osc = ctx.createOscillator(),
           gain = ctx.createGain();
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.type = "sine";
+        osc.type = 'sine';
         const t = ctx.currentTime + i * 0.12;
         osc.frequency.setValueAtTime(freq, t);
         gain.gain.setValueAtTime(0, t);
@@ -89,7 +83,7 @@ export function playSound(type) {
     }
   } catch (e) {
     // Fix #5: surface errors in development so real bugs aren't silently swallowed
-    if (import.meta.env?.DEV) console.warn("playSound error:", e);
+    if (import.meta.env?.DEV) console.warn('playSound error:', e);
   }
 }
 
@@ -194,19 +188,19 @@ function schedulePiano(freq, startTime, duration, vol) {
   if (!bgDryGain || !bgConvolver) return;
   const env = ctx.createGain(),
     filt = ctx.createBiquadFilter();
-  filt.type = "lowpass";
+  filt.type = 'lowpass';
   filt.frequency.value = Math.min(freq * 8, 8000);
   filt.Q.value = 0.7;
   env.connect(filt);
   filt.connect(bgDryGain);
   filt.connect(bgConvolver);
   const f1 = ctx.createOscillator();
-  f1.type = "triangle";
+  f1.type = 'triangle';
   f1.frequency.value = freq;
   f1.connect(env);
   const f2 = ctx.createOscillator(),
     g2 = ctx.createGain();
-  f2.type = "sine";
+  f2.type = 'sine';
   f2.frequency.value = freq * 2;
   g2.gain.value = 0.15;
   f2.connect(g2);
@@ -232,13 +226,13 @@ function scheduleBass(freq, startTime, duration, vol) {
   if (!bgDryGain) return;
   const env = ctx.createGain(),
     filt = ctx.createBiquadFilter();
-  filt.type = "lowpass";
+  filt.type = 'lowpass';
   filt.frequency.value = 320;
   filt.Q.value = 0.5;
   env.connect(filt);
   filt.connect(bgDryGain);
   const osc = ctx.createOscillator();
-  osc.type = "sine";
+  osc.type = 'sine';
   osc.frequency.value = freq;
   osc.connect(env);
   env.gain.setValueAtTime(0, startTime);
@@ -264,7 +258,7 @@ function scheduleHihat(startTime, vol) {
   const src = ctx.createBufferSource(),
     gain = ctx.createGain(),
     filt = ctx.createBiquadFilter();
-  filt.type = "highpass";
+  filt.type = 'highpass';
   filt.frequency.value = 8000;
   src.buffer = _hihatBuf;
   src.connect(filt);
@@ -287,7 +281,7 @@ function buildSharedGraph() {
   bgCompressor.attack.value = 0.05;
   bgCompressor.release.value = 0.3;
   bgEQ = ctx.createBiquadFilter();
-  bgEQ.type = "lowpass";
+  bgEQ.type = 'lowpass';
   bgEQ.frequency.value = 4000;
   bgEQ.Q.value = 0.5;
   const revLen = ctx.sampleRate * 3.5;
@@ -296,9 +290,7 @@ function buildSharedGraph() {
     const d = revBuf.getChannelData(ch);
     const preDelay = Math.floor(ctx.sampleRate * 0.025);
     for (let i = preDelay; i < revLen; i++)
-      d[i] =
-        (Math.random() * 2 - 1) *
-        Math.pow(1 - (i - preDelay) / (revLen - preDelay), 2.2);
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - (i - preDelay) / (revLen - preDelay), 2.2);
   }
   bgConvolver = ctx.createConvolver();
   bgConvolver.buffer = revBuf;
@@ -322,13 +314,11 @@ function teardownSharedGraph() {
   bgMaster.gain.setValueAtTime(bgMaster.gain.value, ctx.currentTime);
   bgMaster.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
   setTimeout(() => {
-    [bgMaster, bgCompressor, bgEQ, bgWetGain, bgDryGain, bgConvolver].forEach(
-      (n) => {
-        try {
-          n.disconnect();
-        } catch (e) {}
-      },
-    );
+    [bgMaster, bgCompressor, bgEQ, bgWetGain, bgDryGain, bgConvolver].forEach((n) => {
+      try {
+        n.disconnect();
+      } catch (e) {}
+    });
     bgMaster = bgCompressor = bgEQ = bgWetGain = bgDryGain = bgConvolver = null;
   }, 1600);
 }
@@ -344,15 +334,11 @@ function schedulerTick() {
     const chord = SONG[chordIndex];
     const t = nextBeatTime;
     if (beatInChord === 0)
-      chord.chord.forEach((freq, i) =>
-        schedulePiano(freq, t + i * 0.035, BAR * 2 - 0.15, 0.08),
-      );
+      chord.chord.forEach((freq, i) => schedulePiano(freq, t + i * 0.035, BAR * 2 - 0.15, 0.08));
     if (beatInChord === 0) scheduleBass(chord.bass, t, BEAT * 3.5, 0.22);
-    else if (beatInChord === 4)
-      scheduleBass(chord.bass * 1.5, t, BEAT * 3.2, 0.14);
+    else if (beatInChord === 4) scheduleBass(chord.bass * 1.5, t, BEAT * 3.2, 0.14);
     scheduleHihat(t, beatInChord % 2 === 0 ? 0.02 : 0.01);
-    const cycleIndex =
-      Math.floor(currentBeat / TOTAL_BEATS) % MELODY_CYCLES.length;
+    const cycleIndex = Math.floor(currentBeat / TOTAL_BEATS) % MELODY_CYCLES.length;
     if (MELODY_CYCLES[cycleIndex][beat] !== undefined)
       schedulePiano(MELODY_CYCLES[cycleIndex][beat], t, BEAT * 1.8, 0.1);
     nextBeatTime += BEAT;

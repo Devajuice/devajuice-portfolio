@@ -1,5 +1,5 @@
-import React from "react";
-import { PROJECTS } from "./projects";
+import React from 'react';
+import { PROJECTS } from './projects';
 
 export default function ProjectsSection() {
   return (
@@ -23,11 +23,8 @@ export default function ProjectsSection() {
             </div>
             <div className="card-content">
               <h3>
-                {p.title}{" "}
-                <i
-                  className="fas fa-external-link-alt project-link-icon"
-                  aria-hidden="true"
-                />
+                {p.title}{' '}
+                <i className="fas fa-external-link-alt project-link-icon" aria-hidden="true" />
               </h3>
               <p>{p.desc}</p>
               <div className="tags">

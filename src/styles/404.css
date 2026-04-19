@@ -5,403 +5,403 @@
 
 /* ── Layout ── */
 .error-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 90px);
-    padding: 40px 24px 80px;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 90px);
+  padding: 40px 24px 80px;
+  text-align: center;
 }
 
 /* ── Big glitchy 404 number ── */
 .error-code {
-    font-size: clamp(6rem, 20vw, 11rem);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    margin-bottom: 0.5rem;
-    background: var(--hero-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    background-size: 200% 200%;
-    animation:
-        gradientShift 5s ease infinite,
-        glitch 6s ease-in-out infinite;
-    user-select: none;
-    position: relative;
+  font-size: clamp(6rem, 20vw, 11rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation:
+    gradientShift 5s ease infinite,
+    glitch 6s ease-in-out infinite;
+  user-select: none;
+  position: relative;
 }
 
 /* Glitch pseudo-layers */
 .error-code::before,
 .error-code::after {
-    content: "404";
-    position: absolute;
-    inset: 0;
-    background: var(--hero-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    background-size: 200% 200%;
-    animation: gradientShift 5s ease infinite;
+  content: '404';
+  position: absolute;
+  inset: 0;
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease infinite;
 }
 .error-code::before {
-    animation:
-        gradientShift 5s ease infinite,
-        glitchTop 6s ease-in-out infinite;
-    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
-    opacity: 0;
+  animation:
+    gradientShift 5s ease infinite,
+    glitchTop 6s ease-in-out infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  opacity: 0;
 }
 .error-code::after {
-    animation:
-        gradientShift 5s ease infinite,
-        glitchBot 6s ease-in-out infinite;
-    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
-    opacity: 0;
+  animation:
+    gradientShift 5s ease infinite,
+    glitchBot 6s ease-in-out infinite;
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  opacity: 0;
 }
 
 @keyframes glitch {
-    0%,
-    92%,
-    100% {
-        transform: translate(0);
-    }
-    93% {
-        transform: translate(-3px, 1px);
-    }
-    94% {
-        transform: translate(3px, -1px);
-    }
-    95% {
-        transform: translate(0);
-    }
-    96% {
-        transform: translate(-2px, 2px);
-    }
-    97% {
-        transform: translate(2px, 0);
-    }
+  0%,
+  92%,
+  100% {
+    transform: translate(0);
+  }
+  93% {
+    transform: translate(-3px, 1px);
+  }
+  94% {
+    transform: translate(3px, -1px);
+  }
+  95% {
+    transform: translate(0);
+  }
+  96% {
+    transform: translate(-2px, 2px);
+  }
+  97% {
+    transform: translate(2px, 0);
+  }
 }
 @keyframes glitchTop {
-    0%,
-    92%,
-    100% {
-        opacity: 0;
-        transform: translate(0);
-    }
-    93% {
-        opacity: 0.7;
-        transform: translate(4px, -2px);
-    }
-    94% {
-        opacity: 0.5;
-        transform: translate(-4px, 0);
-    }
-    95% {
-        opacity: 0;
-    }
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+    transform: translate(0);
+  }
+  93% {
+    opacity: 0.7;
+    transform: translate(4px, -2px);
+  }
+  94% {
+    opacity: 0.5;
+    transform: translate(-4px, 0);
+  }
+  95% {
+    opacity: 0;
+  }
 }
 @keyframes glitchBot {
-    0%,
-    93%,
-    100% {
-        opacity: 0;
-        transform: translate(0);
-    }
-    94% {
-        opacity: 0.6;
-        transform: translate(-3px, 2px);
-    }
-    95% {
-        opacity: 0.4;
-        transform: translate(3px, -2px);
-    }
-    96% {
-        opacity: 0;
-    }
+  0%,
+  93%,
+  100% {
+    opacity: 0;
+    transform: translate(0);
+  }
+  94% {
+    opacity: 0.6;
+    transform: translate(-3px, 2px);
+  }
+  95% {
+    opacity: 0.4;
+    transform: translate(3px, -2px);
+  }
+  96% {
+    opacity: 0;
+  }
 }
 @keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* ── Floating icon badge ── */
 .error-icon-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 1.8rem;
-    animation: floatBadge 3s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.8rem;
+  animation: floatBadge 3s ease-in-out infinite;
 }
 .error-icon-badge i {
-    color: var(--accent);
+  color: var(--accent);
 }
 @keyframes floatBadge {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 /* ── Text ── */
 .error-title {
-    font-size: clamp(1.6rem, 4vw, 2.2rem);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    letter-spacing: -0.02em;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
 }
 .error-description {
-    font-size: 1.05rem;
-    color: var(--text-muted);
-    line-height: 1.8;
-    margin-bottom: 2.5rem;
-    max-width: 440px;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  max-width: 440px;
 }
 
 /* ── Actions ── */
 .error-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 .error-actions .btn-primary,
 .error-actions .btn-secondary {
-    min-width: 160px;
-    justify-content: center;
+  min-width: 160px;
+  justify-content: center;
 }
 
 /* ── Decorative scattered dots ── */
 .error-dots {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
 .error-dots span {
-    position: absolute;
-    border-radius: 50%;
-    background: var(--accent);
-    opacity: 0.08;
-    animation: floatDot linear infinite;
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.08;
+  animation: floatDot linear infinite;
 }
 .error-dots span:nth-child(1) {
-    width: 6px;
-    height: 6px;
-    top: 15%;
-    left: 8%;
-    animation-duration: 14s;
-    animation-delay: 0s;
+  width: 6px;
+  height: 6px;
+  top: 15%;
+  left: 8%;
+  animation-duration: 14s;
+  animation-delay: 0s;
 }
 .error-dots span:nth-child(2) {
-    width: 10px;
-    height: 10px;
-    top: 70%;
-    left: 90%;
-    animation-duration: 18s;
-    animation-delay: 2s;
+  width: 10px;
+  height: 10px;
+  top: 70%;
+  left: 90%;
+  animation-duration: 18s;
+  animation-delay: 2s;
 }
 .error-dots span:nth-child(3) {
-    width: 4px;
-    height: 4px;
-    top: 40%;
-    left: 5%;
-    animation-duration: 12s;
-    animation-delay: 1s;
+  width: 4px;
+  height: 4px;
+  top: 40%;
+  left: 5%;
+  animation-duration: 12s;
+  animation-delay: 1s;
 }
 .error-dots span:nth-child(4) {
-    width: 8px;
-    height: 8px;
-    top: 85%;
-    left: 20%;
-    animation-duration: 20s;
-    animation-delay: 3s;
+  width: 8px;
+  height: 8px;
+  top: 85%;
+  left: 20%;
+  animation-duration: 20s;
+  animation-delay: 3s;
 }
 .error-dots span:nth-child(5) {
-    width: 5px;
-    height: 5px;
-    top: 25%;
-    left: 92%;
-    animation-duration: 16s;
-    animation-delay: 0.5s;
+  width: 5px;
+  height: 5px;
+  top: 25%;
+  left: 92%;
+  animation-duration: 16s;
+  animation-delay: 0.5s;
 }
 .error-dots span:nth-child(6) {
-    width: 12px;
-    height: 12px;
-    top: 55%;
-    left: 50%;
-    animation-duration: 22s;
-    animation-delay: 4s;
+  width: 12px;
+  height: 12px;
+  top: 55%;
+  left: 50%;
+  animation-duration: 22s;
+  animation-delay: 4s;
 }
 .error-dots span:nth-child(7) {
-    width: 3px;
-    height: 3px;
-    top: 10%;
-    left: 60%;
-    animation-duration: 11s;
-    animation-delay: 2.5s;
+  width: 3px;
+  height: 3px;
+  top: 10%;
+  left: 60%;
+  animation-duration: 11s;
+  animation-delay: 2.5s;
 }
 .error-dots span:nth-child(8) {
-    width: 7px;
-    height: 7px;
-    top: 90%;
-    left: 70%;
-    animation-duration: 17s;
-    animation-delay: 1.5s;
+  width: 7px;
+  height: 7px;
+  top: 90%;
+  left: 70%;
+  animation-duration: 17s;
+  animation-delay: 1.5s;
 }
 
 @keyframes floatDot {
-    0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 0.08;
-    }
-    50% {
-        opacity: 0.14;
-    }
-    100% {
-        transform: translateY(-40px) rotate(180deg);
-        opacity: 0.08;
-    }
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.14;
+  }
+  100% {
+    transform: translateY(-40px) rotate(180deg);
+    opacity: 0.08;
+  }
 }
 
 /* ── Stagger content in ── */
 .error-code {
-    animation:
-        staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both,
-        gradientShift 5s ease infinite,
-        glitch 6s ease-in-out infinite;
+  animation:
+    staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both,
+    gradientShift 5s ease infinite,
+    glitch 6s ease-in-out infinite;
 }
 .error-icon-badge {
-    animation:
-        staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both,
-        floatBadge 3s ease-in-out infinite;
+  animation:
+    staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both,
+    floatBadge 3s ease-in-out infinite;
 }
 .error-title {
-    animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
 }
 .error-description {
-    animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 }
 .error-actions {
-    animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.38s both;
+  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.38s both;
 }
 
 @keyframes staggerFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Ensure content sits above dots */
 .error-wrapper > * {
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Theme toggle — same position as main site ── */
 .page-theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 24px;
-    z-index: 200;
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 200;
 }
 .theme-toggle-btn {
-    width: 38px;
-    height: 38px;
-    background: rgba(var(--nav-glass-rgb), 0.65);
-    border: 1px solid rgba(var(--nav-glass-border-rgb), 0.18);
-    border-radius: 50%;
-    color: var(--text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow: 0 4px 20px var(--shadow);
-    transition:
-        background 0.2s,
-        transform 0.2s,
-        box-shadow 0.2s;
+  width: 38px;
+  height: 38px;
+  background: rgba(var(--nav-glass-rgb), 0.65);
+  border: 1px solid rgba(var(--nav-glass-border-rgb), 0.18);
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 4px 20px var(--shadow);
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 .theme-toggle-btn:hover {
-    background: var(--bg-secondary);
-    transform: scale(1.1);
+  background: var(--bg-secondary);
+  transform: scale(1.1);
 }
 @keyframes iconSpin {
-    from {
-        transform: rotate(0deg) scale(1);
-    }
-    50% {
-        transform: rotate(180deg) scale(1.2);
-    }
-    to {
-        transform: rotate(360deg) scale(1);
-    }
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
 }
 .theme-toggle-btn.spinning i {
-    animation: iconSpin 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: iconSpin 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── Logo top-left ── */
 .page-logo {
-    position: fixed;
-    top: 22px;
-    left: 24px;
-    z-index: 200;
-    font-size: 1rem;
-    font-weight: 700;
-    font-style: italic;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: color 0.2s;
+  position: fixed;
+  top: 22px;
+  left: 24px;
+  z-index: 200;
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 .page-logo i {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    transition: color 0.2s;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
 }
 .page-logo:hover i {
-    color: var(--accent);
+  color: var(--accent);
 }
 
 /* ── Mobile ── */
 @media (max-width: 480px) {
-    .error-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-    .error-actions .btn-primary,
-    .error-actions .btn-secondary {
-        width: 100%;
-        max-width: 280px;
-    }
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .error-actions .btn-primary,
+  .error-actions .btn-secondary {
+    width: 100%;
+    max-width: 280px;
+  }
 }

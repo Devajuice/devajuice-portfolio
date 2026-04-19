@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { fetchNowPlaying } from "../utils/lastfm";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { fetchNowPlaying } from '../utils/lastfm';
 
 // ── useTheme ───────────────────────────────────────────────────
 export function useTheme() {
   const [theme, setTheme] = useState(() => {
-    return document.documentElement.getAttribute("data-theme") || "light";
+    return document.documentElement.getAttribute('data-theme') || 'light';
   });
 
   const updateTheme = useCallback((newTheme) => {
@@ -17,17 +17,17 @@ export function useTheme() {
 // ── useSound ──────────────────────────────────────────────────
 export function useSound() {
   const [soundEnabled, setSoundEnabled] = useState(
-    () => localStorage.getItem("soundEnabled") === "true",
+    () => localStorage.getItem('soundEnabled') === 'true'
   );
 
   const toggle = useCallback(
     (val) => {
       const next = val !== undefined ? val : !soundEnabled;
       setSoundEnabled(next);
-      localStorage.setItem("soundEnabled", next);
+      localStorage.setItem('soundEnabled', next);
       return next;
     },
-    [soundEnabled],
+    [soundEnabled]
   );
 
   return { soundEnabled, toggle };
@@ -40,7 +40,6 @@ export function useNowPlaying() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      // Fix #7: catch fetch/network errors so the pill never gets stuck on "Loading…"
       try {
         const result = await fetchNowPlaying();
         if (!cancelled) setData(result);
@@ -61,38 +60,38 @@ export function useNowPlaying() {
 
 // ── useTimezone ───────────────────────────────────────────────
 export function useTimezone() {
-  const MY_TZ = "Asia/Kolkata",
-    MY_TZ_SHORT = "IST";
+  const MY_TZ = 'Asia/Kolkata',
+    MY_TZ_SHORT = 'IST';
   const [display, setDisplay] = useState({
-    time: "--:-- --",
-    label: "Loading...",
+    time: '--:-- --',
+    label: 'Loading...',
   });
 
   useEffect(() => {
     const visitorTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const fmtTime = (tz) => {
       try {
-        return new Intl.DateTimeFormat("en-US", {
+        return new Intl.DateTimeFormat('en-US', {
           timeZone: tz,
-          hour: "numeric",
-          minute: "2-digit",
+          hour: 'numeric',
+          minute: '2-digit',
           hour12: true,
         }).format(new Date());
       } catch {
-        return "--:--";
+        return '--:--';
       }
     };
     const getMinutes = (tz) => {
       try {
-        const p = new Intl.DateTimeFormat("en-US", {
+        const p = new Intl.DateTimeFormat('en-US', {
           timeZone: tz,
-          hour: "numeric",
-          minute: "numeric",
+          hour: 'numeric',
+          minute: 'numeric',
           hour12: false,
         }).formatToParts(new Date());
         return (
-          parseInt(p.find((x) => x.type === "hour")?.value || 0) * 60 +
-          parseInt(p.find((x) => x.type === "minute")?.value || 0)
+          parseInt(p.find((x) => x.type === 'hour')?.value || 0) * 60 +
+          parseInt(p.find((x) => x.type === 'minute')?.value || 0)
         );
       } catch {
         return 0;
@@ -101,9 +100,7 @@ export function useTimezone() {
     const getLabel = () => {
       try {
         const isDev =
-          visitorTz === MY_TZ ||
-          visitorTz.includes("Calcutta") ||
-          visitorTz.includes("Kolkata");
+          visitorTz === MY_TZ || visitorTz.includes('Calcutta') || visitorTz.includes('Kolkata');
         if (isDev) return `${MY_TZ_SHORT} · Same timezone as me 🙌`;
         let diff = getMinutes(MY_TZ) - getMinutes(visitorTz);
         if (diff > 720) diff -= 1440;
@@ -111,7 +108,7 @@ export function useTimezone() {
         const a = Math.abs(diff),
           h = Math.floor(a / 60),
           m = a % 60;
-        return `${MY_TZ_SHORT} · ${h > 0 ? h + "h " : ""}${m > 0 ? m + "m " : ""}${diff > 0 ? "ahead of" : "behind"} you`;
+        return `${MY_TZ_SHORT} · ${h > 0 ? h + 'h ' : ''}${m > 0 ? m + 'm ' : ''}${diff > 0 ? 'ahead of' : 'behind'} you`;
       } catch {
         return MY_TZ_SHORT;
       }
@@ -129,10 +126,10 @@ export function useTimezone() {
 // Optimized with spatial hashing to avoid O(n²) line rendering
 export function useParticleCanvas(canvasRef) {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     let W,
       H,
@@ -145,8 +142,7 @@ export function useParticleCanvas(canvasRef) {
     // Detect device capabilities and adjust particle count
     const isLowEnd =
       /mobile|android|iPhone|iPad/i.test(navigator.userAgent) ||
-      (typeof navigator.deviceMemory !== "undefined" &&
-        navigator.deviceMemory <= 4);
+      (typeof navigator.deviceMemory !== 'undefined' && navigator.deviceMemory <= 4);
     const COUNT = isLowEnd
       ? Math.min(40, Math.floor(window.innerWidth / 30))
       : Math.min(80, Math.floor(window.innerWidth / 18));
@@ -173,9 +169,7 @@ export function useParticleCanvas(canvasRef) {
     };
 
     const getAccentColor = () =>
-      document.documentElement.getAttribute("data-theme") === "dark"
-        ? "59,130,246"
-        : "37,99,235";
+      document.documentElement.getAttribute('data-theme') === 'dark' ? '59,130,246' : '37,99,235';
 
     // Spatial hash grid to avoid O(n²) distance checks
     const createGrid = () => {
@@ -245,7 +239,7 @@ export function useParticleCanvas(canvasRef) {
       // Draw connections using spatial hashing (O(n) instead of O(n²))
       const grid = createGrid();
       for (const [key, indices] of grid.entries()) {
-        const [gx, gy] = key.split(",").map(Number);
+        const [gx, gy] = key.split(',').map(Number);
 
         // Check neighboring grid cells
         const neighbors = new Set(indices);
@@ -303,10 +297,10 @@ export function useParticleCanvas(canvasRef) {
       }
     };
 
-    window.addEventListener("resize", onResize, { passive: true });
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
-    window.addEventListener("mouseleave", onMouseLeave);
-    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener('resize', onResize, { passive: true });
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('visibilitychange', onVisibility);
 
     resize();
     createParticles();
@@ -314,21 +308,20 @@ export function useParticleCanvas(canvasRef) {
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseleave", onMouseLeave);
-      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [canvasRef]);
 }
 
 // ── useTypewriter ─────────────────────────────────────────────
-// Fix #5: use a ref-based flag to reliably cancel on unmount mid-timeout
-export function useTypewriter(words = ["Student", "Developer", "Gamer"]) {
-  const [text, setText] = useState("");
+export function useTypewriter(words = ['Student', 'Developer', 'Gamer']) {
+  const [text, setText] = useState('');
 
   useEffect(() => {
-    let cancelled = false; // Fix #5: single cancellation flag covers all pending timers
+    let cancelled = false;
     let wIdx = 0,
       cIdx = 0,
       del = false;

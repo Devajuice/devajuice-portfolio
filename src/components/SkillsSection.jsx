@@ -1,34 +1,34 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
 const SKILL_GROUPS = [
   {
-    icon: "fab fa-python",
-    title: "Programming Languages",
+    icon: 'fab fa-python',
+    title: 'Programming Languages',
     skills: [
-      ["fab fa-python", "Python", 85],
-      ["fab fa-js", "JavaScript", 75],
-      ["fab fa-html5", "HTML/CSS", 90],
-      ["fas fa-database", "SQL", 70],
+      ['fab fa-python', 'Python', 85],
+      ['fab fa-js', 'JavaScript', 75],
+      ['fab fa-html5', 'HTML/CSS', 90],
+      ['fas fa-database', 'SQL', 70],
     ],
   },
   {
-    icon: "fas fa-tools",
-    title: "Frameworks & Tools",
+    icon: 'fas fa-tools',
+    title: 'Frameworks & Tools',
     skills: [
-      ["fab fa-react", "React", 70],
-      ["fab fa-node-js", "Node.js", 60],
-      ["fab fa-git-alt", "Git/GitHub", 80],
-      ["fas fa-terminal", "VS Code", 95],
+      ['fab fa-react', 'React', 70],
+      ['fab fa-node-js', 'Node.js', 60],
+      ['fab fa-git-alt', 'Git/GitHub', 80],
+      ['fas fa-terminal', 'VS Code', 95],
     ],
   },
   {
-    icon: "fas fa-chart-bar",
-    title: "Data Science",
+    icon: 'fas fa-chart-bar',
+    title: 'Data Science',
     skills: [
-      ["fas fa-table", "Pandas", 80],
-      ["fas fa-square-root-alt", "NumPy", 75],
-      ["fas fa-chart-area", "Matplotlib", 70],
-      ["fas fa-brain", "Scikit-learn", 65],
+      ['fas fa-table', 'Pandas', 80],
+      ['fas fa-square-root-alt', 'NumPy', 75],
+      ['fas fa-chart-area', 'Matplotlib', 70],
+      ['fas fa-brain', 'Scikit-learn', 65],
     ],
   },
 ];
@@ -61,16 +61,14 @@ function SkillBar({ icon, name, pct, animate }) {
           <i className={icon} aria-hidden="true" />
           {name}
         </span>
-        <span
-          className={`skill-bar-pct${animate && current === pct ? " counting-done" : ""}`}
-        >
+        <span className={`skill-bar-pct${animate && current === pct ? ' counting-done' : ''}`}>
           {animate ? current : 0}%
         </span>
       </div>
       <div className="skill-bar-track">
         <div
           className="skill-bar-fill"
-          style={{ width: animate ? width + "%" : "0%" }}
+          style={{ width: animate ? width + '%' : '0%' }}
           data-pct={pct}
         />
       </div>
@@ -106,13 +104,7 @@ export default function SkillsSection({ isActive }) {
               <h3>{group.title}</h3>
               <ul className="skill-bars-list">
                 {group.skills.map(([icon, name, pct]) => (
-                  <SkillBar
-                    key={name}
-                    icon={icon}
-                    name={name}
-                    pct={pct}
-                    animate={animated}
-                  />
+                  <SkillBar key={name} icon={icon} name={name} pct={pct} animate={animated} />
                 ))}
               </ul>
             </div>

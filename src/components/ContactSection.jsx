@@ -1,37 +1,36 @@
-import React, { useState } from "react";
-import { useToast } from "./useToast";
-import { playSound } from "../utils/audio";
-import { useRef } from "react";
+import React, { useState } from 'react';
+import { useToast } from './useToast';
+import { playSound } from '../utils/audio';
+import { useRef } from 'react';
 
 export default function ContactSection() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sending, setSending] = useState(false);
   const submittingRef = useRef(false); // ref guard prevents double-submit before state update settles
   const showToast = useToast();
 
-  const handleChange = (e) =>
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submittingRef.current) return; // block concurrent submissions
     const { name, email, message } = form;
     if (!name || !email || !message) {
-      showToast("Please fill in all fields.", "warning");
+      showToast('Please fill in all fields.', 'warning');
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showToast("Please enter a valid email address.", "error");
+      showToast('Please enter a valid email address.', 'error');
       return;
     }
     submittingRef.current = true;
     setSending(true);
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          access_key: "22419ab2-e874-481c-a3b5-6d2fc55fa04e",
+          access_key: '22419ab2-e874-481c-a3b5-6d2fc55fa04e',
           name,
           email,
           message,
@@ -39,14 +38,14 @@ export default function ContactSection() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        playSound("success");
-        showToast("Message sent! I'll get back to you soon.", "success");
-        setForm({ name: "", email: "", message: "" });
+        playSound('success');
+        showToast("Message sent! I'll get back to you soon.", 'success');
+        setForm({ name: '', email: '', message: '' });
       } else {
-        showToast("Failed to send. Please try again.", "error");
+        showToast('Failed to send. Please try again.', 'error');
       }
     } catch {
-      showToast("An error occurred. Please try again later.", "error");
+      showToast('An error occurred. Please try again later.', 'error');
     } finally {
       submittingRef.current = false;
       setSending(false);
@@ -56,17 +55,17 @@ export default function ContactSection() {
   // Fix: one-click copy email button
   const handleCopyEmail = () => {
     navigator.clipboard
-      .writeText("devajuice@zohomail.in")
+      .writeText('devajuice@zohomail.in')
       .then(() => {
-        playSound("success");
+        playSound('success');
         showToast(
           '<i class="fas fa-copy" style="margin-right:6px"></i> Email address copied!',
-          "success",
-          2000,
+          'success',
+          2000
         );
       })
       .catch(() => {
-        showToast("Could not copy — please copy manually.", "error");
+        showToast('Could not copy — please copy manually.', 'error');
       });
   };
 
@@ -86,7 +85,7 @@ export default function ContactSection() {
             <input
               type="checkbox"
               name="botcheck"
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
               tabIndex={-1}
               aria-hidden="true"
             />
@@ -150,19 +149,19 @@ export default function ContactSection() {
           <div className="social-links">
             {[
               {
-                href: "https://github.com/devajuice",
-                icon: "fab fa-github",
-                label: "GitHub",
+                href: 'https://github.com/devajuice',
+                icon: 'fab fa-github',
+                label: 'GitHub',
               },
               {
-                href: "https://www.linkedin.com/in/devajith-jijush-5741ab39b/",
-                icon: "fab fa-linkedin",
-                label: "LinkedIn",
+                href: 'https://www.linkedin.com/in/devajith-jijush-5741ab39b/',
+                icon: 'fab fa-linkedin',
+                label: 'LinkedIn',
               },
               {
-                href: "https://instagram.com/devajuice",
-                icon: "fab fa-instagram",
-                label: "Instagram",
+                href: 'https://instagram.com/devajuice',
+                icon: 'fab fa-instagram',
+                label: 'Instagram',
               },
             ].map((s) => (
               <a

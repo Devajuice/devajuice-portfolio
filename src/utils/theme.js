@@ -114,26 +114,26 @@ function makeBlob(points, cx, cy, maxR) {
       c2y = p2[1] - (p3[1] - p1[1]) / 6;
     d += ` C ${c1x},${c1y} ${c2x},${c2y} ${p2[0]},${p2[1]}`;
   }
-  return d + " Z";
+  return d + ' Z';
 }
 
 let _lastBlobIdx = -1;
 
 export function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.setAttribute('data-theme', theme);
 }
 
 // New function to call ONLY when a user manually clicks a toggle
 export function saveThemePreference(theme) {
-  localStorage.setItem("theme", theme);
+  localStorage.setItem('theme', theme);
 }
 
 export function getTheme() {
-  return document.documentElement.getAttribute("data-theme") || "light";
+  return document.documentElement.getAttribute('data-theme') || 'light';
 }
 
 export function triggerInkBlot(newTheme, onComplete) {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     applyTheme(newTheme);
     onComplete?.(newTheme);
     return;
@@ -149,13 +149,13 @@ export function triggerInkBlot(newTheme, onComplete) {
   } while (idx === _lastBlobIdx && INK_BLOBS.length > 1);
   _lastBlobIdx = idx;
 
-  const svgNS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(svgNS, "svg");
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
   svg.style.cssText =
-    "position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:visible;";
-  const path = document.createElementNS(svgNS, "path");
-  path.setAttribute("d", makeBlob(INK_BLOBS[idx], cx, cy, maxR));
-  path.setAttribute("fill", newTheme === "dark" ? "#0a0a0a" : "#ffffff");
+    'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:visible;';
+  const path = document.createElementNS(svgNS, 'path');
+  path.setAttribute('d', makeBlob(INK_BLOBS[idx], cx, cy, maxR));
+  path.setAttribute('fill', newTheme === 'dark' ? '#0a0a0a' : '#ffffff');
   path.style.cssText = `transform-origin:${cx}px ${cy}px;transform:scale(0);transition:transform .55s cubic-bezier(.34,1.05,.64,1);`;
   svg.appendChild(path);
   document.body.appendChild(svg);
@@ -166,7 +166,7 @@ export function triggerInkBlot(newTheme, onComplete) {
   const finish = () => {
     if (completed) return;
     completed = true;
-    document.removeEventListener("visibilitychange", onHide);
+    document.removeEventListener('visibilitychange', onHide);
     applyTheme(newTheme);
     onComplete?.(newTheme);
     svg.remove();
@@ -174,22 +174,22 @@ export function triggerInkBlot(newTheme, onComplete) {
   const onHide = () => {
     if (document.hidden) finish();
   };
-  document.addEventListener("visibilitychange", onHide);
+  document.addEventListener('visibilitychange', onHide);
 
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
-      path.style.transform = "scale(1)";
-    }),
+      path.style.transform = 'scale(1)';
+    })
   );
   setTimeout(() => {
     if (completed) return; // already finished via visibilitychange
     applyTheme(newTheme);
     onComplete?.(newTheme);
-    document.removeEventListener("visibilitychange", onHide);
+    document.removeEventListener('visibilitychange', onHide);
     completed = true;
     setTimeout(() => {
-      path.style.transition = "transform .45s cubic-bezier(.4,0,.2,1)";
-      path.style.transform = "scale(0)";
+      path.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1)';
+      path.style.transform = 'scale(0)';
       setTimeout(() => svg.remove(), 500);
     }, 60);
   }, 580);

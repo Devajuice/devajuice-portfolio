@@ -1,22 +1,14 @@
-import React, { useEffect, useRef } from "react";
-import { useFocusTrap } from "../hooks/useFocusTrap";
+import React, { useEffect, useRef } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export function triggerConfetti() {
-  const colors = [
-    "#3b82f6",
-    "#60a5fa",
-    "#818cf8",
-    "#34d399",
-    "#f59e0b",
-    "#f472b6",
-    "#a78bfa",
-  ];
+  const colors = ['#3b82f6', '#60a5fa', '#818cf8', '#34d399', '#f59e0b', '#f472b6', '#a78bfa'];
   for (let i = 0; i < 80; i++) {
-    const el = document.createElement("div");
-    el.className = "confetti-piece";
-    el.style.cssText = `left:${Math.random() * 100}vw;background:${colors[Math.floor(Math.random() * colors.length)]};width:${Math.random() * 8 + 4}px;height:${Math.random() * 8 + 4}px;border-radius:${Math.random() > 0.5 ? "50%" : "2px"};animation-delay:${Math.random() * 0.8}s;animation-duration:${Math.random() * 1.5 + 1.5}s;`;
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `left:${Math.random() * 100}vw;background:${colors[Math.floor(Math.random() * colors.length)]};width:${Math.random() * 8 + 4}px;height:${Math.random() * 8 + 4}px;border-radius:${Math.random() > 0.5 ? '50%' : '2px'};animation-delay:${Math.random() * 0.8}s;animation-duration:${Math.random() * 1.5 + 1.5}s;`;
     document.body.appendChild(el);
-    el.addEventListener("animationend", () => el.remove());
+    el.addEventListener('animationend', () => el.remove());
   }
 }
 
@@ -28,16 +20,16 @@ export default function EasterEgg({ open, onClose }) {
   useEffect(() => {
     if (!open) return; // only register when visible — avoids dangling no-op handler
     const handler = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
   return (
     <div
       id="easterEggOverlay"
-      className={`easter-egg-overlay${open ? " open" : ""}`}
+      className={`easter-egg-overlay${open ? ' open' : ''}`}
       aria-hidden={!open}
       aria-modal="true"
       role="dialog"

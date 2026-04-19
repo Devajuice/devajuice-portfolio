@@ -5,11 +5,11 @@
  *   const ogImage = useOgImage({ title: 'About Me', description: '...', author: 'Dev' });
  *   // Returns: https://your-site.vercel.app/api/og?title=About+Me&description=...&author=Dev
  */
-export function useOgImage({ title = "", description = "", author = "" } = {}) {
+export function useOgImage({ title = '', description = '', author = '' } = {}) {
   const base =
-    typeof window !== "undefined"
+    typeof window !== 'undefined'
       ? window.location.origin
-      : "https://devajuice-portfolio.vercel.app"; // fallback for SSR / meta tags
+      : 'https://devajuice-portfolio.vercel.app'; // fallback for SSR / meta tags
 
   const params = new URLSearchParams({
     ...(title && { title }),
