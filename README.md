@@ -17,7 +17,7 @@ A modern, responsive single-page portfolio website featuring a clean monochrome 
 - **Responsive Design** — Seamlessly adapts to desktop, tablet, and mobile devices
 - **Floating Pill Navbar** — Centered glassmorphism navigation bar on desktop with clickable logo, compact dropdown on mobile
 - **DM Sans Typography** — Modern, clean font used across the entire site
-- **Site Footer** — Persistent footer with logo, copyright, tech stack chips, social icon links, and a keyboard shortcuts hint; stacks and centers on mobile
+- **Site Footer** — 4-column grid layout (Brand, Quick Links, Connect, Resources) with tagline, tech stack chips, navigation links, email contact, resume download, social icon links, and keyboard shortcuts hint; responsive 4→2→1 column grid on mobile
 - **Custom 404 Page** — Styled error page matching the portfolio design with glitch animation, served via Vercel routing
 - **Locale-Aware Timezone Display** — Hero section shows the current IST time and how far ahead/behind it is from the visitor's local timezone, updating every 30 seconds
 - **No-JS Fallback** — A `<noscript>` banner informs users if JavaScript is disabled and reveals the home section statically
@@ -82,7 +82,7 @@ A modern, responsive single-page portfolio website featuring a clean monochrome 
 - **PWA Ready** — `manifest.json` enables "Add to Home Screen" on Android/iOS with app shortcuts for Projects and Contact
 - **Theme Color** — `theme-color` meta tag updates the browser chrome to match your accent color (light and dark variants)
 - **Fast Loading** — Vite-bundled output, deferred script loading, preconnect hints for all external origins, and no render-blocking resources
-- **SEO Optimised** — Full meta tags, Open Graph (with image dimensions), Twitter Card, canonical URL, and a clean `sitemap.xml`
+- **SEO Optimised** — Full meta tags, Open Graph (with image dimensions), Twitter Card, canonical URL, JSON-LD structured data (Person schema), and a clean `sitemap.xml`
 - **Accessibility** — Skip link, ARIA labels, keyboard navigation, focus traps on overlays (`role="dialog"`), `aria-live` regions for dynamic content, and `aria-hidden` on the mobile nav dropdown when closed so hidden buttons are invisible to screen readers and excluded from the tab order
 - **Reduced Motion** — Respects `prefers-reduced-motion` — disables particle canvas, transitions, and animations
 - **Tab Visibility** — Particle canvas and ambient music both pause when the tab is hidden, resuming when you return
@@ -130,7 +130,7 @@ devajith-portfolio/
 │   │   ├── AboutSection.jsx
 │   │   ├── ContactSection.jsx   # Contact form + copy-email button
 │   │   ├── EasterEgg.jsx
-│   │   ├── Footer.jsx
+│   │   ├── Footer.jsx            # 4-column grid: brand, quick links, connect, resources
 │   │   ├── HomeSection.jsx
 │   │   ├── HobbiesSection.jsx
 │   │   ├── KeyboardShortcuts.jsx
