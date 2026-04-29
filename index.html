@@ -1,192 +1,170 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Devajith | Developer Portfolio</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devajith | Developer Portfolio</title>
 
-        <!-- SEO -->
-        <meta
-            name="description"
-            content="Devajith — Student, Developer, and Data Analyst passionate about creating efficient solutions."
-        />
-        <meta
-            name="keywords"
-            content="Devajith, Developer, Portfolio, Web Development, Python, Data Analysis, Kerala"
-        />
-        <meta name="author" content="Devajith" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://devajuice.vercel.app" />
+    <!-- SEO -->
+    <meta
+      name="description"
+      content="Devajith — Student, Developer, and Data Analyst passionate about creating efficient solutions."
+    />
+    <meta
+      name="keywords"
+      content="Devajith, Developer, Portfolio, Web Development, Python, Data Analysis, Kerala"
+    />
+    <meta name="author" content="Devajith" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://devajuice.vercel.app" />
 
-        <!-- Open Graph -->
-        <meta property="og:url" content="https://devajuice.vercel.app/" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Devajith — Portfolio" />
-        <meta
-            property="og:description"
-            content="Building cool things on the web."
-        />
-        <meta
-            property="og:image"
-            content="https://devajuice.vercel.app/og-image-v2.png"
-        />
+    <!-- Open Graph -->
+    <meta property="og:url" content="https://devajuice.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Devajith — Portfolio" />
+    <meta property="og:description" content="Building cool things on the web." />
+    <meta property="og:image" content="https://devajuice.vercel.app/og-image-v2.png" />
 
-        <!-- Twitter Meta Tags -->
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="devajuice.vercel.app" />
-        <meta property="twitter:url" content="https://devajuice.vercel.app/" />
-        <meta name="twitter:title" content="Devajith — Portfolio" />
-        <meta
-            name="twitter:description"
-            content="Building cool things on the web."
-        />
-        <meta
-            name="twitter:image"
-            content="https://devajuice.vercel.app/og-image-v2.png"
-        />
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="devajuice.vercel.app" />
+    <meta property="twitter:url" content="https://devajuice.vercel.app/" />
+    <meta name="twitter:title" content="Devajith — Portfolio" />
+    <meta name="twitter:description" content="Building cool things on the web." />
+    <meta name="twitter:image" content="https://devajuice.vercel.app/og-image-v2.png" />
 
-        <!-- PWA -->
-        <link rel="manifest" href="/manifest.json" />
-        <meta
-            name="theme-color"
-            content="#3b82f6"
-            media="(prefers-color-scheme: dark)"
-        />
-        <meta
-            name="theme-color"
-            content="#2563eb"
-            media="(prefers-color-scheme: light)"
-        />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
-        />
-        <meta name="apple-mobile-web-app-title" content="Devajith" />
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Devajith",
+        "url": "https://devajuice.vercel.app",
+        "image": "https://devajuice.vercel.app/og-image-v2.png",
+        "jobTitle": "Student, Developer, and Data Analyst",
+        "description": "Devajith — Student, Developer, and Data Analyst passionate about creating efficient solutions.",
+        "sameAs": [
+          "https://github.com/devajuice",
+          "https://www.linkedin.com/in/devajith-jijush-5741ab39b/",
+          "https://instagram.com/devajuice"
+        ],
+        "knowsAbout": ["Web Development", "Python", "Data Analysis", "React", "JavaScript"]
+      }
+    </script>
 
-        <!-- Preconnect -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-        <link rel="preconnect" href="https://ws.audioscrobbler.com" />
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#3b82f6" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Devajith" />
 
-        <!-- Font Awesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://ws.audioscrobbler.com" />
 
-        <!-- Google Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap"
-            rel="stylesheet"
-        />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-        <!-- Theme init — prevents flash -->
-        <script>
-            (function () {
-                var t =
-                    localStorage.getItem("theme") ||
-                    (window.matchMedia("(prefers-color-scheme: dark)").matches
-                        ? "dark"
-                        : "light");
-                document.documentElement.setAttribute("data-theme", t);
-            })();
-        </script>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap"
+      rel="stylesheet"
+    />
 
-        <style>
-            :root {
-                color-scheme: light dark;
-            }
-            html {
-                background: #fff;
-            }
-            html[data-theme="dark"] {
-                background: #0a0a0a;
-            }
-            body {
-                margin: 0;
-                font-family: "DM Sans", system-ui, sans-serif;
-            }
-        </style>
-    </head>
-    <body>
-        <noscript>
-            <div
-                style="
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    min-height: 100vh;
-                    font-family: &quot;DM Sans&quot;, system-ui, sans-serif;
-                    background: #0a0a0a;
-                    color: #f1f5f9;
-                    text-align: center;
-                    padding: 2rem;
-                    gap: 1.25rem;
-                "
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="52"
-                    height="52"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#3b82f6"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                >
-                    <polyline points="16 18 22 12 16 6" />
-                    <polyline points="8 6 2 12 8 18" />
-                </svg>
-                <h1
-                    style="
-                        font-size: 1.6rem;
-                        font-weight: 700;
-                        margin: 0;
-                        letter-spacing: -0.02em;
-                    "
-                >
-                    JavaScript Required
-                </h1>
-                <p
-                    style="
-                        color: #94a3b8;
-                        max-width: 360px;
-                        margin: 0;
-                        line-height: 1.7;
-                        font-size: 1rem;
-                    "
-                >
-                    This portfolio is built with React and needs JavaScript to
-                    run. Please enable JavaScript in your browser settings and
-                    refresh the page.
-                </p>
-                <a
-                    href="https://www.enable-javascript.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style="
-                        margin-top: 0.5rem;
-                        padding: 0.6rem 1.4rem;
-                        background: #3b82f6;
-                        color: #fff;
-                        border-radius: 9999px;
-                        text-decoration: none;
-                        font-size: 0.9rem;
-                        font-weight: 600;
-                    "
-                >
-                    How to enable JavaScript →
-                </a>
-            </div>
-        </noscript>
-        <div id="root"></div>
-        <script type="module" src="/src/main.jsx"></script>
-    </body>
+    <!-- Theme init — prevents flash -->
+    <script>
+      (function () {
+        var t =
+          localStorage.getItem('theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        background: #fff;
+      }
+      html[data-theme='dark'] {
+        background: #0a0a0a;
+      }
+      body {
+        margin: 0;
+        font-family: 'DM Sans', system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          background: #0a0a0a;
+          color: #f1f5f9;
+          text-align: center;
+          padding: 2rem;
+          gap: 1.25rem;
+        "
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="52"
+          height="52"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#3b82f6"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+        <h1 style="font-size: 1.6rem; font-weight: 700; margin: 0; letter-spacing: -0.02em">
+          JavaScript Required
+        </h1>
+        <p style="color: #94a3b8; max-width: 360px; margin: 0; line-height: 1.7; font-size: 1rem">
+          This portfolio is built with React and needs JavaScript to run. Please enable JavaScript
+          in your browser settings and refresh the page.
+        </p>
+        <a
+          href="https://www.enable-javascript.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="
+            margin-top: 0.5rem;
+            padding: 0.6rem 1.4rem;
+            background: #3b82f6;
+            color: #fff;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+          "
+        >
+          How to enable JavaScript →
+        </a>
+      </div>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
