@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Footer({ onOpenShortcuts }) {
+export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="site-footer">
@@ -86,16 +86,6 @@ export default function Footer({ onOpenShortcuts }) {
                   <i className="fas fa-file-pdf" aria-hidden="true" />
                   Download Resume
                 </a>
-              </li>
-              <li>
-                <button
-                  className="footer-kbd-hint"
-                  onClick={onOpenShortcuts}
-                  aria-label="View keyboard shortcuts"
-                >
-                  <kbd>?</kbd>
-                  <span>Keyboard shortcuts</span>
-                </button>
               </li>
             </ul>
           </div>

@@ -169,7 +169,7 @@ export function useParticleCanvas(canvasRef) {
     };
 
     const getAccentColor = () =>
-      document.documentElement.getAttribute('data-theme') === 'dark' ? '59,130,246' : '37,99,235';
+      document.documentElement.getAttribute('data-theme') === 'dark' ? '173,181,189' : '73,80,87';
 
     // Spatial hash grid to avoid O(n²) distance checks
     const createGrid = () => {

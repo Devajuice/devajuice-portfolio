@@ -45,13 +45,13 @@ function LoadingFallback() {
 
 function triggerConfetti() {
   const colors = [
-    "#3b82f6",
-    "#60a5fa",
-    "#818cf8",
-    "#34d399",
-    "#f59e0b",
-    "#f472b6",
-    "#a78bfa",
+    "#495057",
+    "#6c757d",
+    "#adb5bd",
+    "#ced4da",
+    "#dee2e6",
+    "#e9ecef",
+    "#f8f9fa",
   ];
   for (let i = 0; i < 80; i++) {
     const el = document.createElement("div");
@@ -309,8 +309,8 @@ function AppInner() {
         isDark = document.documentElement.getAttribute("data-theme") === "dark";
       ctx.clearRect(0, 0, 32, 32);
       const bg = ctx.createLinearGradient(0, 0, 32, 32);
-      bg.addColorStop(0, isDark ? "#1a1a2e" : "#e8f0fe");
-      bg.addColorStop(1, isDark ? "#16213e" : "#d1e3ff");
+      bg.addColorStop(0, isDark ? "#212529" : "#f8f9fa");
+      bg.addColorStop(1, isDark ? "#343a40" : "#e9ecef");
       ctx.beginPath();
       ctx.arc(16, 16, 15, 0, Math.PI * 2);
       ctx.fillStyle = bg;
@@ -322,11 +322,11 @@ function AppInner() {
       ctx.font = "bold 13px monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = isDark ? "#3b82f6" : "#2563eb";
+      ctx.fillStyle = isDark ? "#adb5bd" : "#495057";
       ctx.fillText("</>", 16, 16);
       const gg = ctx.createRadialGradient(dx, dy, 0, dx, dy, 4);
-      gg.addColorStop(0, isDark ? "rgba(96,165,250,1)" : "rgba(37,99,235,1)");
-      gg.addColorStop(1, "rgba(59,130,246,0)");
+      gg.addColorStop(0, isDark ? "rgba(173,181,189,1)" : "rgba(73,80,87,1)");
+      gg.addColorStop(1, "rgba(173,181,189,0)");
       ctx.beginPath();
       ctx.arc(dx, dy, 4, 0, Math.PI * 2);
       ctx.fillStyle = gg;
@@ -734,7 +734,7 @@ function AppInner() {
       </main>
 
       <Suspense fallback={null}>
-        <Footer onOpenShortcuts={() => setKbdOpen(true)} />
+        <Footer />
       </Suspense>
     </>
   );

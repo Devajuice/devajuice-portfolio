@@ -155,7 +155,7 @@ export function triggerInkBlot(newTheme, onComplete) {
     'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:visible;';
   const path = document.createElementNS(svgNS, 'path');
   path.setAttribute('d', makeBlob(INK_BLOBS[idx], cx, cy, maxR));
-  path.setAttribute('fill', newTheme === 'dark' ? '#0a0a0a' : '#ffffff');
+  path.setAttribute('fill', newTheme === 'dark' ? '#212529' : '#f8f9fa');
   path.style.cssText = `transform-origin:${cx}px ${cy}px;transform:scale(0);transition:transform .55s cubic-bezier(.34,1.05,.64,1);`;
   svg.appendChild(path);
   document.body.appendChild(svg);

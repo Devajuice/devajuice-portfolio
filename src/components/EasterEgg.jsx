@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export function triggerConfetti() {
-  const colors = ['#3b82f6', '#60a5fa', '#818cf8', '#34d399', '#f59e0b', '#f472b6', '#a78bfa'];
+  const colors = ['#495057', '#6c757d', '#adb5bd', '#ced4da', '#dee2e6', '#e9ecef', '#f8f9fa'];
   for (let i = 0; i < 80; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
