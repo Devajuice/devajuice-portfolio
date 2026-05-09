@@ -67,15 +67,6 @@ export default function KeyboardShortcuts({ open, onClose, activeSection }) {
         <ul className="kbd-list">
           <li className="kbd-item">
             <span className="kbd-desc">
-              <i className="fas fa-moon" aria-hidden="true" />
-              Toggle theme
-            </span>
-            <span className="kbd-keys">
-              <kbd id="kk-t">T</kbd>
-            </span>
-          </li>
-          <li className="kbd-item">
-            <span className="kbd-desc">
               <i className="fas fa-arrow-up" aria-hidden="true" />
               Back to top
             </span>

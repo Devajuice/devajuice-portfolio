@@ -1,125 +1,84 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>404 | Page Not Found — Devajith</title>
-        <meta name="robots" content="noindex, nofollow" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 | Page Not Found — Devajith</title>
+    <meta name="robots" content="noindex, nofollow" />
 
-        <!-- ✦ PWA -->
-        <link rel="manifest" href="/manifest.json" />
-        <meta
-            name="theme-color"
-            content="#adb5bd"
-            media="(prefers-color-scheme: dark)"
-        />
-        <meta
-            name="theme-color"
-            content="#495057"
-            media="(prefers-color-scheme: light)"
-        />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
-        />
-        <meta name="apple-mobile-web-app-title" content="Devajith" />
+    <!-- ✦ PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Devajith" />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
-        <link
-            href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap"
-            rel="stylesheet"
-        />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap"
+      rel="stylesheet"
+    />
 
-        <!-- Shared design system -->
-        <link rel="stylesheet" href="/global.css" />
-        <!-- 404-specific styles -->
-        <link rel="stylesheet" href="/404.css" />
-        <script src="/js/404.js" defer></script>
+    <!-- Shared design system -->
+    <link rel="stylesheet" href="/global.css" />
+    <!-- 404-specific styles -->
+    <link rel="stylesheet" href="/404.css" />
+    <script src="/js/404.js" defer></script>
+  </head>
+  <body>
+    <!-- Cursor spotlight — same as main site -->
+    <div class="cursor-spotlight" id="cursorSpotlight" aria-hidden="true"></div>
 
-        <!-- Inline theme init: prevents flash of wrong theme before CSS loads -->
-        <script>
-            (function () {
-                var stored = localStorage.getItem("theme");
-                var prefersDark = window.matchMedia(
-                    "(prefers-color-scheme: dark)",
-                ).matches;
-                document.documentElement.setAttribute(
-                    "data-theme",
-                    stored || (prefersDark ? "dark" : "light"),
-                );
-            })();
-        </script>
-    </head>
-    <body>
-        <!-- Cursor spotlight — same as main site -->
-        <div
-            class="cursor-spotlight"
-            id="cursorSpotlight"
-            aria-hidden="true"
-        ></div>
+    <!-- Floating background dots -->
+    <div class="error-dots" aria-hidden="true">
+      <span></span><span></span><span></span><span></span> <span></span><span></span><span></span
+      ><span></span>
+    </div>
 
-        <!-- Floating background dots -->
-        <div class="error-dots" aria-hidden="true">
-            <span></span><span></span><span></span><span></span> <span></span
-            ><span></span><span></span><span></span>
-        </div>
+    <!-- Logo (top-left) -->
+    <a href="/" class="page-logo" aria-label="Go to home page">
+      <i class="fas fa-code" aria-hidden="true"></i>
+      <span>Devajith</span>
+    </a>
 
-        <!-- Logo (top-left) -->
-        <a href="/" class="page-logo" aria-label="Go to home page">
-            <i class="fas fa-code" aria-hidden="true"></i>
-            <span>Devajith</span>
+    <!-- Main 404 content -->
+    <main class="error-wrapper" role="main">
+      <div class="error-code" aria-label="404">404</div>
+
+      <div class="error-icon-badge">
+        <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+        <span>Page not found</span>
+      </div>
+
+      <h1 class="error-title">Oops — nothing here</h1>
+
+      <p class="error-description">
+        This page doesn't exist or was moved.<br />
+        Let's get you back on track.
+      </p>
+
+      <div class="error-actions">
+        <a href="/" class="btn-primary" data-magnetic>
+          <i class="fas fa-house" aria-hidden="true"></i>
+          <span>Go Home</span>
         </a>
+        <a href="/#contact" class="btn-secondary" data-magnetic>
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+          <span>Contact Me</span>
+        </a>
+      </div>
+    </main>
 
-        <!-- Theme toggle (top-right) -->
-        <div class="page-theme-toggle">
-            <button
-                id="themeToggle"
-                class="theme-toggle-btn"
-                aria-label="Toggle dark mode"
-            >
-                <i class="fas fa-moon" aria-hidden="true"></i>
-            </button>
-        </div>
-
-        <!-- Main 404 content -->
-        <main class="error-wrapper" role="main">
-            <div class="error-code" aria-label="404">404</div>
-
-            <div class="error-icon-badge">
-                <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
-                <span>Page not found</span>
-            </div>
-
-            <h1 class="error-title">Oops — nothing here</h1>
-
-            <p class="error-description">
-                This page doesn't exist or was moved.<br />
-                Let's get you back on track.
-            </p>
-
-            <div class="error-actions">
-                <a href="/" class="btn-primary" data-magnetic>
-                    <i class="fas fa-house" aria-hidden="true"></i>
-                    <span>Go Home</span>
-                </a>
-                <a href="/#contact" class="btn-secondary" data-magnetic>
-                    <i class="fas fa-envelope" aria-hidden="true"></i>
-                    <span>Contact Me</span>
-                </a>
-            </div>
-        </main>
-
-        <script src="/js/404.js" defer></script>
-    </body>
+    <script src="/js/404.js" defer></script>
+  </body>
 </html>

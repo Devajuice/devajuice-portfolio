@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { triggerInkBlot, saveThemePreference } from '../utils/theme';
-import { playSound } from '../utils/audio';
 
 const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'contact'];
 const SECTION_LABELS = {
@@ -20,13 +18,12 @@ const SECTION_ICONS = {
   contact: 'fa-paper-plane',
 };
 
-export default function Navigation({ activeSection, onNavigate, theme, onThemeChange }) {
+export default function Navigation({ activeSection, onNavigate }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState({});
-  const [scrolled, setScrolled] = useState(false); // ← scroll-shrink state
+  const [scrolled, setScrolled] = useState(false);
   const navLinksRef = useRef(null);
   const btnRefs = useRef({});
-  const themeRef = useRef(null);
 
   // Scroll-shrink: toggle `scrolled` class past a 20px threshold
   useEffect(() => {
@@ -47,17 +44,6 @@ export default function Navigation({ activeSection, onNavigate, theme, onThemeCh
       opacity: 1,
     });
   }, [activeSection]);
-
-  const handleThemeToggle = () => {
-    if (themeRef.current?.classList.contains('spinning')) return;
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    themeRef.current?.classList.add('spinning');
-    triggerInkBlot(nextTheme, (t) => {
-      onThemeChange(t);
-      saveThemePreference(t);
-      playSound('click');
-    });
-  };
 
   const handleNav = (section) => {
     onNavigate(section);
@@ -91,16 +77,6 @@ export default function Navigation({ activeSection, onNavigate, theme, onThemeCh
         </ul>
 
         <div className="topnav-actions">
-          <button
-            ref={themeRef}
-            id="themeToggle"
-            className="theme-toggle-btn"
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            onAnimationEnd={() => themeRef.current?.classList.remove('spinning')}
-            onClick={handleThemeToggle}
-          >
-            <i className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'}`} aria-hidden="true" />
-          </button>
           <button
             className={`mobile-menu-btn${mobileOpen ? ' is-open' : ''}`}
             onClick={() => setMobileOpen((o) => !o)}

@@ -1,18 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchNowPlaying } from '../utils/lastfm';
-
-// ── useTheme ───────────────────────────────────────────────────
-export function useTheme() {
-  const [theme, setTheme] = useState(() => {
-    return document.documentElement.getAttribute('data-theme') || 'light';
-  });
-
-  const updateTheme = useCallback((newTheme) => {
-    setTheme(newTheme);
-  }, []);
-
-  return { theme, updateTheme };
-}
 
 // ── useSound ──────────────────────────────────────────────────
 export function useSound() {
@@ -168,8 +155,7 @@ export function useParticleCanvas(canvasRef) {
       }));
     };
 
-    const getAccentColor = () =>
-      document.documentElement.getAttribute('data-theme') === 'dark' ? '173,181,189' : '73,80,87';
+    const getAccentColor = () => '255,255,255';
 
     // Spatial hash grid to avoid O(n²) distance checks
     const createGrid = () => {
