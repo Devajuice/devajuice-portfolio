@@ -166,14 +166,14 @@
 }
 .error-actions .btn-primary {
   background: transparent;
-  color: #ffffff;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+  color: #000000;
+  border: 2px solid #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 .error-actions .btn-primary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.06);
+  color: #000000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Decorative scattered dots ── */

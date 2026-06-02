@@ -155,7 +155,7 @@ export function useParticleCanvas(canvasRef) {
       }));
     };
 
-    const getAccentColor = () => '255,255,255';
+    const getAccentColor = () => '0,0,0';
 
     // Spatial hash grid to avoid O(n²) distance checks
     const createGrid = () => {

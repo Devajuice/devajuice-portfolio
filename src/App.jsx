@@ -40,7 +40,7 @@ function LoadingFallback() {
 }
 
 function triggerConfetti() {
-  const colors = ['#ffffff', '#000000'];
+  const colors = ['#000000', '#333333', '#666666'];
   for (let i = 0; i < 80; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
