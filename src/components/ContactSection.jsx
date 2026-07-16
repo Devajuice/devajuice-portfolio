@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useToast } from './useToast';
 import { playSound } from '../utils/audio';
-import { useRef } from 'react';
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });

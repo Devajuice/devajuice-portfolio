@@ -1,5 +1,3 @@
-import React from 'react';
-
 function MusicCard({ musicData }) {
   const isLive = musicData?.isLive;
   const hasTrack = musicData?.name && !musicData?.error;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { PROJECTS } from './projects';
 
 export default function ProjectsSection() {

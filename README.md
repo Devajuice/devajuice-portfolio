@@ -436,10 +436,10 @@ This project is open source and available under the [MIT License](LICENSE.md).
 - **LinkedIn:** [Devajith Jijush](https://www.linkedin.com/in/devajith-jijush-5741ab39b/)
 - **GitHub:** [@Devajuice](https://github.com/devajuice)
 - **Instagram:** [@Devajuice](https://instagram.com/devajuice)
-- **Website:** [devajuice.vercel.app](https://devajuice.vercel.app)
+- **Website:** [devajuice.com](https://devajuice.com)
 
 ---
 
-Made with ❤️ by [Devajuice](https://devajuice.vercel.app)
+Made with ❤️ by [Devajuice](https://devajuice.com)
 
 ⭐ Star this repo if you found it helpful!

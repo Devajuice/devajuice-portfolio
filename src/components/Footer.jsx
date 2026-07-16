@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
@@ -54,7 +52,7 @@ export default function Footer() {
             <h3 className="footer-col-title">Connect</h3>
             <ul className="footer-links-list">
               <li>
-                <a href="mailto:devajith@example.com" className="footer-email">
+                <a href="mailto:devajuice@zohomail.in" className="footer-email">
                   <i className="fas fa-envelope" aria-hidden="true" />
                   devajuice@zohomail.in
                 </a>
@@ -82,7 +80,7 @@ export default function Footer() {
             <h3 className="footer-col-title">Resources</h3>
             <ul className="footer-links-list">
               <li>
-                <a href="/assets/Devajith_Resume.pdf" download>
+                <a href="/assets/docs/Devajith_Resume.pdf" download>
                   <i className="fas fa-file-pdf" aria-hidden="true" />
                   Download Resume
                 </a>

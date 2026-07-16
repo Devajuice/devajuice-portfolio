@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTypewriter, useTimezone } from '../hooks';
 import { useToast } from './useToast';
 import { playSound } from '../utils/audio';
@@ -90,7 +89,7 @@ export default function HomeSection({ onNavigate, musicData }) {
           <span>Contact Me</span>
         </button>
         <a
-          href="assets/docs/Devajith_Resume.pdf"
+          href="/assets/docs/Devajith_Resume.pdf"
           download="Devajith_Resume.pdf"
           className="btn-resume"
           id="resumeBtn"

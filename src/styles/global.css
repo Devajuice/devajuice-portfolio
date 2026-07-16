@@ -66,7 +66,6 @@ i {
   --glass-active-bg: rgba(0, 0, 0, 0.04);
   --glass-active-border: rgba(0, 0, 0, 0.08);
   --hero-gradient: #000000;
-  --spotlight-color: rgba(0, 0, 0, 0.06);
   --timeline-line: #000000;
   --timeline-dot-bg: #ffffff;
   --timeline-dot-border: #000000;
@@ -332,24 +331,6 @@ i {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-}
-
-/* ═══════════════════════════════════════════════════
-   CURSOR SPOTLIGHT
-═══════════════════════════════════════════════════ */
-.cursor-spotlight {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  /* Position driven by --sx/--sy CSS vars updated via JS — no gradient string rebuild per frame */
-  background: #000000;
-  transition: opacity 0.4s ease;
-  opacity: 0;
-  will-change: background;
-}
-.cursor-spotlight.visible {
-  opacity: 1;
 }
 
 /* ═══════════════════════════════════════════════════

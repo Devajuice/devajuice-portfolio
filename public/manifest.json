@@ -24,15 +24,6 @@
       "purpose": "maskable any"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/assets/images/og-image.png",
-      "sizes": "1200x630",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Devajith Portfolio — Home"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Projects",

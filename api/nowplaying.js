@@ -1,5 +1,5 @@
 const LASTFM_USERNAME = "Devajuice";
-const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
+const LASTFM_API_KEY = process.env.VITE_LASTFM_API_KEY;
 
 export default async function handler(req, res) {
   // Allow the client to request different Last.fm methods via ?method=
