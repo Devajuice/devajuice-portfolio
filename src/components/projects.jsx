@@ -46,4 +46,15 @@ export const PROJECTS = [
     desc: 'Track and manage YouTube Music playlists with a clean, intuitive interface.',
     tags: [['fab fa-python', 'Python']],
   },
+  {
+    href: 'https://livef1tv.vercel.app',
+    icon: 'fa-circle-play',
+    title: 'F1 Tv',
+    desc: 'F1 Tv is a streaming platform for Formula 1 content with a modern UI and responsive design.',
+    tags: [
+      ['fab fa-typescript', 'TypeScript'],
+      ['fab fa-html5', 'HTML'],
+      ['fab fa-css3-alt', 'CSS'],
+    ],
+  },
 ];
