@@ -37,3 +37,4 @@ dist/
 # OS
 Thumbs.db
 ehthumbs.db
+vite.config.js.timestamp-*.mjs

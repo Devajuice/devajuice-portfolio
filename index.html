@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Devajith | Developer Portfolio</title>
 
+    <!-- Pre-mount theme bootstrap. Runs synchronously before React paints so
+         there is no flash of incorrect theme on first load. Reads
+         localStorage('easyui-theme') first, then falls back to the OS
+         prefers-color-scheme. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('easyui-theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia &&
+                  window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          /* no-op */
+        }
+      })();
+    </script>
+
     <!-- SEO -->
     <meta
       name="description"
@@ -54,7 +77,8 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Devajith" />
@@ -81,7 +105,10 @@
 
     <style>
       html {
-        background: #ffffff;
+        background: #fafafa;
+      }
+      html.dark {
+        background: #111113;
       }
       body {
         margin: 0;
@@ -99,8 +126,8 @@
           justify-content: center;
           min-height: 100vh;
           font-family: 'DM Sans', system-ui, sans-serif;
-          background: #ffffff;
-          color: #000000;
+          background: #fafafa;
+          color: #0a0a0a;
           text-align: center;
           padding: 2rem;
           gap: 1.25rem;

@@ -1,4 +1,13 @@
 import { useEffect, useState } from 'react';
+import {
+  motion,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+  useMotionValueEvent,
+} from 'framer-motion';
+import SpotlightCard from './ui/SpotlightCard';
+import { motionTransitions } from '../lib/motion-tokens';
 
 const SKILL_GROUPS = [
   {
@@ -34,81 +43,108 @@ const SKILL_GROUPS = [
 ];
 
 function SkillBar({ icon, name, pct, animate }) {
-  const [current, setCurrent] = useState(0);
-  const [width, setWidth] = useState(0);
+  const reducedMotion = useReducedMotion();
+
+  // Spring-driven bar width — 0 → pct with EasyUI's spring physics
+  const spring = useSpring(0, {
+    stiffness: 120,
+    damping: 20,
+    mass: 0.9,
+  });
+
+  // Spring-driven counter so the number tracks the bar instead of racing it
+  const counter = useSpring(0, { stiffness: 120, damping: 24, mass: 0.9 });
+  const rounded = useTransform(counter, (v) => Math.round(v));
+
+  // A MotionValue cannot be rendered directly as a React child — React throws
+  // "Objects are not valid as a React child". Mirror it into state instead,
+  // starting at 0 so activating the section counts up from zero.
+  const [shown, setShown] = useState(0);
+  useMotionValueEvent(rounded, 'change', setShown);
+
+  // Convert the spring MotionValue into a percentage string for the bar width
+  const widthPct = useTransform(spring, (v) => `${v}%`);
 
   useEffect(() => {
-    if (!animate) return;
-    setWidth(pct);
-    const duration = 1100,
-      start = performance.now();
-    let rafId;
-    const update = (now) => {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCurrent(Math.round(eased * pct));
-      if (progress < 1) rafId = requestAnimationFrame(update);
-      else setCurrent(pct);
-    };
-    rafId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(rafId);
-  }, [animate, pct]);
+    // No setShown() here: counter.set() fires the `change` event that
+    // useMotionValueEvent listens to, so `shown` follows the spring on its own.
+    if (!animate) {
+      spring.set(0);
+      counter.set(0);
+      return;
+    }
+    spring.set(pct);
+    counter.set(pct);
+  }, [animate, pct, spring, counter]);
 
   return (
-    <li className="skill-bar-item">
-      <div className="skill-bar-header">
-        <span className="skill-bar-name">
+    <li>
+      <div className="mb-1.5 flex items-center justify-between text-sm">
+        <span className="flex items-center gap-2 font-medium text-text-primary">
           <i className={icon} aria-hidden="true" />
           {name}
         </span>
-        <span className={`skill-bar-pct${animate && current === pct ? ' counting-done' : ''}`}>
-          {animate ? current : 0}%
-        </span>
+        <motion.span className="font-mono text-xs text-text-muted tabular-nums">
+          {animate && !reducedMotion ? shown : pct}%
+        </motion.span>
       </div>
-      <div className="skill-bar-track">
-        <div
-          className="skill-bar-fill"
-          style={{ width: animate ? width + '%' : '0%' }}
-          data-pct={pct}
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-full bg-surface-raised"
+        role="progressbar"
+        aria-label={`${name} proficiency`}
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <motion.div
+          className="h-full rounded-full bg-text-primary"
+          style={{ width: reducedMotion ? `${animate ? pct : 0}%` : widthPct }}
+          transition={motionTransitions.springSmooth}
         />
       </div>
     </li>
   );
 }
 
-export default function SkillsSection({ isActive }) {
-  const [animated, setAnimated] = useState(false);
+/**
+ * Returns `flag`, which becomes true `delay`ms after `active` flips true and
+ * false again once `active` goes false. State updates happen inside the timer
+ * callback so the effect body never triggers a cascading render.
+ */
+function useDelayedFlag(active, delay) {
+  const [flag, setFlag] = useState(false);
 
   useEffect(() => {
-    if (isActive && !animated) {
-      // Slight delay lets the section entrance transition finish first
-      const timer = setTimeout(() => setAnimated(true), 50);
-      return () => clearTimeout(timer);
-    }
-    if (!isActive) setAnimated(false);
-  }, [isActive, animated]);
+    const timer = setTimeout(() => setFlag(Boolean(active)), active ? delay : 0);
+    return () => clearTimeout(timer);
+  }, [active, delay]);
+
+  return flag;
+}
+
+export default function SkillsSection({ isActive }) {
+  const animated = useDelayedFlag(isActive, 120);
 
   return (
     <>
-      <h2 id="skills-heading" className="section-title">
+      <h2 id="skills-heading" className="section-heading">
         <i className="fas fa-chart-line" aria-hidden="true" />
         <span>Skills &amp; Technologies</span>
       </h2>
-      <div className="skills-grid">
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {SKILL_GROUPS.map((group) => (
-          <div className="card" key={group.title}>
-            <div className="card-icon">
-              <i className={group.icon} aria-hidden="true" />
+          <SpotlightCard key={group.title} className="flex h-full flex-col">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface-hover text-text-primary">
+              <i className={`${group.icon} text-base`} aria-hidden="true" />
             </div>
-            <div className="card-content">
-              <h3>{group.title}</h3>
-              <ul className="skill-bars-list">
-                {group.skills.map(([icon, name, pct]) => (
-                  <SkillBar key={name} icon={icon} name={name} pct={pct} animate={animated} />
-                ))}
-              </ul>
-            </div>
-          </div>
+            <h3 className="mb-4 text-base font-semibold text-text-primary">{group.title}</h3>
+            <ul className="flex flex-col gap-4">
+              {group.skills.map(([icon, name, pct]) => (
+                <SkillBar key={name} icon={icon} name={name} pct={pct} animate={animated} />
+              ))}
+            </ul>
+          </SpotlightCard>
         ))}
       </div>
     </>

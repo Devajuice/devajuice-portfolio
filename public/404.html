@@ -8,7 +8,8 @@
 
     <!-- ✦ PWA -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Devajith" />
@@ -29,26 +30,30 @@
       rel="stylesheet"
     />
 
-    <!-- Shared design system -->
-    <link rel="stylesheet" href="/global.css" />
-    <!-- 404-specific styles -->
+    <!-- Pre-mount theme bootstrap — matches src/index.html -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('easyui-theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia &&
+                  window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          /* no-op */
+        }
+      })();
+    </script>
+
+    <!-- Shared design system (EasyUI tokens) + 404-specific styles -->
     <link rel="stylesheet" href="/404.css" />
-    <script src="/js/404.js" defer></script>
   </head>
   <body>
-    <!-- Floating background dots -->
-    <div class="error-dots" aria-hidden="true">
-      <span></span><span></span><span></span><span></span> <span></span><span></span><span></span
-      ><span></span>
-    </div>
-
-    <!-- Logo (top-left) -->
-    <a href="/" class="page-logo" aria-label="Go to home page">
-      <i class="fas fa-code" aria-hidden="true"></i>
-      <span>Devajith</span>
-    </a>
-
-    <!-- Main 404 content -->
     <main class="error-wrapper" role="main">
       <div class="error-code" aria-label="404">404</div>
 
@@ -65,16 +70,18 @@
       </p>
 
       <div class="error-actions">
-        <a href="/" class="btn-primary" data-magnetic>
-          <i class="fas fa-house" aria-hidden="true"></i>
-          <span>Go Home</span>
-        </a>
-        <a href="/#contact" class="btn-secondary" data-magnetic>
+        <a href="/" class="btn-magnetic"> <i class="fas fa-house" aria-hidden="true"></i> Go Home </a>
+        <a href="/#contact" class="btn-magnetic btn-magnetic--secondary">
           <i class="fas fa-envelope" aria-hidden="true"></i>
-          <span>Contact Me</span>
+          Contact Me
         </a>
       </div>
     </main>
 
+    <!-- Logo (top-left) -->
+    <a href="/" class="page-logo" aria-label="Go to home page">
+      <i class="fas fa-code" aria-hidden="true"></i>
+      <span>Devajith</span>
+    </a>
   </body>
 </html>

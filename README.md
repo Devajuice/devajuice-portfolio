@@ -165,6 +165,26 @@ devajith-portfolio/
 - Last.fm account (for music widget)
 - Web3Forms account (for contact form)
 
+### Verification scripts
+
+Run the dev server (or `npm run preview`) first, then:
+
+```bash
+npm run check              # build + static/SSR render assertions (26 checks)
+npm run browser-check      # navigation, section rendering, console/network errors
+npm run music-pill-check   # live / no-tracks / failed now-playing states
+npm run music-style-check  # glass + blur + masking, green "Live" accent, mobile layout
+npm run ui-polish-check   # pill centring, button icon alignment, transition smoothness
+```
+
+`music-style-check` measures artwork visibility by **screenshotting the region
+with and without artwork** and comparing pixels, because asserting that the
+backdrop CSS exists says nothing about whether the artwork is actually visible
+through the glass tint.
+
+It pins the theme via `localStorage` so the light and dark accent tokens are each
+verified explicitly.
+
 ### Installation
 
 1. **Clone the repository**
@@ -182,13 +202,27 @@ devajith-portfolio/
 
 3. **Set up environment variables**
 
-   Create a `.env` file in the project root:
+   Copy the example file and add your Last.fm API key (get one at
+   <https://www.last.fm/api/account/create>):
 
-   ```env
-   VITE_LASTFM_API_KEY=your_lastfm_api_key_here
+   ```bash
+   cp .env.example .env
    ```
 
-   > In production on Vercel, add this as an environment variable in the dashboard. The `/api/nowplaying` serverless function keeps the key server-side so it never reaches the browser.
+   ```env
+   LASTFM_API_KEY=your_lastfm_api_key_here
+   ```
+
+   > Use the plain name `LASTFM_API_KEY` — **not** `VITE_LASTFM_API_KEY`.
+   > Vite inlines any `VITE_`-prefixed variable into the client bundle at build
+   > time, which would publish your key in the shipped JavaScript. The
+   > unprefixed name stays server-side.
+   >
+   > `npm run dev` and `npm run preview` serve `/api/nowplaying` from a Vite
+   > middleware; production uses the `api/nowplaying.js` function. The key is
+   > read in all three cases and never reaches the browser. If it is missing,
+   > the endpoint returns a 500 explaining what to set, the terminal prints the
+   > same message, and the pill shows *Unavailable* rather than breaking.
 
 4. **Start the dev server**
 
@@ -238,7 +272,7 @@ devajith-portfolio/
 1. Push your code to GitHub
 2. Go to [vercel.com](https://vercel.com) and sign in
 3. Click **New Project** → **Import Git Repository**
-4. Select your repository, add `VITE_LASTFM_API_KEY` under **Environment Variables**, and click **Deploy**
+4. Select your repository, add `LASTFM_API_KEY` under **Environment Variables** and click **Deploy**
 5. Your site will be live at `your-project.vercel.app`
 
 > The included `vercel.json` handles routing so unknown URLs correctly show the 404 page instead of a blank Vercel error. The `/api/nowplaying` serverless function proxies Last.fm requests so the API key is never exposed in the browser bundle.
@@ -247,9 +281,9 @@ devajith-portfolio/
 
 1. Run `npm run build` and drag the `dist/` folder to [netlify.com/drop](https://app.netlify.com/drop)
 2. Or connect your GitHub repository for automatic deployments on push
-3. Add `VITE_LASTFM_API_KEY` under **Site settings → Environment variables**
+3. Add `LASTFM_API_KEY` under **Site settings → Environment variables** (read by the `/api/nowplaying` function; the static build itself needs no key)
 
-> Note: The `/api/nowplaying` serverless function is Vercel-specific. On Netlify you can recreate it as a Netlify Function, or set `IS_DEV = true` to call Last.fm directly from the browser (exposes your API key).
+> Note: The `/api/nowplaying` function is Vercel-specific. On Netlify, recreate it as a Netlify Function pointing at the same Last.fm endpoint. Do not fall back to calling Last.fm from the browser — that exposes your API key.
 
 ### Deploy to GitHub Pages
 
@@ -417,6 +451,33 @@ Replace the string with your real email address.
 | Edge | Latest 2 versions |
 
 > The animated favicon and particle canvas use the HTML5 Canvas API, supported in all modern browsers. The ambient music uses the Web Audio API, available in all evergreen browsers. The timezone display uses `Intl.DateTimeFormat`, universally supported. The copy-email button uses the Clipboard API, available in all modern browsers over HTTPS.
+
+## 🩺 Troubleshooting
+
+### `can't access property 'useState', dispatcher is null`
+
+This is not an application bug — it means **two copies of React** were loaded in
+the browser. Vite pre-bundles dependencies into `node_modules/.vite`, and if that
+cache is regenerated mid-session (typically after `npm install` while `npm run dev`
+is still running) the browser can end up holding modules from two different
+generations.
+
+Fix it by restarting the dev server with a clean cache:
+
+```bash
+# stop the running dev server first (Ctrl+C), then:
+npm run dev:clean
+```
+
+A hard reload (`Cmd+Shift+R`) also helps if the browser cached the old modules.
+If you keep hitting this after changing dependencies, make sure the dev server is
+restarted after each `npm install` rather than left running.
+
+### Now-playing pill shows "Unavailable"
+
+The `/api/nowplaying` endpoint could not reach Last.fm. Check the dev server
+output — it prints the reason. The usual cause is a missing key: see
+[Set up environment variables](#installation).
 
 ## 📄 License
 

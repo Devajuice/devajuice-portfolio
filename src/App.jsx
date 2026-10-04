@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
-import Navigation from './components/Navigation';
+import Navigation, { SECTIONS } from './components/Navigation';
 import HomeSection from './components/HomeSection';
+import DotShader from './components/ui/DotShader';
 import { ToastProvider } from './components/Toast';
 import { useToast } from './components/useToast';
-import { useNowPlaying, useParticleCanvas, useSound } from './hooks';
+import { useNowPlaying, useSound } from './hooks';
+import { useIsDark } from './hooks/useIsDark';
 import {
   playSound,
   startBgMusic,
@@ -14,6 +16,9 @@ import {
 } from './utils/audio';
 import { Helmet } from 'react-helmet-async';
 import { useOgImage } from './hooks/useOgImage';
+import { ArrowUp, Volume2, VolumeX } from 'lucide-react';
+import { cn } from './lib/utils';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const AboutSection = lazy(() => import('./components/AboutSection'));
 const ProjectsSection = lazy(() => import('./components/ProjectsSection'));
@@ -26,21 +31,14 @@ const Footer = lazy(() => import('./components/Footer'));
 
 function LoadingFallback() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '50vh',
-      }}
-    >
-      <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem', color: 'var(--accent)' }} />
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <i className="fas fa-spinner fa-spin text-2xl text-text-primary" aria-hidden="true" />
     </div>
   );
 }
 
 function triggerConfetti() {
-  const colors = ['#000000', '#333333', '#666666'];
+  const colors = ['#0a0a0a', '#52525b', '#a1a1aa'];
   for (let i = 0; i < 80; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
@@ -50,7 +48,6 @@ function triggerConfetti() {
   }
 }
 
-const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'contact'];
 const EXIT_MS = 180,
   ENTER_MS = 300;
 
@@ -72,6 +69,7 @@ function AppInner() {
   const [kbdOpen, setKbdOpen] = useState(false);
   const [easterEggOpen, setEasterEggOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const isDark = useIsDark();
   const musicData = useNowPlaying();
   const showToast = useToast();
   const ogImage = useOgImage({
@@ -79,12 +77,20 @@ function AppInner() {
     description: 'Building cool things on the web.',
     author: 'Devajith',
   });
-  const canvasRef = useRef(null);
   const splashRef = useRef(null);
   const isTransitioningRef = useRef(false);
   const activeSectionRef = useRef(_initialSection);
+
+  // Sections whose entrance animations have already played, so they don't
+  // replay on every visit (see .page-section.revealed in index.css). Updated in
+  // the same batch as setActiveSection in navigate(), so a single render sees
+  // both. State rather than a ref because getStateClasses reads it while
+  // rendering, which must not depend on mutable render-time refs.
+  const [revealed, setRevealed] = useState(() => new Set([_initialSection]));
+  const markRevealed = useCallback((id) => {
+    setRevealed((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }, []);
   const musicStartedRef = useRef(false);
-  useParticleCanvas(canvasRef);
 
   const navigate = useCallback((sectionId) => {
     if (isTransitioningRef.current) return;
@@ -107,26 +113,23 @@ function AppInner() {
     }));
 
     setTimeout(() => {
+      // Swap straight into the entering state. Previously this set 'active'
+      // first and added 'entering' on the next animation frame, which painted
+      // the incoming section at full opacity for one frame and read as a flash.
+      // The enter animation uses `both` fill mode, so it applies its own `from`
+      // state immediately — the pre-positioning step wasn't needed at all.
       setSectionState(() => ({
         ...Object.fromEntries(SECTIONS.map((s) => [s, 'hidden'])),
-        // Pre-position incoming section off-screen in the correct direction
-        [sectionId]: goingForward ? 'active' : 'active from-left-init',
+        [sectionId]: goingForward ? 'active entering' : 'active entering from-left',
       }));
       setActiveSection(sectionId);
-
-      requestAnimationFrame(() => {
-        setSectionState((prev) => ({
-          ...prev,
-          // Enter: forward → from right (default); backward → from left
-          [sectionId]: goingForward ? 'active entering' : 'active entering from-left',
-        }));
-      });
+      markRevealed(sectionId);
 
       setTimeout(() => {
         isTransitioningRef.current = false;
       }, ENTER_MS);
     }, EXIT_MS);
-  }, []);
+  }, [markRevealed]);
 
   // Keep activeSectionRef in sync with state
   useEffect(() => {
@@ -152,37 +155,10 @@ function AppInner() {
     if (!splash) return;
     const timer = setTimeout(() => {
       splash.classList.add('splash-out');
-      splash.addEventListener('transitionend', () => splash.remove(), {
-        once: true,
-      });
+      splash.addEventListener('transitionend', () => splash.remove(), { once: true });
     }, 700);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const btns = document.querySelectorAll('[data-magnetic]');
-    btns.forEach((btn) => {
-      btn.onmousemove = (e) => {
-        const r = btn.getBoundingClientRect();
-        const dx = (e.clientX - r.left - r.width / 2) * 0.38;
-        const dy = (e.clientY - r.top - r.height / 2) * 0.38;
-        btn.style.transition = 'transform .25s cubic-bezier(.23,1,.32,1)';
-        btn.style.transform = `translate(${dx}px,${dy}px)`;
-      };
-      btn.onmouseleave = () => {
-        btn.style.transition = 'transform .5s cubic-bezier(.23,1,.32,1)';
-        btn.style.transform = 'translate(0,0)';
-      };
-    });
-    // Cleanup handlers on unmount / section change
-    return () => {
-      btns.forEach((btn) => {
-        btn.onmousemove = null;
-        btn.onmouseleave = null;
-      });
-    };
-  }, [activeSection]);
 
   // Scroll → back-to-top button + progress bar (single listener for perf)
   useEffect(() => {
@@ -190,7 +166,6 @@ function AppInner() {
     const onScroll = () => {
       const scrollY = window.scrollY;
       setShowBackToTop(scrollY > 0);
-      // Update CSS custom property for the progress bar transform
       if (progressEl) {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         const pct = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0;
@@ -231,9 +206,6 @@ function AppInner() {
   }, [soundEnabled]);
 
   // Animated favicon — throttled to ~10 fps; paused when tab is hidden.
-  // Fix: stop the animation after 3 seconds — the favicon doesn't need to
-  // spin forever and calling toDataURL() + setting link.href every 100ms
-  // causes unnecessary repaints for the lifetime of the page.
   useEffect(() => {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 32;
@@ -247,42 +219,36 @@ function AppInner() {
     let frame = 0,
       rafId,
       lastDraw = 0;
-    const INTERVAL = 100; // ~10 fps — favicon doesn't need 60 fps
-    const STOP_AFTER = 3000; // stop animating after 3 seconds
+    const INTERVAL = 100; // ~10 fps
+    const STOP_AFTER = 3000;
     const startTime = performance.now();
 
     const draw = (now) => {
-      // Fix: stop the loop once the intro animation is done
       if (now - startTime >= STOP_AFTER) {
         cancelAnimationFrame(rafId);
         return;
       }
       rafId = requestAnimationFrame(draw);
-      if (document.hidden) return; // skip entirely when tab is backgrounded
-      if (now - lastDraw < INTERVAL) return; // throttle
+      if (document.hidden) return;
+      if (now - lastDraw < INTERVAL) return;
       lastDraw = now;
 
-      const t = frame / 120;
       ctx.clearRect(0, 0, 32, 32);
       ctx.beginPath();
       ctx.arc(16, 16, 15, 0, Math.PI * 2);
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = isDark ? '#f2f2f3' : '#0a0a0a';
       ctx.fill();
-      const angle = t * Math.PI * 2,
-        r = 8,
-        dx = 16 + Math.cos(angle) * r,
-        dy = 16 + Math.sin(angle) * r;
       ctx.font = 'bold 13px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = isDark ? '#0a0a0a' : '#ffffff';
       ctx.fillText('</>', 16, 16);
       link.href = canvas.toDataURL('image/png');
       frame = (frame + 1) % 120;
     };
     rafId = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [isDark]);
 
   // Konami code
   useEffect(() => {
@@ -339,10 +305,7 @@ function AppInner() {
     };
     const hideHint = () => hint.classList.remove('swipe-hint--visible');
     const onStart = (e) => {
-      if (
-        e.touches.length !== 1 ||
-        e.target.closest('.tags,.skill-bars-list,input,textarea,select')
-      )
+      if (e.touches.length !== 1 || e.target.closest('input,textarea,select,[role="progressbar"]'))
         return;
       sx = e.touches[0].clientX;
       sy = e.touches[0].clientY;
@@ -402,7 +365,7 @@ function AppInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // stable: reads activeSectionRef + navigate (useCallback, stable ref)
 
-  // Fix #2: keyboard shortcuts — navigate is now defined above this effect
+  // Keyboard shortcuts
   useEffect(() => {
     const isTyping = () => {
       const t = document.activeElement?.tagName?.toLowerCase();
@@ -469,13 +432,10 @@ function AppInner() {
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [kbdOpen, easterEggOpen, navigate]);
+  }, [kbdOpen, easterEggOpen, navigate, showToast]);
 
-  // Fix #2: sound toggle now fully delegated to useSound hook
   const handleSoundToggle = () => {
     const next = toggleSound();
-    // Fix #2: keep the audio module's internal cache in sync so playSound()
-    // doesn't have to re-read localStorage on every call
     setSoundEnabled(next);
     if (next) {
       const ctx = getAudioCtx();
@@ -493,10 +453,8 @@ function AppInner() {
 
   const getStateClasses = (section) => {
     const s = sectionState[section];
-    if (!s || s === 'hidden') return 'page-section';
-    // s can be: "active", "active entering", "active entering from-left",
-    //           "active from-left-init", "exiting", "exiting to-right"
-    return `page-section ${s}`;
+    const base = !s || s === 'hidden' ? 'page-section' : `page-section ${s}`;
+    return revealed.has(section) ? `${base} revealed` : base;
   };
 
   return (
@@ -516,7 +474,7 @@ function AppInner() {
       <div ref={splashRef} id="pageSplash" className="page-splash" aria-hidden="true">
         <div className="splash-inner">
           <div className="splash-logo">
-            <i className="fas fa-code" />
+            <i className="fas fa-code" aria-hidden="true" />
             <span>Devajith</span>
           </div>
           <div className="splash-bar-wrap">
@@ -526,21 +484,25 @@ function AppInner() {
       </div>
 
       {/* Scroll Progress Bar */}
-      <div
-        id="scrollProgress"
-        className="scroll-progress"
+      <div id="scrollProgress" className="scroll-progress" aria-hidden="true" />
+
+      {/* Dot Shader background */}
+      <DotShader
         aria-hidden="true"
-        style={{ '--scroll-progress': 0 }}
+        className="pointer-events-none fixed inset-0 z-0"
+        dotColor={isDark ? 'rgba(242, 242, 243, 0.14)' : 'rgba(10, 10, 10, 0.16)'}
+        accentColor={isDark ? 'rgba(242, 242, 243, 0.7)' : 'rgba(10, 10, 10, 0.75)'}
+        dotSize={1.4}
+        spacing={24}
+        cursorRadius={190}
+        distortionStrength={0.32}
+        maxScale={2.4}
+        waveIntensity={0.22}
+        overlay={false}
       />
 
-      {/* Canvas */}
-      <canvas ref={canvasRef} id="particleCanvas" aria-hidden="true" />
-
       <Suspense fallback={null}>
-        {/* Easter Egg */}
         <EasterEgg open={easterEggOpen} onClose={() => setEasterEggOpen(false)} />
-
-        {/* Keyboard Shortcuts */}
         <KeyboardShortcuts
           open={kbdOpen}
           onClose={() => setKbdOpen(false)}
@@ -548,42 +510,45 @@ function AppInner() {
         />
       </Suspense>
 
-      {/* Back to Top */}
-      <button
-        id="backToTop"
-        className={`back-to-top${showBackToTop ? ' btt-visible' : ''}`}
-        aria-label="Back to top"
-        onClick={() => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          playSound('nav');
-        }}
-      >
-        <i className="fas fa-arrow-up" aria-hidden="true" />
-      </button>
+      {/* Floating controls */}
+      <div className="fixed right-5 bottom-5 z-[900] flex flex-col items-end gap-2.5">
+        <button
+          className="kbd-hint-badge"
+          id="kbdHintBadge"
+          aria-label="View keyboard shortcuts"
+          onClick={() => setKbdOpen(true)}
+        >
+          <kbd>?</kbd>
+          <span>Shortcuts</span>
+        </button>
 
-      {/* Sound Toggle */}
-      <button
-        id="soundToggle"
-        className={`sound-toggle-btn${showBackToTop ? ' snd-visible' : ''}${!soundEnabled ? ' muted' : ''}`}
-        aria-label={soundEnabled ? 'Mute transition sounds' : 'Unmute transition sounds'}
-        onClick={handleSoundToggle}
-      >
-        <i
-          className={`fas ${soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'}`}
-          aria-hidden="true"
-        />
-      </button>
+        <div className="flex gap-2.5">
+          <button
+            id="soundToggle"
+            className={cn('floating-btn', !soundEnabled && 'muted')}
+            aria-label={soundEnabled ? 'Mute transition sounds' : 'Unmute transition sounds'}
+            onClick={handleSoundToggle}
+          >
+            {soundEnabled ? (
+              <Volume2 className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <VolumeX className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
 
-      {/* Keyboard hint badge */}
-      <button
-        className="kbd-hint-badge"
-        id="kbdHintBadge"
-        aria-label="View keyboard shortcuts"
-        onClick={() => setKbdOpen(true)}
-      >
-        <kbd>?</kbd>
-        <span>Shortcuts</span>
-      </button>
+          <button
+            id="backToTop"
+            className={cn('floating-btn', showBackToTop && 'visible')}
+            aria-label="Back to top"
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              playSound('nav');
+            }}
+          >
+            <ArrowUp className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
 
       {/* Skip link */}
       <a href="#main-content" className="skip-link">
@@ -594,42 +559,60 @@ function AppInner() {
       <Navigation activeSection={activeSection} onNavigate={navigate} />
 
       {/* Main Content */}
-      <main id="main-content" className="main-content">
+      <main id="main-content" className="relative z-10 flex min-h-screen flex-col">
         <Suspense fallback={<LoadingFallback />}>
-          <section id="home" className={getStateClasses('home')} aria-labelledby="home-heading">
-            <HomeSection onNavigate={navigate} musicData={musicData} />
-          </section>
-          <section id="about" className={getStateClasses('about')} aria-labelledby="about-heading">
-            <AboutSection musicData={musicData} />
-          </section>
-          <section
-            id="projects"
-            className={getStateClasses('projects')}
-            aria-labelledby="projects-heading"
-          >
-            <ProjectsSection />
-          </section>
-          <section
-            id="skills"
-            className={getStateClasses('skills')}
-            aria-labelledby="skills-heading"
-          >
-            <SkillsSection isActive={activeSection === 'skills'} />
-          </section>
-          <section
-            id="hobbies"
-            className={getStateClasses('hobbies')}
-            aria-labelledby="hobbies-heading"
-          >
-            <HobbiesSection />
-          </section>
-          <section
-            id="contact"
-            className={getStateClasses('contact')}
-            aria-labelledby="contact-heading"
-          >
-            <ContactSection />
-          </section>
+          <div className="mx-auto w-full max-w-6xl flex-1 px-6 pt-32 pb-20 sm:pt-36 md:pt-40">
+            <ErrorBoundary>
+              <section id="home" className={getStateClasses('home')} aria-labelledby="home-heading">
+                <HomeSection onNavigate={navigate} musicData={musicData} />
+              </section>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <section
+                id="about"
+                className={getStateClasses('about')}
+                aria-labelledby="about-heading"
+              >
+                <AboutSection musicData={musicData} />
+              </section>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <section
+                id="projects"
+                className={getStateClasses('projects')}
+                aria-labelledby="projects-heading"
+              >
+                <ProjectsSection />
+              </section>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <section
+                id="skills"
+                className={getStateClasses('skills')}
+                aria-labelledby="skills-heading"
+              >
+                <SkillsSection isActive={activeSection === 'skills'} />
+              </section>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <section
+                id="hobbies"
+                className={getStateClasses('hobbies')}
+                aria-labelledby="hobbies-heading"
+              >
+                <HobbiesSection />
+              </section>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <section
+                id="contact"
+                className={getStateClasses('contact')}
+                aria-labelledby="contact-heading"
+              >
+                <ContactSection />
+              </section>
+            </ErrorBoundary>
+          </div>
         </Suspense>
       </main>
 

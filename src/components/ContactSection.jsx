@@ -1,18 +1,34 @@
 import { useState, useRef } from 'react';
 import { useToast } from './useToast';
 import { playSound } from '../utils/audio';
+import Button from './ui/Button';
+import SpotlightCard from './ui/SpotlightCard';
+import { User, AtSign, MessageSquare, Send, Copy, FileDown } from 'lucide-react';
+
+const SOCIALS = [
+  { href: 'https://github.com/devajuice', icon: 'fab fa-github', label: 'GitHub' },
+  {
+    href: 'https://www.linkedin.com/in/devajith-jijush-5741ab39b/',
+    icon: 'fab fa-linkedin',
+    label: 'LinkedIn',
+  },
+  { href: 'https://instagram.com/devajuice', icon: 'fab fa-instagram', label: 'Instagram' },
+];
+
+const FIELD_CLASSES =
+  'focus-ring w-full rounded-md border border-border bg-surface py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-subtle transition-colors focus:border-border-hover';
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sending, setSending] = useState(false);
-  const submittingRef = useRef(false); // ref guard prevents double-submit before state update settles
+  const submittingRef = useRef(false);
   const showToast = useToast();
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (submittingRef.current) return; // block concurrent submissions
+    if (submittingRef.current) return;
     const { name, email, message } = form;
     if (!name || !email || !message) {
       showToast('Please fill in all fields.', 'warning');
@@ -51,7 +67,6 @@ export default function ContactSection() {
     }
   };
 
-  // Fix: one-click copy email button
   const handleCopyEmail = () => {
     navigator.clipboard
       .writeText('devajuice@zohomail.in')
@@ -70,26 +85,39 @@ export default function ContactSection() {
 
   return (
     <>
-      <h2 id="contact-heading" className="section-title">
+      <h2 id="contact-heading" className="section-heading">
         <i className="fas fa-envelope" aria-hidden="true" />
         <span>Get In Touch</span>
       </h2>
-      <div className="contact-grid">
-        <div className="card">
-          <h3>
-            <i className="fas fa-paper-plane" aria-hidden="true" />
+
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-5 md:grid-cols-2">
+        {/* ── Message form ── */}
+        <SpotlightCard>
+          <h3 className="mb-5 flex items-center gap-2 text-base font-semibold text-text-primary">
+            <Send className="h-4 w-4" aria-hidden="true" />
             Send a Message
           </h3>
-          <form onSubmit={handleSubmit} aria-label="Contact form" noValidate>
+
+          <form
+            onSubmit={handleSubmit}
+            aria-label="Contact form"
+            noValidate
+            className="flex flex-col gap-4"
+          >
             <input
               type="checkbox"
               name="botcheck"
-              style={{ display: 'none' }}
+              className="hidden"
               tabIndex={-1}
               aria-hidden="true"
+              readOnly
             />
-            <div className="form-group">
-              <i className="fas fa-user" aria-hidden="true" />
+
+            <div className="relative">
+              <User
+                className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-subtle"
+                aria-hidden="true"
+              />
               <input
                 type="text"
                 name="name"
@@ -99,10 +127,15 @@ export default function ContactSection() {
                 autoComplete="name"
                 value={form.name}
                 onChange={handleChange}
+                className={FIELD_CLASSES}
               />
             </div>
-            <div className="form-group">
-              <i className="fas fa-envelope" aria-hidden="true" />
+
+            <div className="relative">
+              <AtSign
+                className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-subtle"
+                aria-hidden="true"
+              />
               <input
                 type="email"
                 name="email"
@@ -112,91 +145,101 @@ export default function ContactSection() {
                 autoComplete="email"
                 value={form.email}
                 onChange={handleChange}
+                className={FIELD_CLASSES}
               />
             </div>
-            <div className="form-group">
-              <i className="fas fa-comment" aria-hidden="true" />
+
+            <div className="relative">
+              <MessageSquare
+                className="pointer-events-none absolute top-3.5 left-3 h-4 w-4 text-text-subtle"
+                aria-hidden="true"
+              />
               <textarea
                 name="message"
+                rows={4}
                 placeholder="Your Message"
                 required
                 aria-label="Your message"
                 value={form.message}
                 onChange={handleChange}
+                className={`${FIELD_CLASSES} resize-y`}
               />
             </div>
-            <button type="submit" className="btn-primary" disabled={sending}>
-              {sending ? (
-                <>
-                  <i className="fas fa-spinner fa-spin" />
-                  <span>Sending…</span>
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-paper-plane" aria-hidden="true" />
-                  <span>Send Message</span>
-                </>
-              )}
-            </button>
+
+            {/* The icon must go through `leftIcon`. Button wraps `children` in a
+                single <span>, so an inline <Send/> inside it becomes one flex
+                item: the size `gap` never applies and the SVG sits on the text
+                baseline instead of being centred by items-center. */}
+            <Button
+              type="submit"
+              isLoading={sending}
+              loadingText="Sending…"
+              fullWidth
+              leftIcon={<Send className="h-4 w-4" aria-hidden="true" />}
+            >
+              Send Message
+            </Button>
           </form>
-        </div>
-        <div className="card">
-          <h3>
+        </SpotlightCard>
+
+        {/* ── Social links ── */}
+        <SpotlightCard>
+          <h3 className="mb-5 flex items-center gap-2 text-base font-semibold text-text-primary">
             <i className="fas fa-share-alt" aria-hidden="true" />
             Connect With Me
           </h3>
-          <div className="social-links">
-            {[
-              {
-                href: 'https://github.com/devajuice',
-                icon: 'fab fa-github',
-                label: 'GitHub',
-              },
-              {
-                href: 'https://www.linkedin.com/in/devajith-jijush-5741ab39b/',
-                icon: 'fab fa-linkedin',
-                label: 'LinkedIn',
-              },
-              {
-                href: 'https://instagram.com/devajuice',
-                icon: 'fab fa-instagram',
-                label: 'Instagram',
-              },
-            ].map((s) => (
+
+          <div className="flex flex-col gap-2">
+            {SOCIALS.map((s) => (
               <a
                 key={s.label}
                 href={s.href}
-                className="social-btn"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Visit my ${s.label} profile`}
+                className="focus-ring group flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3 text-sm font-medium text-text-primary no-underline transition-colors hover:border-border-hover hover:bg-surface-hover"
               >
-                <i className={s.icon} aria-hidden="true" />
-                <span>{s.label}</span>
+                <span className="flex items-center gap-3">
+                  <i className={`${s.icon} w-4 text-center`} aria-hidden="true" />
+                  {s.label}
+                </span>
+                <i
+                  className="fas fa-arrow-up-right-from-square text-xs text-text-subtle transition-colors group-hover:text-text-primary"
+                  aria-hidden="true"
+                />
               </a>
             ))}
 
             <button
               type="button"
-              className="social-btn"
               onClick={handleCopyEmail}
               aria-label="Copy my email address to clipboard"
+              className="focus-ring flex cursor-pointer items-center justify-between rounded-md border border-border bg-surface px-4 py-3 text-sm font-medium text-text-primary transition-colors hover:border-border-hover hover:bg-surface-hover"
             >
-              <i className="fas fa-copy" aria-hidden="true" />
-              <span>Copy Email</span>
+              <span className="flex items-center gap-3">
+                <Copy className="h-4 w-4" aria-hidden="true" />
+                Copy Email
+              </span>
+              <span className="font-mono text-xs text-text-subtle">devajuice@zohomail.in</span>
             </button>
 
             <a
               href="/assets/docs/Devajith_Resume.pdf"
               download="Devajith_Resume.pdf"
-              className="social-btn social-btn--resume"
               aria-label="Download my Resume"
+              className="focus-ring flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3 text-sm font-medium text-text-primary no-underline transition-colors hover:border-border-hover hover:bg-surface-hover"
             >
-              <i className="fas fa-file-arrow-down" aria-hidden="true" />
-              <span>Download Resume</span>
+              <span className="flex items-center gap-3">
+                <FileDown className="h-4 w-4" aria-hidden="true" />
+                Download Resume
+              </span>
+              <i
+                className="fas fa-arrow-down text-xs text-text-subtle transition-colors hover:text-text-primary"
+                aria-hidden="true"
+              />
             </a>
           </div>
-        </div>
+        </SpotlightCard>
       </div>
     </>
   );

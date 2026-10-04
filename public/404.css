@@ -1,7 +1,107 @@
-/* ══════════════════════════════════════════════
-   404 PAGE — STYLES
-   Depends on: styles.css (loaded first)
-══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════
+   404 PAGE — EasyUI design tokens + page styles
+
+   Self-contained on purpose: this is a static page outside the React app, so it
+   cannot depend on the SPA's hashed Tailwind bundle. Tokens below mirror
+   src/index.css `@theme`; keep the two in sync.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f4f4f5;
+  --color-surface-raised: #f1f1f2;
+
+  --color-border: #e4e4e7;
+  --color-border-hover: #d4d4d8;
+  --color-border-subtle: #ededef;
+
+  --color-text-primary: #0a0a0a;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #71717a;
+  --color-text-subtle: #a1a1aa;
+
+  --color-accent: #0a0a0a;
+  --color-accent-ring: rgb(10 10 10 / 0.15);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-subtle: 0 1px 2px 0 rgb(15 15 20 / 0.06), 0 0 0 1px rgb(15 15 20 / 0.04);
+  --shadow-elevated: 0 10px 25px -8px rgb(15 15 20 / 0.12), 0 0 0 1px rgb(15 15 20 / 0.05);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark {
+  --color-bg: #111113;
+  --color-surface: #1c1c1f;
+  --color-surface-hover: #202023;
+  --color-surface-raised: #18181a;
+
+  --color-border: #29292c;
+  --color-border-hover: #343438;
+  --color-border-subtle: #18181a;
+
+  --color-text-primary: #f2f2f3;
+  --color-text-secondary: #a1a1a6;
+  --color-text-muted: #6f6f75;
+  --color-text-subtle: #4d4d52;
+
+  --color-accent: #f2f2f3;
+  --color-accent-ring: rgb(242 242 243 / 0.2);
+
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.18), 0 0 0 1px rgb(242 242 243 / 0.02);
+  --shadow-elevated: 0 10px 25px -8px rgb(0 0 0 / 0.22), 0 0 0 1px rgb(242 242 243 / 0.04);
+}
+
+/* ── Reset ── */
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--color-bg);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+::selection {
+  background: rgb(10 10 10 / 0.05);
+  color: var(--color-text-primary);
+}
+.dark ::selection {
+  background: rgb(242 242 243 / 0.06);
+}
+*:focus-visible {
+  outline: 1px solid var(--color-accent-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Dot Shader background (pure CSS stand-in for the WebGL canvas) ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--color-accent) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.14;
+}
 
 /* ── Layout ── */
 .error-wrapper {
@@ -9,46 +109,159 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 90px);
-  padding: 40px 24px 80px;
+  min-height: 100vh;
+  padding: 48px 24px;
   text-align: center;
 }
 
-/* ── Big glitchy 404 number ── */
+/* ── 404 number ── */
 .error-code {
   font-size: clamp(6rem, 20vw, 11rem);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
-  animation: glitch 6s ease-in-out infinite;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-primary);
   user-select: none;
-  position: relative;
+  animation:
+    staggerFadeUp 0.5s var(--ease-out) 0.05s both,
+    glitch 6s ease-in-out infinite;
 }
 
-.error-code::before,
-.error-code::after {
-  content: '404';
-  position: absolute;
-  inset: 0;
-  color: var(--text-primary);
-}
-.error-code::before {
+/* ── Floating icon badge ── */
+.error-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-subtle);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
   animation:
-    gradientShift 5s ease infinite,
-    glitchTop 6s ease-in-out infinite;
-  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
-  opacity: 0;
+    staggerFadeUp 0.5s var(--ease-out) 0.15s both,
+    floatBadge 3s ease-in-out infinite;
 }
-.error-code::after {
-  animation:
-    gradientShift 5s ease infinite,
-    glitchBot 6s ease-in-out infinite;
-  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
-  opacity: 0;
+.error-icon-badge i {
+  color: var(--color-accent);
 }
 
+/* ── Text ── */
+.error-title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  animation: staggerFadeUp 0.5s var(--ease-out) 0.22s both;
+}
+.error-description {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  max-width: 440px;
+  animation: staggerFadeUp 0.5s var(--ease-out) 0.3s both;
+}
+
+/* ── Magnetic-style buttons ── */
+.error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: staggerFadeUp 0.5s var(--ease-out) 0.38s both;
+}
+.btn-magnetic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow-subtle);
+  transition:
+    transform 0.25s var(--ease-out),
+    opacity 0.2s ease,
+    background-color 0.2s ease;
+}
+.btn-magnetic:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.btn-magnetic:active {
+  transform: scale(0.96);
+}
+.btn-magnetic--secondary {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+.btn-magnetic--secondary:hover {
+  background: var(--color-surface);
+  border-color: var(--color-border-hover);
+}
+
+/* ── Logo top-left ── */
+.page-logo {
+  position: fixed;
+  top: 22px;
+  left: 24px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-subtle);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+.page-logo:hover {
+  border-color: var(--color-border-hover);
+}
+.page-logo i {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Keyframes ── */
+@keyframes staggerFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes floatBadge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
 @keyframes glitch {
   0%,
   92%,
@@ -71,255 +284,16 @@
     transform: translate(2px, 0);
   }
 }
-@keyframes glitchTop {
-  0%,
-  92%,
-  100% {
-    opacity: 0;
-    transform: translate(0);
-  }
-  93% {
-    opacity: 0.7;
-    transform: translate(4px, -2px);
-  }
-  94% {
-    opacity: 0.5;
-    transform: translate(-4px, 0);
-  }
-  95% {
-    opacity: 0;
-  }
-}
-@keyframes glitchBot {
-  0%,
-  93%,
-  100% {
-    opacity: 0;
-    transform: translate(0);
-  }
-  94% {
-    opacity: 0.6;
-    transform: translate(-3px, 2px);
-  }
-  95% {
-    opacity: 0.4;
-    transform: translate(3px, -2px);
-  }
-  96% {
-    opacity: 0;
-  }
-}
-/* ── Floating icon badge ── */
-.error-icon-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 1.8rem;
-  animation: floatBadge 3s ease-in-out infinite;
-}
-.error-icon-badge i {
-  color: var(--accent);
-}
-@keyframes floatBadge {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
 
-/* ── Text ── */
-.error-title {
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
-}
-.error-description {
-  font-size: 1.05rem;
-  color: var(--text-muted);
-  line-height: 1.8;
-  margin-bottom: 2.5rem;
-  max-width: 440px;
-}
-
-/* ── Actions ── */
-.error-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.error-actions .btn-primary,
-.error-actions .btn-secondary {
-  min-width: 160px;
-  justify-content: center;
-}
-
-/* ── Decorative scattered dots ── */
-.error-dots {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-.error-dots span {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: 0.08;
-  animation: floatDot linear infinite;
-}
-.error-dots span:nth-child(1) {
-  width: 6px;
-  height: 6px;
-  top: 15%;
-  left: 8%;
-  animation-duration: 14s;
-  animation-delay: 0s;
-}
-.error-dots span:nth-child(2) {
-  width: 10px;
-  height: 10px;
-  top: 70%;
-  left: 90%;
-  animation-duration: 18s;
-  animation-delay: 2s;
-}
-.error-dots span:nth-child(3) {
-  width: 4px;
-  height: 4px;
-  top: 40%;
-  left: 5%;
-  animation-duration: 12s;
-  animation-delay: 1s;
-}
-.error-dots span:nth-child(4) {
-  width: 8px;
-  height: 8px;
-  top: 85%;
-  left: 20%;
-  animation-duration: 20s;
-  animation-delay: 3s;
-}
-.error-dots span:nth-child(5) {
-  width: 5px;
-  height: 5px;
-  top: 25%;
-  left: 92%;
-  animation-duration: 16s;
-  animation-delay: 0.5s;
-}
-.error-dots span:nth-child(6) {
-  width: 12px;
-  height: 12px;
-  top: 55%;
-  left: 50%;
-  animation-duration: 22s;
-  animation-delay: 4s;
-}
-.error-dots span:nth-child(7) {
-  width: 3px;
-  height: 3px;
-  top: 10%;
-  left: 60%;
-  animation-duration: 11s;
-  animation-delay: 2.5s;
-}
-.error-dots span:nth-child(8) {
-  width: 7px;
-  height: 7px;
-  top: 90%;
-  left: 70%;
-  animation-duration: 17s;
-  animation-delay: 1.5s;
-}
-
-@keyframes floatDot {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.08;
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-  50% {
-    opacity: 0.14;
-  }
-  100% {
-    transform: translateY(-40px) rotate(180deg);
-    opacity: 0.08;
-  }
-}
-
-/* ── Stagger content in ── */
-.error-code {
-  animation:
-    staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both,
-    glitch 6s ease-in-out infinite;
-}
-.error-icon-badge {
-  animation:
-    staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both,
-    floatBadge 3s ease-in-out infinite;
-}
-.error-title {
-  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
-}
-.error-description {
-  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-}
-.error-actions {
-  animation: staggerFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.38s both;
-}
-
-@keyframes staggerFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Ensure content sits above dots */
-.error-wrapper > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* ── Logo top-left ── */
-.page-logo {
-  position: fixed;
-  top: 22px;
-  left: 24px;
-  z-index: 200;
-  font-size: 1rem;
-  font-weight: 700;
-  font-style: italic;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.page-logo i {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  transition: color 0.2s;
-}
-.page-logo:hover i {
-  color: var(--accent);
 }
 
 /* ── Mobile ── */
@@ -328,8 +302,7 @@
     flex-direction: column;
     align-items: center;
   }
-  .error-actions .btn-primary,
-  .error-actions .btn-secondary {
+  .btn-magnetic {
     width: 100%;
     max-width: 280px;
   }

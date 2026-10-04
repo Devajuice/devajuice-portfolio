@@ -1,11 +1,13 @@
-const LASTFM_USERNAME = 'Devajuice';
 const LASTFM_PH = '2a96cbd8b46e442fc41c2b86b821562f';
 
-// In development (vite dev), call Last.fm directly so we don't need a
-// running serverless runtime. In production (Vercel), route through the
-// /api/nowplaying serverless function so the API key stays server-side.
-const IS_DEV = import.meta.env.DEV;
-const LASTFM_API_KEY_DEV = import.meta.env.VITE_LASTFM_API_KEY;
+// Always go through /api/nowplaying, never Last.fm directly.
+//
+// Dev/preview: handled by the lastfmDevApi plugin in vite.config.js.
+// Production:   handled by api/nowplaying.js (Vercel function).
+//
+// The API key must never be read from import.meta.env here — a VITE_ prefixed
+// key gets inlined into the production bundle as plaintext. Keeping it behind
+// this one URL means it stays server-side in every environment.
 
 // ─── In-memory cache ─────────────────────────────────────────────────────────
 // Live tracks:    cache 30 s  (user might change song soon)
@@ -136,15 +138,7 @@ export async function fetchNowPlaying() {
 
 async function _doFetch() {
   try {
-    // Dev: call Last.fm directly (no serverless runtime needed for vite dev)
-    // Prod: route through /api/nowplaying so the key never hits the browser
-    const recentTracksUrl = IS_DEV
-      ? `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks` +
-        `&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY_DEV}` +
-        `&format=json&limit=1&extended=1`
-      : `/api/nowplaying`;
-
-    const res = await fetchWithTimeout(recentTracksUrl);
+    const res = await fetchWithTimeout(`/api/nowplaying`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.message);
@@ -172,15 +166,9 @@ async function _doFetch() {
     const [infoResult, itunesResult] = await Promise.allSettled([
       needsInfo
         ? fetchWithTimeout(
-            IS_DEV
-              ? `https://ws.audioscrobbler.com/2.0/?method=track.getInfo` +
-                  `&api_key=${LASTFM_API_KEY_DEV}` +
-                  `&artist=${encodeURIComponent(artist)}` +
-                  `&track=${encodeURIComponent(name)}` +
-                  `&format=json&username=${LASTFM_USERNAME}`
-              : `/api/nowplaying?method=track.getInfo` +
-                  `&artist=${encodeURIComponent(artist)}` +
-                  `&track=${encodeURIComponent(name)}`
+            `/api/nowplaying?method=track.getInfo` +
+              `&artist=${encodeURIComponent(artist)}` +
+              `&track=${encodeURIComponent(name)}`
           )
             .then((r) => r.json())
             .catch(() => null)
@@ -209,6 +197,9 @@ async function _doFetch() {
     _cache = { data: result, ts: Date.now(), isLive };
     return result;
   } catch {
-    return { error: true }; // don't cache errors → allow retry next poll
+    // A missing API key is reported by the /api/nowplaying handler (dev proxy or
+    // serverless function), so no extra warning is needed here. Don't cache
+    // errors, so a fixed key recovers on the next poll.
+    return { error: true };
   }
 }

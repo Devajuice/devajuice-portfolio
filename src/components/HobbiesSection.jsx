@@ -1,3 +1,5 @@
+import SpotlightCard from './ui/SpotlightCard';
+
 const HOBBIES = [
   {
     icon: 'fa-gamepad',
@@ -19,21 +21,20 @@ const HOBBIES = [
 export default function HobbiesSection() {
   return (
     <>
-      <h2 id="hobbies-heading" className="section-title">
+      <h2 id="hobbies-heading" className="section-heading">
         <i className="fas fa-heart" aria-hidden="true" />
         <span>Hobbies &amp; Interests</span>
       </h2>
-      <div className="grid-container">
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {HOBBIES.map((h) => (
-          <div className="card" key={h.title}>
-            <div className="card-icon">
-              <i className={`fas ${h.icon}`} aria-hidden="true" />
+          <SpotlightCard key={h.title} className="flex h-full flex-col">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface-hover text-text-primary">
+              <i className={`fas ${h.icon} text-base`} aria-hidden="true" />
             </div>
-            <div className="card-content">
-              <h3>{h.title}</h3>
-              <p>{h.desc}</p>
-            </div>
-          </div>
+            <h3 className="mb-2 text-base font-semibold text-text-primary">{h.title}</h3>
+            <p className="text-sm leading-relaxed text-text-muted">{h.desc}</p>
+          </SpotlightCard>
         ))}
       </div>
     </>

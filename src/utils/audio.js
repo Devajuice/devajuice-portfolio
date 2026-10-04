@@ -317,7 +317,9 @@ function teardownSharedGraph() {
     [bgMaster, bgCompressor, bgEQ, bgWetGain, bgDryGain, bgConvolver].forEach((n) => {
       try {
         n.disconnect();
-      } catch (e) {}
+      } catch {
+        /* node may already be detached — safe to ignore */
+      }
     });
     bgMaster = bgCompressor = bgEQ = bgWetGain = bgDryGain = bgConvolver = null;
   }, 1600);
