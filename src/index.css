@@ -2,55 +2,55 @@
 
 /* ═══════════════════════════════════════════════════
    EASYUI DESIGN TOKENS
-   Monochrome system. `:root` is LIGHT, `.dark` is DARK.
+   Monochrome system. Dark only — there is no light
+   variant and no `.dark` class toggle.
    ════════════════════════════════════════════════════ */
 @theme {
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f4f4f5;
-  --color-surface-raised: #f1f1f2;
+  --color-bg: #111113;
+  --color-surface: #1c1c1f;
+  --color-surface-hover: #202023;
+  --color-surface-raised: #18181a;
 
-  --color-border: #e4e4e7;
-  --color-border-hover: #d4d4d8;
-  --color-border-subtle: #ededef;
+  --color-border: #29292c;
+  --color-border-hover: #343438;
+  --color-border-subtle: #18181a;
 
-  --color-text-primary: #0a0a0a;
-  --color-text-secondary: #52525b;
-  --color-text-muted: #71717a;
-  --color-text-subtle: #a1a1aa;
+  --color-text-primary: #f2f2f3;
+  --color-text-secondary: #a1a1a6;
+  --color-text-muted: #6f6f75;
+  --color-text-subtle: #4d4d52;
 
-  --color-accent: #0a0a0a;
-  --color-accent-subtle: rgb(10 10 10 / 0.05);
-  --color-accent-glow: rgb(10 10 10 / 0.06);
-  --color-accent-ring: rgb(10 10 10 / 0.15);
+  --color-accent: #f2f2f3;
+  --color-accent-subtle: rgb(242 242 243 / 0.06);
+  --color-accent-glow: rgb(242 242 243 / 0.08);
+  --color-accent-ring: rgb(242 242 243 / 0.2);
 
-  /* Album-art backdrop strength. Dark mode needs a much higher value than light
-     mode: the dark surface swallows the artwork, so the same alpha that reads
-     clearly on white is nearly invisible on near-black. Light mode is high
-     enough that the artwork still reads as colour rather than a grey wash, while
-     staying below the point where near-black text loses contrast. */
-  --art-alpha: 0.85;
+  /* Album-art backdrop strength. Runs high because the dark surface swallows the
+     artwork: the alpha that reads clearly on a near-black panel is far lower
+     than the same artwork needs on white. High enough that the art still reads
+     as colour rather than a grey wash, low enough to keep the text legible. */
+  --art-alpha: 0.9;
 
   /* "Live" now-playing accent — the one deliberate colour in the system */
-  --color-live: #22c55e;
-  --color-live-soft: rgb(34 197 94 / 0.12);
-  --color-live-badge: rgb(34 197 94 / 0.15);
-  --color-live-border: rgb(34 197 94 / 0.3);
-  --color-live-glow: rgb(34 197 94 / 0.14);
+  --color-live: #4ade80;
+  --color-live-soft: rgb(74 222 128 / 0.14);
+  --color-live-badge: rgb(74 222 128 / 0.18);
+  --color-live-border: rgb(74 222 128 / 0.38);
+  --color-live-glow: rgb(74 222 128 / 0.16);
 
   /* Navbar pill tokens */
-  --color-pill-bg-scrolled: rgb(255 255 255 / 0.85);
-  --color-pill-bg-idle: rgb(255 255 255 / 0);
-  --color-pill-border-scrolled: rgb(228 228 231);
-  --color-pill-border-idle: rgb(228 228 231 / 0);
+  --color-pill-bg-scrolled: rgb(17 17 19 / 0.85);
+  --color-pill-bg-idle: rgb(17 17 19 / 0);
+  --color-pill-border-scrolled: #29292c;
+  --color-pill-border-idle: rgb(41 41 44 / 0);
 
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
 
-  --shadow-subtle: 0 1px 2px 0 rgb(15 15 20 / 0.06), 0 0 0 1px rgb(15 15 20 / 0.04);
-  --shadow-elevated: 0 10px 25px -8px rgb(15 15 20 / 0.12), 0 0 0 1px rgb(15 15 20 / 0.05);
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.18), 0 0 0 1px rgb(242 242 243 / 0.02);
+  --shadow-elevated: 0 10px 25px -8px rgb(0 0 0 / 0.22), 0 0 0 1px rgb(242 242 243 / 0.04);
 
   --font-sans:
     'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -72,45 +72,6 @@
   --animate-hint-fade-in: hintFadeIn 0.25s ease both;
   --animate-easter-bounce: easterBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   --animate-pill-pulse: pillPulse 2.4s ease-in-out infinite;
-}
-
-/* ═══════════════════════════════════════════════════
-   DARK PALETTE
-   ════════════════════════════════════════════════════ */
-@layer base {
-  .dark {
-    --color-bg: #111113;
-    --color-surface: #1c1c1f;
-    --color-surface-hover: #202023;
-    --color-surface-raised: #18181a;
-
-    --color-border: #29292c;
-    --color-border-hover: #343438;
-    --color-border-subtle: #18181a;
-
-    --color-text-primary: #f2f2f3;
-    --color-text-secondary: #a1a1a6;
-    --color-text-muted: #6f6f75;
-    --color-text-subtle: #4d4d52;
-
-    --color-accent: #f2f2f3;
-    --color-accent-subtle: rgb(242 242 243 / 0.06);
-    --color-accent-glow: rgb(242 242 243 / 0.08);
-    --color-accent-ring: rgb(242 242 243 / 0.2);
-
-    --art-alpha: 0.9;
-
-    --color-live: #4ade80;
-    --color-live-soft: rgb(74 222 128 / 0.14);
-    --color-live-badge: rgb(74 222 128 / 0.18);
-    --color-live-border: rgb(74 222 128 / 0.38);
-    --color-live-glow: rgb(74 222 128 / 0.16);
-
-    --color-pill-bg-scrolled: rgb(17 17 19 / 0.85);
-
-    --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.18), 0 0 0 1px rgb(242 242 243 / 0.02);
-    --shadow-elevated: 0 10px 25px -8px rgb(0 0 0 / 0.22), 0 0 0 1px rgb(242 242 243 / 0.04);
-  }
 }
 
 /* ═══════════════════════════════════════════════════

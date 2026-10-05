@@ -3,39 +3,10 @@
 
    Self-contained on purpose: this is a static page outside the React app, so it
    cannot depend on the SPA's hashed Tailwind bundle. Tokens below mirror
-   src/index.css `@theme`; keep the two in sync.
+   src/index.css `@theme`; keep the two in sync. Dark only, same as the SPA.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f4f4f5;
-  --color-surface-raised: #f1f1f2;
-
-  --color-border: #e4e4e7;
-  --color-border-hover: #d4d4d8;
-  --color-border-subtle: #ededef;
-
-  --color-text-primary: #0a0a0a;
-  --color-text-secondary: #52525b;
-  --color-text-muted: #71717a;
-  --color-text-subtle: #a1a1aa;
-
-  --color-accent: #0a0a0a;
-  --color-accent-ring: rgb(10 10 10 / 0.15);
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-
-  --shadow-subtle: 0 1px 2px 0 rgb(15 15 20 / 0.06), 0 0 0 1px rgb(15 15 20 / 0.04);
-  --shadow-elevated: 0 10px 25px -8px rgb(15 15 20 / 0.12), 0 0 0 1px rgb(15 15 20 / 0.05);
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.dark {
   --color-bg: #111113;
   --color-surface: #1c1c1f;
   --color-surface-hover: #202023;
@@ -53,8 +24,15 @@
   --color-accent: #f2f2f3;
   --color-accent-ring: rgb(242 242 243 / 0.2);
 
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
   --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.18), 0 0 0 1px rgb(242 242 243 / 0.02);
   --shadow-elevated: 0 10px 25px -8px rgb(0 0 0 / 0.22), 0 0 0 1px rgb(242 242 243 / 0.04);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ── Reset ── */
@@ -63,6 +41,7 @@
 }
 html {
   background: var(--color-bg);
+  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
 }
 body {
@@ -79,11 +58,8 @@ body {
     color 0.3s ease;
 }
 ::selection {
-  background: rgb(10 10 10 / 0.05);
-  color: var(--color-text-primary);
-}
-.dark ::selection {
   background: rgb(242 242 243 / 0.06);
+  color: var(--color-text-primary);
 }
 *:focus-visible {
   outline: 1px solid var(--color-accent-ring);

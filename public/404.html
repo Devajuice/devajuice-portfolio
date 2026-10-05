@@ -8,8 +8,7 @@
 
     <!-- ✦ PWA -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#111113" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Devajith" />
@@ -29,26 +28,6 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Pre-mount theme bootstrap — matches src/index.html -->
-    <script>
-      (function () {
-        try {
-          var stored = localStorage.getItem('easyui-theme');
-          var theme =
-            stored === 'light' || stored === 'dark'
-              ? stored
-              : window.matchMedia &&
-                  window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light';
-          if (theme === 'dark') document.documentElement.classList.add('dark');
-          document.documentElement.style.colorScheme = theme;
-        } catch (e) {
-          /* no-op */
-        }
-      })();
-    </script>
 
     <!-- Shared design system (EasyUI tokens) + 404-specific styles -->
     <link rel="stylesheet" href="/404.css" />

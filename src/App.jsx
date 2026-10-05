@@ -5,7 +5,6 @@ import DotShader from './components/ui/DotShader';
 import { ToastProvider } from './components/Toast';
 import { useToast } from './components/useToast';
 import { useNowPlaying, useSound } from './hooks';
-import { useIsDark } from './hooks/useIsDark';
 import {
   playSound,
   startBgMusic,
@@ -24,6 +23,7 @@ const AboutSection = lazy(() => import('./components/AboutSection'));
 const ProjectsSection = lazy(() => import('./components/ProjectsSection'));
 const SkillsSection = lazy(() => import('./components/SkillsSection'));
 const HobbiesSection = lazy(() => import('./components/HobbiesSection'));
+const PlaygroundSection = lazy(() => import('./components/PlaygroundSection'));
 const ContactSection = lazy(() => import('./components/ContactSection'));
 const EasterEgg = lazy(() => import('./components/EasterEgg'));
 const KeyboardShortcuts = lazy(() => import('./components/KeyboardShortcuts'));
@@ -38,7 +38,7 @@ function LoadingFallback() {
 }
 
 function triggerConfetti() {
-  const colors = ['#0a0a0a', '#52525b', '#a1a1aa'];
+  const colors = ['#f2f2f3', '#a1a1a6', '#6f6f75'];
   for (let i = 0; i < 80; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
@@ -69,7 +69,6 @@ function AppInner() {
   const [kbdOpen, setKbdOpen] = useState(false);
   const [easterEggOpen, setEasterEggOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const isDark = useIsDark();
   const musicData = useNowPlaying();
   const showToast = useToast();
   const ogImage = useOgImage({
@@ -236,19 +235,19 @@ function AppInner() {
       ctx.clearRect(0, 0, 32, 32);
       ctx.beginPath();
       ctx.arc(16, 16, 15, 0, Math.PI * 2);
-      ctx.fillStyle = isDark ? '#f2f2f3' : '#0a0a0a';
+      ctx.fillStyle = '#f2f2f3';
       ctx.fill();
       ctx.font = 'bold 13px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = isDark ? '#0a0a0a' : '#ffffff';
+      ctx.fillStyle = '#0a0a0a';
       ctx.fillText('</>', 16, 16);
       link.href = canvas.toDataURL('image/png');
       frame = (frame + 1) % 120;
     };
     rafId = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafId);
-  }, [isDark]);
+  }, []);
 
   // Konami code
   useEffect(() => {
@@ -396,18 +395,14 @@ function AppInner() {
         return;
       }
       if (isTyping() || e.ctrlKey || e.altKey || e.metaKey) return;
-      const SECTION_KEYS = {
-        1: 'home',
-        2: 'about',
-        3: 'projects',
-        4: 'skills',
-        5: 'hobbies',
-        6: 'contact',
-      };
-      if (SECTION_KEYS[e.key]) {
+      // Derived from SECTIONS rather than hand-listed: adding a section used to
+      // require editing this map too, and forgetting left the new section with
+      // no number key while silently shifting the ones after it.
+      const sectionIndex = Number(e.key) - 1;
+      const s = SECTIONS[sectionIndex];
+      if (Number.isInteger(sectionIndex) && sectionIndex >= 0 && s) {
         e.preventDefault();
-        flashKey({ 1: 'kk-1', 2: 'kk-2', 3: 'kk-3', 4: 'kk-4', 5: 'kk-5', 6: 'kk-6' }[e.key]);
-        const s = SECTION_KEYS[e.key];
+        flashKey(`kk-${e.key}`);
         setKbdOpen(false);
         navigate(s);
         showToast(
@@ -490,8 +485,8 @@ function AppInner() {
       <DotShader
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
-        dotColor={isDark ? 'rgba(242, 242, 243, 0.14)' : 'rgba(10, 10, 10, 0.16)'}
-        accentColor={isDark ? 'rgba(242, 242, 243, 0.7)' : 'rgba(10, 10, 10, 0.75)'}
+        dotColor="rgba(242, 242, 243, 0.14)"
+        accentColor="rgba(242, 242, 243, 0.7)"
         dotSize={1.4}
         spacing={24}
         cursorRadius={190}
@@ -601,6 +596,15 @@ function AppInner() {
                 aria-labelledby="hobbies-heading"
               >
                 <HobbiesSection />
+              </section>
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <section
+                id="playground"
+                className={getStateClasses('playground')}
+                aria-labelledby="playground-heading"
+              >
+                <PlaygroundSection />
               </section>
             </ErrorBoundary>
             <ErrorBoundary>

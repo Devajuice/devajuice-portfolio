@@ -93,7 +93,7 @@ export function PillNavigation({
     >
       <div
         role="tablist"
-        className="inline-flex items-center rounded-full border border-[#1f1f1f] bg-[#050505] p-1 shadow-inner"
+        className="inline-flex max-w-full items-center overflow-x-auto rounded-full border border-[#1f1f1f] bg-[#050505] p-1 shadow-inner"
       >
         {items.map((item) => {
           const active = item.id === activeId;
@@ -109,8 +109,8 @@ export function PillNavigation({
               tabIndex={active ? 0 : -1}
               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
               onClick={() => selectMain(item.id)}
-              className={cn(
-                'focus-ring relative flex min-h-8 cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
+        className={cn(
+          'focus-ring relative flex min-h-8 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
                 active
                   ? 'font-semibold text-[#050505]'
                   : 'text-[#a1a1a1] hover:text-[#fafafa]'

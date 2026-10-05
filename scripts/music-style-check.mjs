@@ -17,7 +17,10 @@ if (!FIREFOX) {
   process.exit(1);
 }
 
-const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
+// Defaults to the preview port, matching browser-check and music-pill-check:
+// this suite asserts resolved CSS values, which Vite's dev server does not
+// produce. Override with BASE_URL to point elsewhere.
+const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173';
 
 const ART =
   'data:image/svg+xml;base64,' +
@@ -114,22 +117,6 @@ const page = await browser.newPage();
 installFetchStub(page);
 await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
 
-// Headless Firefox reports prefers-color-scheme: dark by default, which would
-// silently make every "light" assertion read the dark tokens. Pin the theme via
-// localStorage — this is the exact key index.html's bootstrap reads first, and it
-// runs before any page script. (emulateMediaFeatures needs CDP, unsupported by
-// Firefox WebDriver BiDi.)
-await page.evaluateOnNewDocument(() => {
-  try {
-    const forced = new URL(location.href).searchParams.get('theme');
-    localStorage.setItem('easyui-theme', forced === 'dark' ? 'dark' : 'light');
-  } catch (e) {
-    /* ignore */
-  }
-});
-
-
-
 const fail = [];
 const ok = [];
 const check = (name, cond, detail = '') =>
@@ -196,7 +183,7 @@ const live = await page.evaluate(() => {
 });
 check('live pill text is green', isGreenLike(live.color), live.color);
 check('live pill border is green', isGreenLike(live.border), live.border);
-check('light mode uses light green token', /rgb\(34,\s*197,\s*94\)/.test(live.color), live.color);
+check('live pill uses the dark green token', /rgb\(74,\s*222,\s*128\)/.test(live.color), live.color);
 
 const art = await page.evaluate(() => {
   const host = [...document.querySelectorAll('#home [role="status"]')].find((e) =>
@@ -337,41 +324,41 @@ check('non-live card border is NOT green', !isGreenLike(recent.cardBorder), rece
 check('non-live pill labelled Last Played', /Last Played/.test(recent.homeLabel), recent.homeLabel.slice(0, 70));
 check('non-live home pill is NOT green', !isGreenLike(recent.homeColor), recent.homeColor);
 
-// ── dark mode keeps the live accent green (lighter token) ─────────
-await page.goto(`${BASE}/?theme=dark#home`, { waitUntil: 'networkidle2' });
+// ── dark-only: the dark palette must be the active one, unconditionally ─
+// The page is still on the `state=recent` fixture from the checks above, so
+// return it to the live fixture before asserting the live accent.
+await page.goto(`${BASE}/?state=live#home`, { waitUntil: 'networkidle2' });
 await new Promise((r) => setTimeout(r, 2500));
 
 const dark = await page.evaluate(() => {
   const host = [...document.querySelectorAll('#home [role="status"]')].find((e) =>
     /now playing|last played/i.test(e.textContent)
   );
-  const el = host;
-  const cs = getComputedStyle(el);
-  return { color: cs.color, border: cs.borderTopColor, isDark: document.documentElement.classList.contains('dark') };
+  const cs = getComputedStyle(host);
+  return {
+    color: cs.color,
+    border: cs.borderTopColor,
+    rootBg: getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim(),
+    hasDarkClass: document.documentElement.classList.contains('dark'),
+  };
 });
-check('dark class applied', dark.isDark);
-check('dark mode live pill is green', isGreenLike(dark.color), dark.color);
-check('dark mode live border is green', isGreenLike(dark.border), dark.border);
-check('dark mode uses dark green token', /rgb\(74,\s*222,\s*128\)/.test(dark.color), dark.color);
+check('no .dark class needed — palette is dark by default', !dark.hasDarkClass);
+check('dark palette is the active token set', /#111113/i.test(dark.rootBg), dark.rootBg);
+check('live pill is green', isGreenLike(dark.color), dark.color);
+check('live border is green', isGreenLike(dark.border), dark.border);
+check('live pill uses the dark green token', /rgb\(74,\s*222,\s*128\)/.test(dark.color), dark.color);
 
 /* ── pixel visibility ───────────────────────────────────────────────
    Asserting that the backdrop CSS *exists* is not the same as asserting the
    artwork is *visible* — an 85%-opaque tint over the art still satisfies every
    declaration check while showing none of it. So screenshot the region with and
    without artwork and require a real perceptual difference. */
-async function measure(target, { art, theme }) {
+async function measure(target, { art }) {
   const p = await browser.newPage();
   installFetchStub(p);
   await p.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
-  await p.evaluateOnNewDocument((t) => {
-    try {
-      localStorage.setItem('easyui-theme', t);
-    } catch (e) {
-      /* ignore */
-    }
-  }, theme);
 
-  const q = `theme=${theme}&art=${art ? 1 : 0}#${target === 'about' ? 'about' : 'home'}`;
+  const q = `art=${art ? 1 : 0}#${target === 'about' ? 'about' : 'home'}`;
   await p.goto(`${BASE}/?${q}`, { waitUntil: 'networkidle2' });
   await new Promise((r) => setTimeout(r, 2500));
   await p.evaluate((t) => {
@@ -409,28 +396,26 @@ async function measure(target, { art, theme }) {
   return out;
 }
 
-for (const theme of ['light', 'dark']) {
-  for (const target of ['about', 'home']) {
-    const withArt = await measure(target, { art: true, theme });
-    const without = await measure(target, { art: false, theme });
-    const d = colorDistance(withArt.center, without.center);
-    // Baseline before the glass fix measured 5.9 (about) / 8.7 (home) in dark
-    // mode, which is imperceptible. Anything under 12 is effectively invisible.
-    check(
-      `${theme} ${target} artwork is visibly rendered`,
-      d !== null && d >= 12,
-      `delta=${d?.toFixed(1)} with=${withArt.center && `rgb(${withArt.center.r.toFixed(0)},${withArt.center.g.toFixed(0)},${withArt.center.b.toFixed(0)})`}`
-    );
-    // The artwork must reach both borders — an edge mask made it look like a
-    // blotchy vignette rather than a cover.
-    const dl = colorDistance(withArt.left, without.left);
-    const dr = colorDistance(withArt.right, without.right);
-    check(
-      `${theme} ${target} artwork reaches the edges`,
-      dl !== null && dr !== null && dl >= 4 && dr >= 4,
-      `left=${dl?.toFixed(1)} right=${dr?.toFixed(1)}`
-    );
-  }
+for (const target of ['about', 'home']) {
+  const withArt = await measure(target, { art: true });
+  const without = await measure(target, { art: false });
+  const d = colorDistance(withArt.center, without.center);
+  // Baseline before the glass fix measured 5.9 (about) / 8.7 (home), which is
+  // imperceptible. Anything under 12 is effectively invisible.
+  check(
+    `${target} artwork is visibly rendered`,
+    d !== null && d >= 12,
+    `delta=${d?.toFixed(1)} with=${withArt.center && `rgb(${withArt.center.r.toFixed(0)},${withArt.center.g.toFixed(0)},${withArt.center.b.toFixed(0)})`}`
+  );
+  // The artwork must reach both borders — an edge mask made it look like a
+  // blotchy vignette rather than a cover.
+  const dl = colorDistance(withArt.left, without.left);
+  const dr = colorDistance(withArt.right, without.right);
+  check(
+    `${target} artwork reaches the edges`,
+    dl !== null && dr !== null && dl >= 4 && dr >= 4,
+    `left=${dl?.toFixed(1)} right=${dr?.toFixed(1)}`
+  );
 }
 
 await browser.close();

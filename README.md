@@ -1,6 +1,6 @@
 # Devajith | Developer Portfolio 🌟
 
-A modern, responsive single-page portfolio website featuring a monochrome design system on Tailwind CSS v4, smooth animations, a gooey mobile menu, light/dark theme switching, live Last.fm music integration with full-bleed album art, and interactive easter eggs. Built with React and Vite.
+A modern, responsive single-page portfolio website featuring a monochrome design system on Tailwind CSS v4, smooth animations, a gooey mobile menu, live Last.fm music integration with full-bleed album art, a playground of self-contained browser toys, and interactive easter eggs. Built with React and Vite.
 
 ![Website Preview](https://img.shields.io/badge/Status-Live-success)
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
@@ -12,11 +12,11 @@ A modern, responsive single-page portfolio website featuring a monochrome design
 
 ### 🎨 Design & UX
 
-- **Light/Dark Theme Toggle** — Respects system preference, persists via `localStorage`, and is bootstrapped inline in `index.html` before first paint so there is no flash of the wrong theme. Components that need concrete colours (the WebGL shader, confetti) read it through `useIsDark()`, which mirrors the DOM `.dark` class with a `MutationObserver` and a `matchMedia` listener
-- **EasyUI Design System** — Every colour, radius and glass surface is a CSS custom property declared in a Tailwind v4 `@theme` block, so tokens are real utilities (`bg-surface`, `text-muted`) rather than magic strings. Light is the `:root` default and dark overrides under `.dark`
+- **Dark-Only Theme** — One palette, declared once, with no toggle and no flash-of-wrong-theme script: `index.html` paints `#111113` before React mounts and `color-scheme: dark` makes native UI (scrollbars, form controls, autofill) match. Anything needing a literal colour (WebGL shader, canvas confetti, animated favicon) hardcodes the dark value rather than branching at runtime
+- **EasyUI Design System** — Every colour, radius and glass surface is a CSS custom property declared in a Tailwind v4 `@theme` block, so tokens are real utilities (`bg-surface`, `text-muted`) rather than magic strings. `public/404.css` hand-mirrors the same tokens for the static 404 page
 - **Monochrome Design** — Black/white palette with a single green accent reserved for the "live" music state, so colour carries meaning
 - **Responsive Design** — Seamlessly adapts to desktop, tablet, and mobile devices
-- **Floating Pill Navbar** — Centered glassmorphism pill on desktop with a sliding active-section indicator; the mobile drawer is a gooey menu (see below)
+- **Floating Pill Navbar** — Centered glassmorphism pill on desktop with a sliding active-section indicator; the mobile drawer is a gooey menu (see below). With seven sections the pill breaks at `lg` rather than `md`, and its tablist scrolls horizontally as a backstop so a tab can never clip
 - **DM Sans Typography** — Modern, clean font used across the entire site
 - **Per-Section Error Boundary** — A failure in any section degrades that section only, instead of blanking the whole page
 - **Site Footer** — 4-column grid layout (Brand, Quick Links, Connect, Resources) with tagline, tech stack chips, navigation links, email contact, resume download, social icon links, and keyboard shortcuts hint; responsive 4→2→1 column grid on mobile
@@ -39,10 +39,10 @@ A modern, responsive single-page portfolio website featuring a monochrome design
 
 ### 🌌 Visual Effects
 
-- **WebGL Dot Shader Background** — A full-screen `DotShader` canvas behind the content, driven by a `uMouse`/`uTime` uniform pair. It re-reads the theme through `useIsDark()` so the dots invert with light/dark, and pauses when the tab is hidden to save GPU/battery
+- **WebGL Dot Shader Background** — A full-screen `DotShader` canvas behind the content, driven by a `uMouse`/`uTime` uniform pair, with light-on-dark dots so they stay visible against the dark surface. Pauses when the tab is hidden to save GPU/battery
 - **Full-Bleed Album Art** — The About card and the home now-playing pill render the cover as a scaled, blurred, saturated backdrop clipped by the container's own `overflow-hidden` radius. No edge masks: at pill height a gradient mask reads as a blotchy vignette rather than a cover
 - **Thin Glass Veil** — The frosted layer over the artwork is 22% surface tint with `blur(10px) saturate(220%)`, enough tint for contrast and enough saturation that the artwork reads as colour rather than a grey wash. The veil inherits its container radius so it cannot show as a hard rectangle where `backdrop-filter` is unsupported
-- **Animated Favicon** — Canvas-drawn `</>` logo with an orbiting glow dot that plays for 3 seconds on load then stops to avoid ongoing repaints; colors update automatically with the active theme
+- **Animated Favicon** — Canvas-drawn `</>` logo with an orbiting glow dot that plays for 3 seconds on load then stops to avoid ongoing repaints; drawn light-on-dark to match the site
 
 ### 🐣 Easter Eggs
 
@@ -67,23 +67,35 @@ A modern, responsive single-page portfolio website featuring a monochrome design
 - **Double-Submit Guard** — A `ref`-based guard prevents concurrent or accidental duplicate submissions
 - **Form Validation** — Client-side validation for all fields including email format check
 - **Copy Email Button** — One-click button copies your email address to the clipboard with a success toast, alongside the social links
-- **Toast Notifications** — Non-intrusive slide-in toasts for form success, errors, and navigation feedback
+- **Toast Notifications** — Non-intrusive slide-in toasts for form success, errors, and navigation feedback; renders through a stacked notification pile so rapid-fire messages never overlap
+- **World Clock** — Airport-board split-flap clock in the footer showing the local time in Dubai, London, and Tokyo, with a scrolling glyph animation that honours `prefers-reduced-motion`
 - **Social Media Links** — Quick access to LinkedIn, GitHub, and Instagram
+
+### 🎛️ Playground
+
+A grab-bag page for self-contained toys, reachable at `/#playground`. Everything runs locally —
+no network requests, no accounts, nothing persisted beyond the clock's city list.
+
+- **Editable World Clock** — The footer's split-flap clock with its city editor switched on. Pick up to five of the 32 available cities and the selection is written to `localStorage`, so it survives reloads. Corrupt or stale stored values fall back to the default three instead of breaking the page
+- **Step Sequencer** — A 16-step, 4-voice drum machine (kick, hat, clap, bass) with three tempos, randomize, and clear. It shares the module-level `AudioContext` from `src/utils/audio.js` rather than opening its own, and uses the standard look-ahead scheduler — notes are placed against `ctx.currentTime` while a coarse 25ms timer only refills the queue, so the rhythm does not jitter when a tick lands late
+- **Random Toys** — Dice (1–4d6), coin flip, a weekend-project picker, and a yes/no decision maker. All resolve in the browser and remember nothing
 
 ### ⌨️ Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| `1` – `6` | Jump to section |
-| `T` | Toggle theme |
+| `1` – `7` | Jump to section (in `SECTIONS` order) |
 | `B` | Back to top |
 | `?` | Open/close shortcuts overlay |
 | `Esc` | Close overlays / mobile menu |
 
+The number keys and the overlay's key list are both derived from `SECTIONS`, so adding a section
+extends them automatically instead of leaving a gap that silently shifts the later shortcuts.
+
 ### ⚡ Performance & Accessibility
 
 - **PWA Ready** — `manifest.json` enables "Add to Home Screen" on Android/iOS with app shortcuts for Projects and Contact
-- **Theme Color** — `theme-color` meta tag updates the browser chrome to match your accent color (light and dark variants)
+- **Theme Color** — a single `theme-color` meta tag sets the browser chrome to the site's background; `color-scheme: dark` is declared so form controls and scrollbars render dark too
 - **Fast Loading** — Vite-bundled output, deferred script loading, preconnect hints for all external origins, and no render-blocking resources
 - **SEO Optimised** — Full meta tags, Open Graph (with image dimensions), Twitter Card, canonical URL, JSON-LD structured data (Person schema), and a clean `sitemap.xml`
 - **Accessibility** — Skip link, ARIA labels, keyboard navigation, focus traps on overlays (`role="dialog"`), `aria-live` regions for dynamic content, and `aria-hidden` on the mobile nav dropdown when closed so hidden buttons are invisible to screen readers and excluded from the tab order
@@ -94,31 +106,18 @@ A modern, responsive single-page portfolio website featuring a monochrome design
 
 ## 🎨 Color Theme
 
-Tokens are declared in `src/index.css`. Light is the `:root` default; `.dark` overrides the same custom properties.
-
-### Light Mode (`:root`)
-
-| Token | Value |
-|-------|-------|
-| `--color-bg` | `#fafafa` |
-| `--color-surface` | `#ffffff` |
-| `--color-surface-hover` | `#f4f4f5` |
-| `--color-border` | `#e4e4e7` |
-| `--color-text-primary` | `#0a0a0a` |
-| `--color-text-secondary` | `#52525b` |
-| `--color-text-muted` | `#71717a` |
-| `--color-text-subtle` | `#a1a1aa` |
-| `--color-accent` | `#0a0a0a` |
-| `--color-live` | `#22c55e` |
-
-### Dark Mode (`.dark`)
+Dark only. Every token is declared once in the `@theme` block in `src/index.css` —
+there is no light variant and no `.dark` class to toggle. `public/404.css` mirrors
+the same set by hand, so keep the two in sync.
 
 | Token | Value |
 |-------|-------|
 | `--color-bg` | `#111113` |
 | `--color-surface` | `#1c1c1f` |
 | `--color-surface-hover` | `#202023` |
+| `--color-surface-raised` | `#18181a` |
 | `--color-border` | `#29292c` |
+| `--color-border-hover` | `#343438` |
 | `--color-text-primary` | `#f2f2f3` |
 | `--color-text-secondary` | `#a1a1a6` |
 | `--color-text-muted` | `#6f6f75` |
@@ -126,13 +125,20 @@ Tokens are declared in `src/index.css`. Light is the `:root` default; `.dark` ov
 | `--color-accent` | `#f2f2f3` |
 | `--color-live` | `#4ade80` |
 
-The accent is intentionally the same as `text-primary` in both themes — the palette is monochrome, and green appears only where it means something (the live now-playing state). `--art-alpha` (`0.85` light / `0.9` dark) controls how far the blurred album art pushes its own colour into the glass surface.
+The accent is intentionally the same as `text-primary` — the palette is monochrome,
+and green appears only where it means something (the live now-playing state).
+`--art-alpha` (`0.9`) controls how far the blurred album art pushes its own colour
+into the glass surface.
+
+Because the theme can no longer change at runtime, anything that needs a literal
+colour (the WebGL shader, canvas confetti, the animated favicon) hardcodes the dark
+value directly instead of branching on a hook.
 
 ## 📂 Project Structure
 
 ```
 devajith-portfolio/
-├── index.html               # Entry point; bootstraps the theme inline before first paint
+├── index.html               # Entry point; carries the pre-paint dark background
 ├── vite.config.js           # Vite bundling, Tailwind plugin, /api/nowplaying dev middleware
 ├── vercel.json              # Vercel deployment & 404 routing logic
 ├── .env.example             # Template for LASTFM_API_KEY (never commit a real .env)
@@ -154,36 +160,42 @@ devajith-portfolio/
 └── src/
     ├── main.jsx             # React DOM mounting
     ├── App.jsx              # Section state, swipe gestures, hashchange, DotShader mount
-    ├── index.css            # The whole design system: @theme tokens, light/dark, utilities
+    ├── index.css            # The whole design system: @theme tokens, keyframes, utilities
     ├── components/
     │   ├── AboutSection.jsx     # Timeline, accordion, music card with full-bleed art
     │   ├── ContactSection.jsx   # Contact form + copy-email button
     │   ├── EasterEgg.jsx
     │   ├── ErrorBoundary.jsx    # Per-section failure isolation
-    │   ├── Footer.jsx           # 4-column grid: brand, quick links, connect, resources
+    │   ├── Footer.jsx           # 4-column grid + world clock
     │   ├── HomeSection.jsx      # Hero + now-playing pill
     │   ├── HobbiesSection.jsx
     │   ├── KeyboardShortcuts.jsx
     │   ├── Navigation.jsx       # PillNavigation desktop bar + gooey mobile drawer, SECTIONS
+    │   ├── PlaygroundSection.jsx # Accordion shell for the self-contained toys
+    │   ├── playground/
+    │   │   ├── WorldClockToy.jsx # Editable clock + localStorage city persistence
+    │   │   ├── SequencerToy.jsx  # 16-step Web Audio drum machine
+    │   │   └── RandomToys.jsx    # Dice, coin flip, project ideas, decision maker
     │   ├── ProjectsSection.jsx
     │   ├── projects.jsx         # Project data config — edit here to add/update projects
     │   ├── SkillsSection.jsx
-    │   ├── Toast.jsx
+    │   ├── Toast.jsx             # Provider; renders NotificationStack
     │   ├── ToastContext.js
     │   ├── useToast.js
     │   └── ui/                  # EasyUI primitives
+    │       ├── AirportMatrixClock.jsx # Split-flap world clock (footer + playground)
     │       ├── Button.jsx
     │       ├── DotShader.jsx      # WebGL background
     │       ├── Equalizer.jsx
     │       ├── LiveBadge.jsx
     │       ├── MagneticButton.jsx
+    │       ├── NotificationStack.jsx # Stacked, drag-to-dismiss pile
     │       ├── PillNavigation.jsx # Floating glass pill + sliding indicator
     │       ├── SmoothAccordion.jsx
     │       └── SpotlightCard.jsx
     ├── hooks/
     │   ├── index.js         # useSound, useNowPlaying, useTimezone, useTypewriter
     │   ├── useFocusTrap.js  # Shared focus-trap hook used by overlays
-    │   ├── useIsDark.js     # Mirrors the DOM .dark class into React state
     │   └── useOgImage.js    # OG image URL builder
     ├── lib/
     │   ├── motion-tokens.js # Shared springs and easings
@@ -211,10 +223,10 @@ devajith-portfolio/
 
 ```bash
 npm run lint               # ESLint over src
-npm run check              # build + static/SSR render assertions (26 checks)
+npm run check              # build + static/SSR render assertions (35 checks)
 npm run browser-check      # navigation, section rendering, console/network errors
 npm run music-pill-check   # live / no-tracks / failed now-playing states
-npm run music-style-check  # artwork visibility, edge coverage, glass, "Live" accent, mobile layout (48 checks)
+npm run music-style-check  # artwork visibility, edge coverage, glass, "Live" accent, mobile layout (45 checks)
 npm run ui-polish-check    # pill centring, icon alignment, transitions, goo menu geometry (38 checks)
 ```
 
@@ -227,13 +239,14 @@ npm run ui-polish-check    # in another
 
 Run the browser suites against `preview`, not `dev` — Vite's dev server serves
 unprocessed CSS, so token-derived values such as the auto-generated
-`-webkit-backdrop-filter` prefix will not match production.
+`-webkit-backdrop-filter` prefix will not match production. All four default to
+`http://127.0.0.1:4173` for that reason; set `BASE_URL` to point them elsewhere.
 
 `music-style-check` measures artwork visibility by **screenshotting the region
 with and without artwork** and comparing pixels, because asserting that the
 backdrop CSS exists says nothing about whether the artwork is actually visible
-through the glass tint. It pins the theme via `localStorage` so the light and
-dark accent tokens are each verified explicitly.
+through the glass tint. It also asserts that the dark palette is the one actually
+resolved, since the site is dark-only and nothing toggles it at runtime.
 
 `ui-polish-check` measures the goo menu geometrically: it compares each blob's
 bounding box against the corresponding text row and fails if they drift in
@@ -362,26 +375,37 @@ than sleeping, so it does not measure the skeleton.
 | **Projects** | Clickable project cards — data lives in `src/components/projects.jsx` |
 | **Skills** | Animated progress bars for programming languages, frameworks & tools, and data science technologies. Bars re-animate every time the section is visited |
 | **Hobbies** | Gaming, music, and tech exploration |
+| **Playground** | Self-contained toys: the editable world clock (picks persist to `localStorage`), a 16-step Web Audio sequencer, and random toys (dice, coin flip, project ideas, decision maker). Nothing here makes a network request |
 | **Contact** | Contact form via Web3Forms, copy-email button, and social media links |
+
+### Adding a new section
+
+There is no router — `SECTIONS` in `src/components/Navigation.jsx` is the single source of
+truth, and a "page" is just an entry in it. Adding one wires up the desktop pill, the mobile
+drawer, the footer quick-links, the `?` shortcuts modal, arrow-key navigation, hash deep-linking
+(`/#playground`), and the entrance animations at once.
+
+1. Add the id to `SECTIONS`, plus `SECTION_LABELS` and `SECTION_ICONS` entries.
+2. `lazy()` the component in `App.jsx` and render a `<section id="…" className={getStateClasses('…')}>`.
+3. `npm run render-check` asserts these three lists agree — a section listed in `SECTIONS` but
+   missing from `App.jsx` renders a nav item that navigates nowhere, with no error otherwise.
+
+With seven tabs the desktop pill no longer fits an 768px row, so it (and the burger that
+replaces it) breaks at `lg` rather than `md`. The tablist also scrolls horizontally as a
+backstop, and tabs are `whitespace-nowrap` so labels can't wrap onto two lines.
 
 ## 🛠️ Customization Guide
 
 ### Changing Theme Colors
 
-Edit the tokens in the `@theme` block in `src/index.css`, and override them for
-dark mode inside the `.dark` block in the same file:
+Edit the tokens in the `@theme` block in `src/index.css`, and mirror any change into
+the `:root` block in `public/404.css` (the static 404 page cannot reach the SPA's
+Tailwind bundle):
 
 ```css
 @theme {
-  --color-accent: #0a0a0a;
-  --color-live: #22c55e;
-}
-
-@layer base {
-  .dark {
-    --color-accent: #f2f2f3;
-    --color-live: #4ade80;
-  }
+  --color-accent: #f2f2f3;
+  --color-live: #4ade80;
 }
 ```
 
@@ -465,6 +489,10 @@ No JSX changes needed — `ProjectsSection.jsx` renders the array automatically.
    export const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'newpage', 'contact'];
    ```
 
+   Position in this array *is* the keyboard-shortcut number and the
+   left/right swipe order, so insert rather than append if the new page belongs
+   mid-flow.
+
 2. Add its label and icon in the same file. Icons are Font Awesome class names:
 
    ```js
@@ -475,19 +503,30 @@ No JSX changes needed — `ProjectsSection.jsx` renders the array automatically.
    `NAV_ITEMS` is derived from those two maps, so the desktop pill and the gooey
    mobile menu both pick up the new entry automatically.
 
-3. Add a matching `<section>` inside `<main>` in `App.jsx`:
+3. `lazy()` the component at the top of `App.jsx` alongside the other sections,
+   then add a matching `<section>` inside `<main>`:
 
    ```jsx
-   <section id="newpage" className={getStateClasses("newpage")} aria-labelledby="newpage-heading">
-     <NewPageSection />
-   </section>
+   const NewPageSection = lazy(() => import('./components/NewPageSection'));
    ```
 
-4. Add the keyboard shortcut mapping if needed:
-
-   ```js
-   const SECTION_KEYS = { ..., 7: "newpage" };
+   ```jsx
+   <ErrorBoundary>
+     <section id="newpage" className={getStateClasses('newpage')} aria-labelledby="newpage-heading">
+       <NewPageSection />
+     </section>
+   </ErrorBoundary>
    ```
+
+   Steps 1–3 are the whole job. The `1`–`7` shortcuts, the `?` overlay's key list,
+   and the arrow-key/swipe order all read from `SECTIONS`, so they extend
+   automatically.
+
+4. Run `npm run check`. A `PlaygroundSection`-style render check is worth adding,
+   and there is a standing assertion that every id in `SECTIONS` has a matching
+   `<section>` in `App.jsx` plus `SECTION_LABELS`/`SECTION_ICONS` entries —
+   without it, a step-3 omission renders a nav item that navigates nowhere and
+   raises no error anywhere.
 
 ### Updating the Copy-Email Address
 
@@ -575,10 +614,10 @@ colour. Two dials in `src/index.css`:
 - `--art-alpha` (0.85 light, 0.9 dark) — how far the artwork pushes its own colour into the glass
 - the `glass-art` utility — the `22%` tint in `color-mix()` and the `saturate(220%)` in its `backdrop-filter`
 
-A very pale cover cannot tint a light surface much, so if the art is still washed
-out on light theme, the cover itself is the limiting factor, not the veil. Also
-check that you are looking at a production build: the `-webkit-backdrop-filter`
-prefix is only added by Lightning CSS during `vite build`.
+A very pale cover cannot tint the dark surface much, so if the art is still washed
+out, the cover itself is the limiting factor, not the veil. Also check that you
+are looking at a production build: the `-webkit-backdrop-filter` prefix is only
+added by Lightning CSS during `vite build`.
 
 ### Glass surfaces are flat and unblurred in one browser only
 

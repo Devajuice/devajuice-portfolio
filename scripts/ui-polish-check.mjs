@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const FIREFOX_CANDIDATES = [
   process.env.FIREFOX_PATH,
@@ -15,7 +15,23 @@ if (!FIREFOX) {
   process.exit(1);
 }
 
-const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
+// Defaults to the preview port, matching browser-check and music-pill-check:
+// these suites assert resolved CSS values, which Vite's dev server does not
+// produce. Override with BASE_URL to point elsewhere.
+const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173';
+
+// The goo drawer renders one blob per SECTIONS entry. Read the expected count
+// out of the source instead of hardcoding it: a literal here silently rots the
+// moment a section is added, and reports a phantom layout failure instead of
+// the real one (a missing blob).
+const EXPECTED_NAV_ITEMS = (
+  readFileSync(new URL('../src/components/Navigation.jsx', import.meta.url), 'utf8').match(
+    /export const SECTIONS\s*=\s*\[([^\]]*)\]/
+  )?.[1] ?? ''
+)
+  .split(',')
+  .map((s) => s.trim().replace(/^['"]|['"]$/g, ''))
+  .filter(Boolean).length;
 
 const browser = await puppeteer.launch({
   browser: 'firefox',
@@ -262,8 +278,9 @@ for (const width of [390, 768, 1440]) {
   check('goo filter is defined (blur + alpha contrast)',
     info?.hasBlur && info?.hasColorMatrix);
   check('blob layer ignores pointer events', info?.pointerEvents === 'none');
-  check('one blob per nav row', info?.blobCount === info?.itemCount && info?.itemCount === 6,
-    `${info?.blobCount} blobs / ${info?.itemCount} items`);
+  check('one blob per nav row',
+    info?.blobCount === info?.itemCount && info?.itemCount === EXPECTED_NAV_ITEMS,
+    `${info?.blobCount} blobs / ${info?.itemCount} items (expected ${EXPECTED_NAV_ITEMS})`);
   check('blobs align with their rows', info?.maxDY <= 1, `maxDY=${info?.maxDY?.toFixed(2)}px`);
   check('blobs match row height', info?.maxDH <= 1, `maxDH=${info?.maxDH?.toFixed(2)}px`);
   check('all nav rows keyboard focusable', info?.focusable);

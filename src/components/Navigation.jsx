@@ -4,7 +4,7 @@ import { Code2, Menu, X } from 'lucide-react';
 import PillNavigation from './ui/PillNavigation';
 import { motionTransitions } from '../lib/motion-tokens';
 
-export const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'contact'];
+export const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'playground', 'contact'];
 
 export const SECTION_LABELS = {
   home: 'Home',
@@ -12,6 +12,7 @@ export const SECTION_LABELS = {
   projects: 'Projects',
   skills: 'Skills',
   hobbies: 'Hobbies',
+  playground: 'Playground',
   contact: 'Contact',
 };
 
@@ -21,6 +22,7 @@ export const SECTION_ICONS = {
   projects: 'fa-folder-open',
   skills: 'fa-code',
   hobbies: 'fa-gamepad',
+  playground: 'fa-flask',
   contact: 'fa-paper-plane',
 };
 
@@ -74,7 +76,9 @@ export default function Navigation({ activeSection, onNavigate }) {
         </button>
 
         {/* ── Desktop pill navigation ── */}
-        <div className="animate-nav-slide-down hidden md:block">
+        {/* `lg` not `md`: with seven tabs the pill no longer fits an 768px row,
+            and a clipped tab is worse than showing the drawer a little earlier. */}
+        <div className="animate-nav-slide-down hidden lg:block">
           {/* The pill is always dark, so the scroll state only deepens the
               shadow rather than introducing a competing glass bar. */}
           <PillNavigation
@@ -93,7 +97,7 @@ export default function Navigation({ activeSection, onNavigate }) {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav-panel"
           id="mobileMenuBtn"
-          className="focus-ring flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#1f1f1f] bg-[#050505] text-[#fafafa] shadow-[0_8px_32px_rgba(0,0,0,0.18)] transition-colors hover:border-[#4a4a4a] md:hidden"
+          className="focus-ring flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#1f1f1f] bg-[#050505] text-[#fafafa] shadow-[0_8px_32px_rgba(0,0,0,0.18)] transition-colors hover:border-[#4a4a4a] lg:hidden"
         >
           {mobileOpen ? (
             <X className="h-4 w-4" aria-hidden="true" />
@@ -116,7 +120,7 @@ export default function Navigation({ activeSection, onNavigate }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={motionTransitions.springGentle}
-            className="pointer-events-auto relative mt-2 w-full max-w-sm origin-top md:hidden"
+            className="pointer-events-auto relative mt-2 w-full max-w-sm origin-top lg:hidden"
           >
             {/* Blur + alpha-contrast is what turns flat shapes into a liquid that
                 merges. stdDeviation is matched to the row height so neighbouring

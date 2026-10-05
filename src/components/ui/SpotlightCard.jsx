@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
  */
 export function SpotlightCard({
   children,
-  spotlightColor = 'rgba(0, 0, 0, 0.06)',
+  spotlightColor = 'rgba(242, 242, 243, 0.06)',
   spotlightSize = 350,
   className,
   as: Comp = 'div',

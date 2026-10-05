@@ -1,4 +1,9 @@
 import { SECTIONS, SECTION_LABELS } from './Navigation';
+import AirportMatrixClock from './ui/AirportMatrixClock';
+
+// A deliberately wide spread: Gulf, EU, and APAC. The visitor's own
+// timezone is already shown in About, so these are the "everyone else" clocks.
+const WORLD_CLOCK_CITIES = ['dubai', 'london', 'tokyo'];
 
 const COLUMNS = [
   {
@@ -107,6 +112,22 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+        </div>
+
+        {/* World clock. Read-only here on purpose — the editable version with
+            the city picker lives on the Playground page. */}
+        <div className="mt-12">
+          <AirportMatrixClock
+            cities={WORLD_CLOCK_CITIES}
+            format="24h"
+            showCountry
+            showControls={false}
+          />
+          <p className="mt-3 text-center font-mono text-[10px] tracking-[0.12em] text-text-subtle">
+            <a href="/#playground" className="focus-ring transition-colors hover:text-text-primary">
+              ADD YOUR OWN CITIES →
+            </a>
+          </p>
         </div>
 
         {/* Bottom bar */}
