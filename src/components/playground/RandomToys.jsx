@@ -8,14 +8,33 @@ import { motionTransitions } from '../../lib/motion-tokens';
  * state that outlives the tab.
  */
 
-const RANDOM_APOLOGIES = [
-  'Build the side project.',
-  'Take the afternoon off.',
-  'Ship it, then sleep.',
-  'Rewrite the thing nobody asked you to rewrite.',
-  'Learn the boring skill.',
-  'Ask them. Just ask.',
-  'Delete it.',
+/**
+ * Verdict bank for the decision maker, grouped rather than flat.
+ *
+ * The middle group is the point: a literal yes/no coin flip can't express "do
+ * the first hour and then decide", which is usually the actually-useful answer.
+ * Each group holds three phrasings so repeat presses read as varied rather than
+ * as the same string flickering.
+ */
+const VERDICTS = [
+  [
+    'Yes — and you already knew that.',
+    'Yes. Worst case, it becomes a good story.',
+    'Yes. The timing is as good as it gets.',
+    'Yes. Stop looking for permission.',
+  ],
+  [
+    'Ask again tomorrow. The answer moves.',
+    'Do the first hour, then decide.',
+    'Yes, but smaller than you were picturing.',
+    'Not now. Not never. Those are different.',
+  ],
+  [
+    'No. Your calendar already told you.',
+    "No — and that's a complete answer.",
+    'Not today. Possibly not ever. Both fine.',
+    'No. Do something easier instead.',
+  ],
 ];
 
 const PROJECT_IDEAS = [
@@ -176,7 +195,14 @@ function DecisionMaker() {
 
   const ask = () => {
     if (!question.trim()) return;
-    setVerdict(Math.random() < 0.5 ? 'Yes. Do it.' : "No. And that's fine.");
+    // Never repeat the previous answer. With three groups and four phrasings a
+    // naive pick lands on the same string often enough to read as broken.
+    let next = null;
+    for (let attempt = 0; attempt < 5 && next === verdict; attempt++) {
+      const group = VERDICTS[Math.floor(Math.random() * VERDICTS.length)];
+      next = group[Math.floor(Math.random() * group.length)];
+    }
+    setVerdict(next);
   };
 
   return (
@@ -204,8 +230,14 @@ function DecisionMaker() {
         maxLength={80}
         className="focus-ring w-full rounded-md border border-border bg-surface-raised px-3 py-2 font-sans text-sm text-text-primary outline-none transition-colors placeholder:text-text-subtle focus-visible:border-border-hover"
       />
-      <p role="status" aria-live="polite" className="mt-3 min-h-5 text-sm text-text-secondary">
-        {verdict ?? RANDOM_APOLOGIES[0]}
+      <p
+        role="status"
+        aria-live="polite"
+        className={`mt-3 min-h-5 text-sm ${verdict ? 'text-text-secondary' : 'text-text-subtle'}`}
+      >
+        {/* Before the first ask this is a prompt, not a verdict — the old build
+            showed a random quote here, which read as an answer already given. */}
+        {verdict ?? 'Type a question, then ask.'}
       </p>
     </ToyCard>
   );

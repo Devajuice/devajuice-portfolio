@@ -78,7 +78,7 @@ no network requests, no accounts, nothing persisted beyond the clock's city list
 
 - **Editable World Clock** — The footer's split-flap clock with its city editor switched on. Pick up to five of the 32 available cities and the selection is written to `localStorage`, so it survives reloads. Corrupt or stale stored values fall back to the default three instead of breaking the page
 - **Step Sequencer** — A 16-step, 4-voice drum machine (kick, hat, clap, bass) with three tempos, randomize, and clear. It shares the module-level `AudioContext` from `src/utils/audio.js` rather than opening its own, and uses the standard look-ahead scheduler — notes are placed against `ctx.currentTime` while a coarse 25ms timer only refills the queue, so the rhythm does not jitter when a tick lands late
-- **Random Toys** — Dice (1–4d6), coin flip, a weekend-project picker, and a yes/no decision maker. All resolve in the browser and remember nothing
+- **Random Toys** — Dice (1–4d6), coin flip, a weekend-project picker, and a decision maker with twelve grouped verdicts (yes / do-something-smaller / no) rather than a yes-no coin flip, so it can express the actually-useful middle answer. Consecutive asks never repeat
 
 ### ⌨️ Keyboard Shortcuts
 
