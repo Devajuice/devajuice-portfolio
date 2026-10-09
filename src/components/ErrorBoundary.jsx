@@ -32,15 +32,37 @@ export default class ErrorBoundary extends React.Component {
         : this.props.fallback;
     }
 
+    const detail = error?.message ? String(error.message) : String(error);
+
     return (
-      <div role="alert" className="rounded-xl border border-border bg-surface p-6">
+      <div
+        role="alert"
+        className="rounded-xl border border-border bg-surface p-6 text-left shadow-subtle"
+      >
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface-raised px-3 py-1 text-xs font-medium text-text-muted">
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+          Section error
+        </div>
+
         <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-text-primary">
-          <i className="fas fa-triangle-exclamation" aria-hidden="true" />
-          Something went wrong
+          <i className="fas fa-triangle-exclamation text-rose-400" aria-hidden="true" />
+          This section failed to render
         </h2>
+
         <p className="mb-4 text-sm text-text-muted">
-          This section could not be displayed. The rest of the page still works.
+          The component below threw while rendering, so it was isolated to keep the rest of the page
+          working. Everything else on the site is unaffected.
         </p>
+
+        <details className="mb-4 overflow-hidden rounded-lg border border-border bg-surface-raised">
+          <summary className="cursor-pointer list-none px-4 py-2.5 text-xs font-semibold tracking-[0.08em] text-text-secondary uppercase select-none hover:text-text-primary">
+            What broke
+          </summary>
+          <pre className="overflow-x-auto border-t border-border px-4 py-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-text-secondary">
+            {detail}
+          </pre>
+        </details>
+
         <button
           type="button"
           onClick={() => this.setState({ error: null })}

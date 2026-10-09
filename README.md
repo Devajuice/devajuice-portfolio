@@ -143,7 +143,10 @@ devajith-portfolio/
 ├── vercel.json              # Vercel deployment & 404 routing logic
 ├── .env.example             # Template for LASTFM_API_KEY (never commit a real .env)
 ├── api/
-│   └── nowplaying.js        # Serverless proxy — keeps the Last.fm key off the client
+│   ├── nowplaying.js        # Serverless proxy — keeps the Last.fm key off the client
+│   ├── og.png.js            # Edge OG route — explains the missing generator / redirects to static
+│   └── _lib/
+│       └── error-page.js    # Shared HTML error page for API routes (browser vs JSON)
 ├── public/                  # Static assets & standalone pages
 │   ├── 404.html             # Custom error page
 │   ├── 404.css              # Error page styles (hand-written; not part of the token layer)
@@ -348,7 +351,7 @@ than sleeping, so it does not measure the skeleton.
 
 > The included `vercel.json` handles routing so unknown URLs correctly show the 404 page instead of a blank Vercel error. The `/api/nowplaying` serverless function proxies Last.fm requests so the API key is never exposed in the browser bundle.
 >
-> **Known issue:** `vercel.json` also rewrites `/api/og` and `/api/og.png` to `/api/og.png.js`, but that file does not exist in the repo, so the OG image endpoint 404s. The static `og-image-v2.png` in `public/` is what actually serves. Either add the generator using `@vercel/og` (already a dependency) or drop those two rewrite rules.
+> **OG images:** `vercel.json` rewrites `/api/og` and `/api/og.png` to `api/og.png.js`. There is no dynamic `@vercel/og` generator in the repo, so that function explains the situation instead of falling through to Vercel's generic error: a browser opening the URL gets a readable page naming the missing generator, while link-preview scrapers are redirected to the static `og-image-v2.png` in `public/`. To serve generated cards, re-add a `@vercel/og` handler at `api/og.png.js` (the dependency is already installed).
 
 ### Deploy to Netlify
 

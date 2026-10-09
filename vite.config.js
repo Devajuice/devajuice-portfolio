@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { sendHtmlError } from "./api/_lib/error-page.js";
 
 const LASTFM_USERNAME = "Devajuice";
 
@@ -26,12 +27,37 @@ function lastfmDevApi(env) {
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(payload));
     };
+    // Mirror api/nowplaying.js: browsers get an explanatory page, the app's
+    // fetch keeps getting JSON.
+    const sendError = (code, { title, message, cause, detail, hint }) => {
+      if (
+        sendHtmlError(res, req, {
+          status: code,
+          title,
+          message,
+          endpoint: "/api/nowplaying",
+          cause,
+          detail,
+          hint,
+          backLabel: "Back to site",
+        })
+      ) {
+        return;
+      }
+      sendJson(code, { error: true, message });
+    };
 
     if (!apiKey) {
       const msg =
         "Last.fm API key missing. Add LASTFM_API_KEY=<your key> to a .env file in the project root (see README).";
       console.error(`\n[lastfm] ${msg}\n`);
-      sendJson(500, { error: true, message: msg });
+      sendError(500, {
+        title: "Last.fm music proxy is not configured",
+        message: "The now-playing service cannot reach Last.fm because no API key is set.",
+        cause: "LASTFM_API_KEY (or VITE_LASTFM_API_KEY) is missing from the dev environment.",
+        detail: ".env — no LASTFM_API_KEY found",
+        hint: "Add LASTFM_API_KEY=<your key> to .env in the project root and restart the dev server.",
+      });
       return;
     }
 
@@ -43,7 +69,13 @@ function lastfmDevApi(env) {
       const artist = params.get("artist");
       const track = params.get("track");
       if (!artist || !track) {
-        sendJson(400, { error: true, message: "Missing artist or track param" });
+        sendError(400, {
+          title: "Missing request parameters",
+          message: "The track lookup could not run because its query parameters are incomplete.",
+          cause: "track.getInfo was called without both `artist` and `track`.",
+          detail: `artist=${artist ?? "(missing)"} track=${track ?? "(missing)"}`,
+          hint: "Call with ?method=track.getInfo&artist=...&track=...",
+        });
         return;
       }
       target =
@@ -55,7 +87,13 @@ function lastfmDevApi(env) {
         `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks` +
         `&user=${LASTFM_USERNAME}&api_key=${apiKey}&format=json&limit=1&extended=1`;
     } else {
-      sendJson(400, { error: true, message: "Unsupported method" });
+      sendError(400, {
+        title: "Unsupported method",
+        message: "This proxy only forwards a fixed set of Last.fm methods.",
+        cause: `The requested method "${method}" is not handled by this function.`,
+        detail: "Supported: user.getrecenttracks, track.getInfo",
+        hint: "Use one of the supported methods listed above.",
+      });
       return;
     }
 
@@ -67,7 +105,13 @@ function lastfmDevApi(env) {
       res.setHeader("Cache-Control", "no-store");
       res.end(body);
     } catch (err) {
-      sendJson(500, { error: true, message: err.message });
+      sendError(502, {
+        title: "Last.fm is unreachable",
+        message: "The music proxy could not complete its request to Last.fm.",
+        cause: "The upstream request to ws.audioscrobbler.com failed.",
+        detail: err.message,
+        hint: "Usually temporary — retry in a moment. If it persists, check Last.fm status and the API key.",
+      });
     }
   };
 
