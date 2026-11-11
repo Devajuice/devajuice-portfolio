@@ -93,7 +93,7 @@ export function PillNavigation({
     >
       <div
         role="tablist"
-        className="inline-flex max-w-full items-center overflow-x-auto rounded-full border border-[#1f1f1f] bg-[#050505] p-1 shadow-inner"
+        className="inline-flex max-w-full items-center overflow-x-auto rounded-full border border-transparent bg-surface/45 p-1 shadow-elevated backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-surface/35"
       >
         {items.map((item) => {
           const active = item.id === activeId;
@@ -109,22 +109,20 @@ export function PillNavigation({
               tabIndex={active ? 0 : -1}
               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
               onClick={() => selectMain(item.id)}
-        className={cn(
-          'focus-ring relative flex min-h-8 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
-                active
-                  ? 'font-semibold text-[#050505]'
-                  : 'text-[#a1a1a1] hover:text-[#fafafa]'
-              )}
+                className={cn(
+                  'focus-ring relative flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition-colors sm:min-h-8 sm:py-1.5',
+                  active ? 'font-semibold text-bg' : 'text-text-secondary hover:text-text-primary'
+                )}
             >
               {active && !reducedMotion && (
                 <motion.span
                   layoutId="easyui-pill-main-indicator"
                   transition={motionTransitions.springMorph}
-                  className="absolute inset-0 rounded-full bg-[#fafafa] shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
+                  className="absolute inset-0 rounded-full bg-text-primary shadow-elevated"
                 />
               )}
               {active && reducedMotion && (
-                <span className="absolute inset-0 rounded-full bg-[#fafafa]" />
+                <span className="absolute inset-0 rounded-full bg-text-primary" />
               )}
 
               <span className="relative z-10">{item.label}</span>
@@ -133,7 +131,7 @@ export function PillNavigation({
                 <ChevronDown
                   className={cn(
                     'relative z-10 h-3 w-3 transition-transform duration-200',
-                    active ? 'text-[#050505]' : 'text-[#6b6b6b]',
+                    active ? 'text-bg' : 'text-text-subtle',
                     active && submenuOpen && 'rotate-180'
                   )}
                 />
@@ -154,7 +152,7 @@ export function PillNavigation({
             transition={motionTransitions.springGentle}
             role="menu"
             aria-label={`${activeItem.label} submenu`}
-            className="inline-flex items-center gap-1 rounded-full border border-[#171717] bg-[#0b0b0b]/90 p-1 shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-md"
+            className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-surface/80 p-1 shadow-elevated backdrop-blur-xl"
           >
             {(activeItem.children || []).map((subItem) => {
               const isSubActive = subItem.id === activeSubId;
@@ -168,21 +166,21 @@ export function PillNavigation({
                   whileTap={reducedMotion ? undefined : { scale: 0.95 }}
                   onClick={() => selectSub(subItem.id)}
                   className={cn(
-                    'focus-ring relative flex min-h-7 cursor-pointer items-center rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
+                    'focus-ring relative flex min-h-8 cursor-pointer items-center rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors',
                     isSubActive
-                      ? 'font-semibold text-[#fafafa]'
-                      : 'text-[#525252] hover:text-[#d4d4d4]'
+                      ? 'font-semibold text-text-primary'
+                      : 'text-text-subtle hover:text-text-secondary'
                   )}
                 >
                   {isSubActive && !reducedMotion && (
                     <motion.span
                       layoutId="easyui-pill-sub-indicator"
                       transition={motionTransitions.springMorph}
-                      className="absolute inset-0 rounded-full border border-[#404040] bg-[#2e2e2e] shadow-xs"
+                      className="absolute inset-0 rounded-full border border-border bg-surface-hover shadow-subtle"
                     />
                   )}
                   {isSubActive && reducedMotion && (
-                    <span className="absolute inset-0 rounded-full border border-[#404040] bg-[#2e2e2e]" />
+                    <span className="absolute inset-0 rounded-full border border-border bg-surface-hover" />
                   )}
 
                   <span className="relative z-10">{subItem.label}</span>

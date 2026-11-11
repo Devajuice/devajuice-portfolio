@@ -16,10 +16,11 @@ export const PROJECTS = [
     href: 'https://github.com/Devajuice/devajuice-portfolio',
     icon: 'fa-code',
     title: 'Devajith Portfolio',
-    desc: 'Building responsive, modern web applications with focus on user experience and clean code architecture.',
+    desc: 'Responsive personal portfolio with section transitions, live music integration, and interactive UI details.',
     tags: [
-      ['fab fa-html5', 'HTML/CSS'],
-      ['fab fa-js', 'JavaScript'],
+      ['fab fa-react', 'React'],
+      ['fas fa-bolt', 'Vite'],
+      ['fas fa-wind', 'Tailwind CSS'],
     ],
   },
   {

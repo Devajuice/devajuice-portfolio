@@ -20,25 +20,56 @@ export function useSound() {
   return { soundEnabled, toggle };
 }
 
+// ── useTheme ──────────────────────────────────────────────────
+export function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'dark';
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem('theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#f7f7f8' : '#111113');
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
+  }, []);
+
+  return { theme, setTheme, toggleTheme };
+}
+
 // ── useNowPlaying ─────────────────────────────────────────────
 export function useNowPlaying() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
+    let timeoutId;
+
     async function load() {
+      let nextDelay = 30000;
       try {
         const result = await fetchNowPlaying();
         if (!cancelled) setData(result);
+        nextDelay = result?.isLive ? 30000 : 120000;
       } catch {
         if (!cancelled) setData({ error: true });
+        nextDelay = 60000;
+      } finally {
+        if (!cancelled) timeoutId = setTimeout(load, nextDelay);
       }
     }
+
     load();
-    const interval = setInterval(load, 30000);
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -112,24 +143,26 @@ export function useTimezone() {
 // ── useTypewriter ─────────────────────────────────────────────
 export function useTypewriter(words = ['Student', 'Developer', 'Gamer']) {
   const [text, setText] = useState('');
+  const wordsKey = words.join('\0');
 
   useEffect(() => {
     let cancelled = false;
     let wIdx = 0,
       cIdx = 0,
       del = false;
+    let timer;
 
     const tick = () => {
       if (cancelled) return;
-      const word = words[wIdx];
+      const word = words[wIdx] || '';
       if (!del) {
         cIdx++;
         setText(word.slice(0, cIdx));
         if (cIdx === word.length) {
           del = true;
-          setTimeout(tick, 1800);
+          timer = setTimeout(tick, 1800);
         } else {
-          setTimeout(tick, 90);
+          timer = setTimeout(tick, 90);
         }
       } else {
         cIdx--;
@@ -137,19 +170,19 @@ export function useTypewriter(words = ['Student', 'Developer', 'Gamer']) {
         if (cIdx === 0) {
           del = false;
           wIdx = (wIdx + 1) % words.length;
-          setTimeout(tick, 300);
+          timer = setTimeout(tick, 300);
         } else {
-          setTimeout(tick, 50);
+          timer = setTimeout(tick, 50);
         }
       }
     };
 
-    const initial = setTimeout(tick, 700);
+    timer = setTimeout(tick, 700);
     return () => {
       cancelled = true;
-      clearTimeout(initial);
+      clearTimeout(timer);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [wordsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return text;
 }

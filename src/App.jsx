@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
-import Navigation, { SECTIONS } from './components/Navigation';
+import Navigation, { SECTIONS, SECTION_LABELS } from './components/Navigation';
 import HomeSection from './components/HomeSection';
 import DotShader from './components/ui/DotShader';
 import { ToastProvider } from './components/Toast';
 import { useToast } from './components/useToast';
-import { useNowPlaying, useSound } from './hooks';
+import { useNowPlaying, useSound, useTheme } from './hooks';
 import {
   playSound,
   startBgMusic,
@@ -15,7 +15,7 @@ import {
 } from './utils/audio';
 import { Helmet } from 'react-helmet-async';
 import { useOgImage } from './hooks/useOgImage';
-import { ArrowUp, Volume2, VolumeX } from 'lucide-react';
+import { ArrowUp, Volume2, VolumeX, Sun, Moon, Music2 } from 'lucide-react';
 import { cn } from './lib/utils';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -23,7 +23,6 @@ const AboutSection = lazy(() => import('./components/AboutSection'));
 const ProjectsSection = lazy(() => import('./components/ProjectsSection'));
 const SkillsSection = lazy(() => import('./components/SkillsSection'));
 const HobbiesSection = lazy(() => import('./components/HobbiesSection'));
-const PlaygroundSection = lazy(() => import('./components/PlaygroundSection'));
 const ContactSection = lazy(() => import('./components/ContactSection'));
 const EasterEgg = lazy(() => import('./components/EasterEgg'));
 const KeyboardShortcuts = lazy(() => import('./components/KeyboardShortcuts'));
@@ -37,8 +36,8 @@ function LoadingFallback() {
   );
 }
 
-function triggerConfetti() {
-  const colors = ['#f2f2f3', '#a1a1a6', '#6f6f75'];
+function triggerConfetti(theme) {
+  const colors = theme === 'light' ? ['#111113', '#71717a', '#16a34a'] : ['#f2f2f3', '#a1a1a6', '#4ade80'];
   for (let i = 0; i < 80; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
@@ -66,77 +65,62 @@ function AppInner() {
     )
   );
   const { soundEnabled, toggle: toggleSound } = useSound();
+  const { theme, toggleTheme } = useTheme();
   const [kbdOpen, setKbdOpen] = useState(false);
   const [easterEggOpen, setEasterEggOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const musicData = useNowPlaying();
   const showToast = useToast();
-  const ogImage = useOgImage({
-    title: 'Devajith — Portfolio',
-    description: 'Building cool things on the web.',
-    author: 'Devajith',
-  });
+  const ogImage = useOgImage();
   const splashRef = useRef(null);
   const isTransitioningRef = useRef(false);
   const activeSectionRef = useRef(_initialSection);
 
-  // Sections whose entrance animations have already played, so they don't
-  // replay on every visit (see .page-section.revealed in index.css). Updated in
-  // the same batch as setActiveSection in navigate(), so a single render sees
-  // both. State rather than a ref because getStateClasses reads it while
-  // rendering, which must not depend on mutable render-time refs.
   const [revealed, setRevealed] = useState(() => new Set([_initialSection]));
   const markRevealed = useCallback((id) => {
     setRevealed((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }, []);
   const musicStartedRef = useRef(false);
 
-  const navigate = useCallback((sectionId) => {
-    if (isTransitioningRef.current) return;
-    const current = activeSectionRef.current;
-    if (sectionId === current) return;
+  const navigate = useCallback(
+    (sectionId) => {
+      if (isTransitioningRef.current) return;
+      const current = activeSectionRef.current;
+      if (sectionId === current) return;
 
-    // Determine direction: going forward (right→left slide) or backward (left→right slide)
-    const goingForward = SECTIONS.indexOf(sectionId) > SECTIONS.indexOf(current);
+      const goingForward = SECTIONS.indexOf(sectionId) > SECTIONS.indexOf(current);
 
-    activeSectionRef.current = sectionId;
-    playSound('nav');
-    window.location.hash = sectionId;
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    isTransitioningRef.current = true;
+      activeSectionRef.current = sectionId;
+      playSound('nav');
+      window.location.hash = sectionId;
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      isTransitioningRef.current = true;
 
-    // Exit: forward → slide out left; backward → slide out right
-    setSectionState((prev) => ({
-      ...prev,
-      [current]: goingForward ? 'exiting' : 'exiting to-right',
-    }));
-
-    setTimeout(() => {
-      // Swap straight into the entering state. Previously this set 'active'
-      // first and added 'entering' on the next animation frame, which painted
-      // the incoming section at full opacity for one frame and read as a flash.
-      // The enter animation uses `both` fill mode, so it applies its own `from`
-      // state immediately — the pre-positioning step wasn't needed at all.
-      setSectionState(() => ({
-        ...Object.fromEntries(SECTIONS.map((s) => [s, 'hidden'])),
-        [sectionId]: goingForward ? 'active entering' : 'active entering from-left',
+      setSectionState((prev) => ({
+        ...prev,
+        [current]: goingForward ? 'exiting' : 'exiting to-right',
       }));
-      setActiveSection(sectionId);
-      markRevealed(sectionId);
 
       setTimeout(() => {
-        isTransitioningRef.current = false;
-      }, ENTER_MS);
-    }, EXIT_MS);
-  }, [markRevealed]);
+        setSectionState(() => ({
+          ...Object.fromEntries(SECTIONS.map((s) => [s, 'hidden'])),
+          [sectionId]: goingForward ? 'active entering' : 'active entering from-left',
+        }));
+        setActiveSection(sectionId);
+        markRevealed(sectionId);
 
-  // Keep activeSectionRef in sync with state
+        setTimeout(() => {
+          isTransitioningRef.current = false;
+        }, ENTER_MS);
+      }, EXIT_MS);
+    },
+    [markRevealed]
+  );
+
   useEffect(() => {
     activeSectionRef.current = activeSection;
   }, [activeSection]);
 
-  // Fix: handle browser Back/Forward — when the user presses back/forward,
-  // the hash changes but the section doesn't update without this listener.
   useEffect(() => {
     const handler = () => {
       const hash = window.location.hash.slice(1);
@@ -148,7 +132,6 @@ function AppInner() {
     return () => window.removeEventListener('hashchange', handler);
   }, [navigate]);
 
-  // Splash screen
   useEffect(() => {
     const splash = splashRef.current;
     if (!splash) return;
@@ -159,7 +142,6 @@ function AppInner() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Scroll → back-to-top button + progress bar (single listener for perf)
   useEffect(() => {
     const progressEl = document.getElementById('scrollProgress');
     const onScroll = () => {
@@ -175,7 +157,6 @@ function AppInner() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // First interaction -> start music
   useEffect(() => {
     const handler = () => {
       if (musicStartedRef.current) return;
@@ -204,7 +185,6 @@ function AppInner() {
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [soundEnabled]);
 
-  // Animated favicon — throttled to ~10 fps; paused when tab is hidden.
   useEffect(() => {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 32;
@@ -218,9 +198,12 @@ function AppInner() {
     let frame = 0,
       rafId,
       lastDraw = 0;
-    const INTERVAL = 100; // ~10 fps
+    const INTERVAL = 100;
     const STOP_AFTER = 3000;
     const startTime = performance.now();
+    const isLight = theme === 'light';
+    const bg = isLight ? '#111113' : '#f2f2f3';
+    const fg = isLight ? '#f7f7f8' : '#0a0a0a';
 
     const draw = (now) => {
       if (now - startTime >= STOP_AFTER) {
@@ -235,21 +218,20 @@ function AppInner() {
       ctx.clearRect(0, 0, 32, 32);
       ctx.beginPath();
       ctx.arc(16, 16, 15, 0, Math.PI * 2);
-      ctx.fillStyle = '#f2f2f3';
+      ctx.fillStyle = bg;
       ctx.fill();
       ctx.font = 'bold 13px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#0a0a0a';
+      ctx.fillStyle = fg;
       ctx.fillText('</>', 16, 16);
       link.href = canvas.toDataURL('image/png');
       frame = (frame + 1) % 120;
     };
     rafId = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [theme]);
 
-  // Konami code
   useEffect(() => {
     const K = [
       'ArrowUp',
@@ -273,14 +255,24 @@ function AppInner() {
       if (seq.length === K.length && seq.every((k, i) => k === K[i])) {
         seq = [];
         setEasterEggOpen(true);
-        triggerConfetti();
+        triggerConfetti(theme);
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  }, [theme]);
 
-  // Swipe gestures — reads activeSectionRef so listeners are registered ONCE
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (localStorage.getItem('swipeHintSeen') === 'true') return;
+    if (!window.matchMedia('(pointer: coarse)').matches) return;
+    const timer = setTimeout(() => {
+      showToast('Tip: swipe left or right to move between sections', 'info', 3200);
+      localStorage.setItem('swipeHintSeen', 'true');
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, [showToast]);
+
   useEffect(() => {
     const MIN_X = 55,
       MAX_Y = 80,
@@ -295,7 +287,6 @@ function AppInner() {
     document.body.appendChild(hint);
     const ha = hint.querySelector('.swipe-hint-arrow'),
       hl = hint.querySelector('.swipe-hint-label');
-    // Use the ref so this closure never goes stale — no re-registration needed
     const idx = () => SECTIONS.indexOf(activeSectionRef.current);
     const showHint = (d, n) => {
       ha.textContent = d === 'left' ? '→' : '←';
@@ -362,9 +353,8 @@ function AppInner() {
       hint.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // stable: reads activeSectionRef + navigate (useCallback, stable ref)
+  }, []);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const isTyping = () => {
       const t = document.activeElement?.tagName?.toLowerCase();
@@ -395,9 +385,6 @@ function AppInner() {
         return;
       }
       if (isTyping() || e.ctrlKey || e.altKey || e.metaKey) return;
-      // Derived from SECTIONS rather than hand-listed: adding a section used to
-      // require editing this map too, and forgetting left the new section with
-      // no number key while silently shifting the ones after it.
       const sectionIndex = Number(e.key) - 1;
       const s = SECTIONS[sectionIndex];
       if (Number.isInteger(sectionIndex) && sectionIndex >= 0 && s) {
@@ -405,11 +392,7 @@ function AppInner() {
         flashKey(`kk-${e.key}`);
         setKbdOpen(false);
         navigate(s);
-        showToast(
-          `<i class="fas fa-compass" style="margin-right:4px"></i> Jumped to <strong>${s[0].toUpperCase() + s.slice(1)}</strong>`,
-          'info',
-          1600
-        );
+        showToast(`Jumped to ${s[0].toUpperCase() + s.slice(1)}`, 'info', 1600);
         return;
       }
       if (e.key === 'b' || e.key === 'B') {
@@ -452,20 +435,48 @@ function AppInner() {
     return revealed.has(section) ? `${base} revealed` : base;
   };
 
+  const activeIndex = Math.max(0, SECTIONS.indexOf(activeSection));
+  const activeLabel = SECTION_LABELS[activeSection] || activeSection;
+  const isCoarsePointer = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+  const nowPlayingText = musicData?.error
+    ? 'Music unavailable'
+    : musicData?.name
+      ? `${musicData.name} — ${musicData.artist}`
+      : musicData === null
+        ? 'Loading music…'
+        : 'No recent track';
+  const nowPlayingState = musicData?.isLive ? 'Live now' : 'Ambient / recent';
+
+  const shaderProps =
+    theme === 'light'
+      ? {
+          dotColor: 'rgba(17, 17, 19, 0.08)',
+          accentColor: 'rgba(17, 17, 19, 0.28)',
+        }
+      : {
+          dotColor: 'rgba(242, 242, 243, 0.14)',
+          accentColor: 'rgba(242, 242, 243, 0.7)',
+        };
+
   return (
     <>
-      {/* OG / Twitter meta tags */}
       <Helmet>
-        <meta property="og:title" content="Devajith — Portfolio" />
-        <meta property="og:description" content="Building cool things on the web." />
+        <title>{`${activeLabel} | Devajith Portfolio`}</title>
+        <meta
+          name="description"
+          content="Portfolio of Devajith — student, developer, and data analyst building web projects, data-driven solutions, and interactive experiences."
+        />
+        <meta property="og:title" content={`${activeLabel} | Devajith Portfolio`} />
+        <meta property="og:description" content="Explore Devajith's projects, skills, and ways to get in touch." />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${activeLabel} | Devajith Portfolio`} />
+        <meta name="twitter:description" content="Explore Devajith's projects, skills, and ways to get in touch." />
         <meta name="twitter:image" content={ogImage} />
       </Helmet>
 
-      {/* Splash */}
       <div ref={splashRef} id="pageSplash" className="page-splash" aria-hidden="true">
         <div className="splash-inner">
           <div className="splash-logo">
@@ -478,22 +489,20 @@ function AppInner() {
         </div>
       </div>
 
-      {/* Scroll Progress Bar */}
       <div id="scrollProgress" className="scroll-progress" aria-hidden="true" />
 
-      {/* Dot Shader background */}
       <DotShader
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
-        dotColor="rgba(242, 242, 243, 0.14)"
-        accentColor="rgba(242, 242, 243, 0.7)"
-        dotSize={1.4}
-        spacing={24}
-        cursorRadius={190}
-        distortionStrength={0.32}
-        maxScale={2.4}
-        waveIntensity={0.22}
+        dotSize={isCoarsePointer ? 1.2 : 1.4}
+        spacing={isCoarsePointer ? 30 : 24}
+        cursorRadius={isCoarsePointer ? 0 : 190}
+        distortionStrength={isCoarsePointer ? 0 : 0.32}
+        maxScale={isCoarsePointer ? 1 : 2.4}
+        waveIntensity={isCoarsePointer ? 0.08 : 0.22}
+        interactive={!isCoarsePointer}
         overlay={false}
+        {...shaderProps}
       />
 
       <Suspense fallback={null}>
@@ -505,8 +514,73 @@ function AppInner() {
         />
       </Suspense>
 
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        Current section: {activeLabel}
+      </div>
+
+      {/* Section orientation - desktop */}
+      <nav
+        aria-label="Section progress"
+        className="pointer-events-auto fixed top-1/2 left-4 z-[850] hidden -translate-y-1/2 flex-col gap-3 rounded-2xl border border-border bg-surface/70 p-3 shadow-subtle backdrop-blur-xl lg:flex"
+      >
+        {SECTIONS.map((s, i) => {
+          const active = s === activeSection;
+          return (
+            <button
+              key={s}
+              type="button"
+              onClick={() => navigate(s)}
+              className="focus-ring group flex items-center gap-2 text-left"
+              aria-current={active ? 'page' : undefined}
+              aria-label={`Go to ${SECTION_LABELS[s]} section`}
+              title={SECTION_LABELS[s]}
+            >
+              <span
+                className={cn(
+                  'h-2.5 w-2.5 rounded-full border transition-all',
+                  active
+                    ? 'scale-110 border-text-primary bg-text-primary'
+                    : 'border-border-hover bg-transparent group-hover:border-text-muted'
+                )}
+              />
+              <span
+                className={cn(
+                  'text-[11px] font-medium transition-colors',
+                  active ? 'text-text-primary' : 'text-text-subtle group-hover:text-text-secondary'
+                )}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Section orientation - mobile */}
+      <div className="pointer-events-auto fixed inset-x-0 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[850] mx-auto flex w-fit max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-2 shadow-elevated backdrop-blur-xl lg:hidden" aria-label="Section progress">
+        <span className="text-[11px] font-semibold text-text-secondary">
+          {activeIndex + 1}/{SECTIONS.length}
+        </span>
+        <div className="flex items-center gap-1.5">
+          {SECTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => navigate(s)}
+              aria-label={`Go to ${SECTION_LABELS[s]}`}
+              aria-current={s === activeSection ? 'page' : undefined}
+              className={cn(
+                'h-2.5 rounded-full transition-all',
+                s === activeSection ? 'w-6 bg-text-primary' : 'w-2.5 bg-border hover:bg-border-hover'
+              )}
+            />
+          ))}
+        </div>
+        <span className="max-w-[8rem] truncate text-[11px] text-text-muted">{activeLabel}</span>
+      </div>
+
       {/* Floating controls */}
-      <div className="fixed right-5 bottom-5 z-[900] flex flex-col items-end gap-2.5">
+      <div className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[900] flex flex-col items-end gap-2.5 sm:right-5 sm:bottom-5">
         <button
           className="kbd-hint-badge"
           id="kbdHintBadge"
@@ -517,23 +591,77 @@ function AppInner() {
           <span>Shortcuts</span>
         </button>
 
+        <div className="hidden min-w-[260px] max-w-[320px] rounded-2xl border border-border bg-surface/75 p-3 shadow-elevated backdrop-blur-xl md:block">
+          <div className="mb-2 flex items-start gap-2">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface-hover/70 text-text-secondary">
+              <Music2 className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold tracking-[0.08em] text-text-subtle uppercase">
+                {nowPlayingState}
+              </p>
+              <p className="truncate text-sm font-medium text-text-primary" title={nowPlayingText}>
+                {nowPlayingText}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              id="soundToggle"
+              className={cn(
+                'focus-ring inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-surface-hover/70 px-3 text-sm font-medium text-text-primary transition-colors hover:border-border-hover hover:bg-surface-hover',
+                !soundEnabled && 'text-text-muted'
+              )}
+              aria-label={soundEnabled ? 'Mute sounds and ambient music' : 'Unmute sounds and ambient music'}
+              onClick={handleSoundToggle}
+            >
+              {soundEnabled ? <Volume2 className="h-4 w-4" aria-hidden="true" /> : <VolumeX className="h-4 w-4" aria-hidden="true" />}
+              <span>{soundEnabled ? 'Ambient on' : 'Ambient off'}</span>
+            </button>
+            <button
+              type="button"
+              className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface-hover/70 text-text-primary transition-colors hover:border-border-hover hover:bg-surface-hover"
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              onClick={toggleTheme}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex gap-2.5 md:hidden">
+          <button
+            id="soundToggleMobile"
+            className={cn('floating-btn backdrop-blur-xl', !soundEnabled && 'muted')}
+            aria-label={soundEnabled ? 'Mute sounds and ambient music' : 'Unmute sounds and ambient music'}
+            onClick={handleSoundToggle}
+          >
+            {soundEnabled ? <Volume2 className="h-4 w-4" aria-hidden="true" /> : <VolumeX className="h-4 w-4" aria-hidden="true" />}
+          </button>
+          <button
+            type="button"
+            className="floating-btn backdrop-blur-xl"
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+          </button>
+        </div>
+
         <div className="flex gap-2.5">
           <button
             id="soundToggle"
-            className={cn('floating-btn', !soundEnabled && 'muted')}
-            aria-label={soundEnabled ? 'Mute transition sounds' : 'Unmute transition sounds'}
+            className={cn('floating-btn hidden md:!hidden backdrop-blur-xl', !soundEnabled && 'muted')}
+            aria-label={soundEnabled ? 'Mute sounds and ambient music' : 'Unmute sounds and ambient music'}
             onClick={handleSoundToggle}
           >
-            {soundEnabled ? (
-              <Volume2 className="h-4 w-4" aria-hidden="true" />
-            ) : (
-              <VolumeX className="h-4 w-4" aria-hidden="true" />
-            )}
+            {soundEnabled ? <Volume2 className="h-4 w-4" aria-hidden="true" /> : <VolumeX className="h-4 w-4" aria-hidden="true" />}
           </button>
 
           <button
             id="backToTop"
-            className={cn('floating-btn', showBackToTop && 'visible')}
+            className={cn('floating-btn backdrop-blur-xl', showBackToTop && 'visible')}
             aria-label="Back to top"
             onClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -545,18 +673,15 @@ function AppInner() {
         </div>
       </div>
 
-      {/* Skip link */}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
 
-      {/* Navigation */}
-      <Navigation activeSection={activeSection} onNavigate={navigate} />
+      <Navigation activeSection={activeSection} onNavigate={navigate} theme={theme} />
 
-      {/* Main Content */}
       <main id="main-content" className="relative z-10 flex min-h-screen flex-col">
         <Suspense fallback={<LoadingFallback />}>
-          <div className="mx-auto w-full max-w-6xl flex-1 px-6 pt-32 pb-20 sm:pt-36 md:pt-40">
+          <div className="mx-auto w-full max-w-6xl flex-1 px-4 pt-28 pb-28 sm:px-6 sm:pt-36 sm:pb-20 md:pt-40 lg:pl-24">
             <ErrorBoundary>
               <section id="home" className={getStateClasses('home')} aria-labelledby="home-heading">
                 <HomeSection onNavigate={navigate} musicData={musicData} />
@@ -596,15 +721,6 @@ function AppInner() {
                 aria-labelledby="hobbies-heading"
               >
                 <HobbiesSection />
-              </section>
-            </ErrorBoundary>
-            <ErrorBoundary>
-              <section
-                id="playground"
-                className={getStateClasses('playground')}
-                aria-labelledby="playground-heading"
-              >
-                <PlaygroundSection />
               </section>
             </ErrorBoundary>
             <ErrorBoundary>

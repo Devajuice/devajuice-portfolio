@@ -96,11 +96,7 @@ export default function HomeSection({ onNavigate, musicData }) {
 
   const handleResumeClick = () => {
     playSound('success');
-    showToast(
-      '<i class="fas fa-file-arrow-down" style="margin-right:6px"></i> Downloading resume…',
-      'info',
-      2500
-    );
+    showToast('Downloading resume…', 'info', 2500);
   };
 
   return (

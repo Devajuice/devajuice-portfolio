@@ -65,7 +65,6 @@ const { default: Button } = await import('../src/components/ui/Button.jsx');
 const { default: SpotlightCard } = await import('../src/components/ui/SpotlightCard.jsx');
 const { default: SmoothAccordion } = await import('../src/components/ui/SmoothAccordion.jsx');
 const { default: DotShader } = await import('../src/components/ui/DotShader.jsx');
-const { default: AirportMatrixClock } = await import('../src/components/ui/AirportMatrixClock.jsx');
 const { default: NotificationStack } = await import('../src/components/ui/NotificationStack.jsx');
 const { default: Navigation, SECTIONS, SECTION_LABELS, SECTION_ICONS } = await import(
   '../src/components/Navigation.jsx'
@@ -75,7 +74,6 @@ const { default: AboutSection } = await import('../src/components/AboutSection.j
 const { default: ProjectsSection } = await import('../src/components/ProjectsSection.jsx');
 const { default: SkillsSection } = await import('../src/components/SkillsSection.jsx');
 const { default: HobbiesSection } = await import('../src/components/HobbiesSection.jsx');
-const { default: PlaygroundSection } = await import('../src/components/PlaygroundSection.jsx');
 const { default: ContactSection } = await import('../src/components/ContactSection.jsx');
 const { default: Footer } = await import('../src/components/Footer.jsx');
 const { ToastProvider } = await import('../src/components/Toast.jsx');
@@ -133,51 +131,12 @@ await check('SmoothAccordion', () =>
 );
 await check('DotShader', () => renderToString(<DotShader className="fixed inset-0" />));
 
-// The clock draws every glyph as a <path> of zero-length round-cap subpaths, so
-// assert that shape rather than just "it rendered" — a regression back to the
-// two-arc form would silently inflate the DOM ~9x.
-await check('AirportMatrixClock (fixed cities)', () =>
-  renderToString(
-    <AirportMatrixClock
-      cities={['san-francisco', 'london', 'tokyo']}
-      format="24h"
-      showCountry
-      showControls={false}
-    />
-  )
-);
-await check('AirportMatrixClock (with city editor)', () =>
-  renderToString(<AirportMatrixClock format="12h" showSeconds />)
-);
-
-await check('AirportMatrixClock glyph paths are compact', () => {
-  const html = renderToString(
-    <AirportMatrixClock cities={['tokyo']} showControls={false} />
-  );
-  const paths = [...html.matchAll(/ d="([^"]*)"/g)].map((m) => m[1]);
-  if (!paths.length) throw new Error('no glyph paths rendered');
-  if (paths.some((d) => d.includes('a0.34'))) throw new Error('arc-form dot paths are back');
-  if (!paths.every((d) => /^M[0-4],[0-6]h0/.test(d) || d === '')) {
-    throw new Error('dot paths are not zero-length subpaths');
-  }
-  return html;
-});
-
-await check('AirportMatrixClock honours maxVisible + unknown cities', () => {
-  const html = renderToString(
-    <AirportMatrixClock cities={['tokyo', 'london', 'miami', 'dubai', 'kyoto', 'pune']} showControls={false} />
-  );
-  const rows = (html.match(/<li /g) || []).length;
-  if (rows !== 5) throw new Error(`expected 5 rows (capped), got ${rows}`);
-  return html;
-});
-
 await check('NotificationStack', () => {
   const html = renderToString(
     <NotificationStack
       notifications={[
         { id: 3, message: 'Third', type: 'info' },
-        { id: 2, message: '<strong>Second</strong>', type: 'success' },
+        { id: 2, message: 'Second', type: 'success' },
         { id: 1, message: 'First', type: 'warning' },
       ]}
       onDismiss={() => {}}
@@ -186,7 +145,6 @@ await check('NotificationStack', () => {
   if (!/Third[\s\S]*Second[\s\S]*First/.test(html)) {
     throw new Error('cards are not ordered newest-first');
   }
-  if (!/<strong>Second<\/strong>/.test(html)) throw new Error('message HTML was not injected');
   // index 0 defines the pile height; the cards behind it are lifted out of flow.
   if ((html.match(/position:absolute/g) || []).length !== 2) {
     throw new Error('expected exactly two stacked-behind cards');
@@ -228,26 +186,6 @@ await check('AboutSection', () => renderToString(<AboutSection musicData={musicD
 await check('ProjectsSection', () => renderToString(<ProjectsSection />));
 await check('SkillsSection', () => renderToString(<SkillsSection isActive />));
 await check('HobbiesSection', () => renderToString(<HobbiesSection />));
-
-// ── Playground toys. Only the clock panel is expanded by default, so assert
-// the accordion headers for all three and the clock's editor for the open one.
-// The clock seeds from localStorage, so this also covers the fallback path when
-// nothing is stored (or storage throws) — a bad read must not take the page down.
-await check('PlaygroundSection', () => {
-  const html = renderToString(<PlaygroundSection />);
-  for (const label of [
-    'playground-heading',
-    'World clock',
-    'Step sequencer',
-    'Random toys',
-    // The city editor is the whole point of this panel — assert it renders.
-    'ADD A CITY',
-  ]) {
-    if (!html.includes(label)) throw new Error(`missing "${label}"`);
-  }
-  if (!/Dubai|London/.test(html)) throw new Error('clock did not fall back to default cities');
-  return html;
-});
 await check('ContactSection', () =>
   renderToString(
     <ToastProvider>
@@ -307,17 +245,18 @@ await check('built CSS contains custom utilities', () => {
   return css;
 });
 
-// ── DotShader colours must be light-on-dark, otherwise the background is
-// invisible (dark dots on a dark surface).
-await check('DotShader light-on-dark colours', () => {
+// ── DotShader colours must remain theme-aware and readable.
+await check('DotShader theme-aware colours', () => {
   const src = readFileSync(new URL('../src/App.jsx', import.meta.url), 'utf8');
-  if (!/dotColor="rgba\(242, 242, 243/.test(src)) {
-    throw new Error('DotShader dotColor is not a light-on-dark value');
+  if (!/dotColor:\s*'rgba\(242,\s*242,\s*243/.test(src)) {
+    throw new Error('DotShader dark theme dotColor is missing');
+  }
+  if (!/dotColor:\s*'rgba\(17,\s*17,\s*19/.test(src)) {
+    throw new Error('DotShader light theme dotColor is missing');
   }
   if (/dotColor="rgba\(10, 10, 10/.test(src)) {
     throw new Error('DotShader dotColor is still a hardcoded light-theme value');
   }
-  if (/\bisDark\b/.test(src)) throw new Error('App.jsx still branches on isDark');
   return src;
 });
 

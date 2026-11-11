@@ -1,9 +1,4 @@
 import { SECTIONS, SECTION_LABELS } from './Navigation';
-import AirportMatrixClock from './ui/AirportMatrixClock';
-
-// A deliberately wide spread: Gulf, EU, and APAC. The visitor's own
-// timezone is already shown in About, so these are the "everyone else" clocks.
-const WORLD_CLOCK_CITIES = ['dubai', 'london', 'tokyo'];
 
 const COLUMNS = [
   {
@@ -60,7 +55,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative z-10 mt-24 border-t border-border bg-surface">
+    <footer className="relative z-10 mt-24 border-t border-border bg-surface/80 backdrop-blur-xl">
       <div className="mx-auto max-w-5xl px-6 py-14">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
           {/* Brand */}
@@ -77,7 +72,7 @@ export default function Footer() {
               {STACK.map(([icon, label]) => (
                 <span
                   key={label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-hover px-2.5 py-1 text-[11px] font-medium text-text-secondary"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-hover/70 px-2.5 py-1 text-[11px] font-medium text-text-secondary backdrop-blur-sm"
                 >
                   <i className={icon} aria-hidden="true" />
                   {label}
@@ -100,7 +95,7 @@ export default function Footer() {
                       download={link.download || undefined}
                       target={link.icon ? '_blank' : undefined}
                       rel={link.icon ? 'noopener noreferrer' : undefined}
-                      className="focus-ring inline-flex items-center gap-2 rounded text-sm text-text-muted no-underline transition-colors hover:text-text-primary"
+                      className="focus-ring inline-flex min-h-10 items-center gap-2 rounded text-sm text-text-muted no-underline transition-colors hover:text-text-primary"
                     >
                       {link.icon && (
                         <i className={`${link.icon} w-3.5 text-center`} aria-hidden="true" />
@@ -114,22 +109,6 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* World clock. Read-only here on purpose — the editable version with
-            the city picker lives on the Playground page. */}
-        <div className="mt-12">
-          <AirportMatrixClock
-            cities={WORLD_CLOCK_CITIES}
-            format="24h"
-            showCountry
-            showControls={false}
-          />
-          <p className="mt-3 text-center font-mono text-[10px] tracking-[0.12em] text-text-subtle">
-            <a href="/#playground" className="focus-ring transition-colors hover:text-text-primary">
-              ADD YOUR OWN CITIES →
-            </a>
-          </p>
-        </div>
-
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border-subtle pt-6 sm:flex-row">
           <p className="text-xs text-text-subtle">&copy; {year} Devajuice. All rights reserved.</p>
@@ -141,7 +120,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="focus-ring flex h-8 w-8 items-center justify-center rounded-full text-text-muted no-underline transition-colors hover:bg-surface-hover hover:text-text-primary"
+                className="focus-ring flex h-10 w-10 items-center justify-center rounded-full text-text-muted no-underline transition-colors hover:bg-surface-hover hover:text-text-primary"
               >
                 <i className={`${icon} text-sm`} aria-hidden="true" />
               </a>

@@ -4,7 +4,7 @@ import { Code2, Menu, X } from 'lucide-react';
 import PillNavigation from './ui/PillNavigation';
 import { motionTransitions } from '../lib/motion-tokens';
 
-export const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'playground', 'contact'];
+export const SECTIONS = ['home', 'about', 'projects', 'skills', 'hobbies', 'contact'];
 
 export const SECTION_LABELS = {
   home: 'Home',
@@ -12,7 +12,6 @@ export const SECTION_LABELS = {
   projects: 'Projects',
   skills: 'Skills',
   hobbies: 'Hobbies',
-  playground: 'Playground',
   contact: 'Contact',
 };
 
@@ -22,7 +21,6 @@ export const SECTION_ICONS = {
   projects: 'fa-folder-open',
   skills: 'fa-code',
   hobbies: 'fa-gamepad',
-  playground: 'fa-flask',
   contact: 'fa-paper-plane',
 };
 
@@ -64,29 +62,25 @@ export default function Navigation({ activeSection, onNavigate }) {
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[100] flex flex-col items-center px-4 pt-4 sm:px-6 sm:pt-6">
-      <div className="pointer-events-auto flex max-w-full items-center gap-2">
+      <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full border border-transparent bg-surface/60 p-1.5 shadow-elevated backdrop-blur-2xl">
         {/* ── Logo ── */}
         <button
           onClick={() => handleNav('home')}
           aria-label="Go to home page"
-          className="focus-ring flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-[#1f1f1f] bg-[#050505] px-4 py-2.5 text-sm font-bold text-[#fafafa] italic shadow-[0_8px_32px_rgba(0,0,0,0.18)] transition-colors hover:border-[#4a4a4a]"
+          className="focus-ring flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-border bg-surface/80 px-4 text-sm font-bold text-text-primary italic transition-colors hover:border-border-hover hover:bg-surface-hover"
         >
-          <Code2 className="h-3.5 w-3.5 text-[#a1a1a1]" aria-hidden="true" />
+          <Code2 className="h-3.5 w-3.5 text-text-muted" aria-hidden="true" />
           <span className="hidden sm:inline">Devajith</span>
         </button>
 
         {/* ── Desktop pill navigation ── */}
-        {/* `lg` not `md`: with seven tabs the pill no longer fits an 768px row,
-            and a clipped tab is worse than showing the drawer a little earlier. */}
         <div className="animate-nav-slide-down hidden lg:block">
-          {/* The pill is always dark, so the scroll state only deepens the
-              shadow rather than introducing a competing glass bar. */}
           <PillNavigation
             items={NAV_ITEMS}
             value={activeSection}
             onChange={(id) => handleNav(id)}
             ariaLabel="Main navigation"
-            className={scrolled ? 'shadow-[0_16px_36px_-10px_rgba(15,15,20,0.32)]' : undefined}
+            className={scrolled ? 'shadow-elevated' : 'shadow-subtle'}
           />
         </div>
 
@@ -97,7 +91,7 @@ export default function Navigation({ activeSection, onNavigate }) {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav-panel"
           id="mobileMenuBtn"
-          className="focus-ring flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#1f1f1f] bg-[#050505] text-[#fafafa] shadow-[0_8px_32px_rgba(0,0,0,0.18)] transition-colors hover:border-[#4a4a4a] lg:hidden"
+          className="focus-ring flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/80 text-text-primary transition-colors hover:border-border-hover hover:bg-surface-hover lg:hidden"
         >
           {mobileOpen ? (
             <X className="h-4 w-4" aria-hidden="true" />
@@ -142,7 +136,7 @@ export default function Navigation({ activeSection, onNavigate }) {
                 melt together. Text sits above this on an unfiltered layer. */}
             <div
               aria-hidden="true"
-              className="goo-filter pointer-events-none absolute inset-0 overflow-hidden rounded-[30px] bg-[#0e0e0e]"
+              className="goo-filter pointer-events-none absolute inset-0 overflow-hidden rounded-[30px] bg-surface-raised"
             >
               <p className="invisible px-3 pt-3 pb-1 text-[11px] font-semibold tracking-[0.12em] uppercase">
                 Navigation
@@ -156,16 +150,13 @@ export default function Navigation({ activeSection, onNavigate }) {
                 {SECTIONS.map((s) => (
                   <motion.li
                     key={s}
-                    className="rounded-full bg-[#0e0e0e] px-3 py-2.5"
+                    className="rounded-full bg-surface-raised px-3 py-3"
                     variants={{
                       hidden: { scaleX: 0.35, scaleY: 0.2, opacity: 0 },
                       shown: { scaleX: 1, scaleY: 1, opacity: 1 },
                     }}
                     transition={motionTransitions.springMorph}
                   >
-                    {/* Mirrors the row's own metrics and glyph, so blob and button
-                        are the same height without a hardcoded value. `invisible`
-                        keeps layout while emitting nothing into the filter. */}
                     <span className="invisible flex items-center gap-3 text-sm">
                       <i className={`fas ${SECTION_ICONS[s]} w-4 text-center`} />
                       {SECTION_LABELS[s]}
@@ -175,7 +166,7 @@ export default function Navigation({ activeSection, onNavigate }) {
               </motion.ul>
             </div>
 
-            <p className="relative z-10 px-3 pt-3 pb-1 text-[11px] font-semibold tracking-[0.12em] text-[#525252] uppercase">
+            <p className="relative z-10 px-3 pt-3 pb-1 text-[11px] font-semibold tracking-[0.12em] text-text-subtle uppercase">
               Navigation
             </p>
             <ul className="relative z-10 grid auto-rows-fr gap-1 p-2">
@@ -186,10 +177,10 @@ export default function Navigation({ activeSection, onNavigate }) {
                     <button
                       onClick={() => handleNav(s)}
                       aria-current={active ? 'page' : undefined}
-                      className={`focus-ring flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+                      className={`focus-ring flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors ${
                         active
-                          ? 'bg-[#1f1f1f] font-semibold text-[#fafafa]'
-                          : 'text-[#a1a1a1] hover:bg-[#18181a] hover:text-[#fafafa]'
+                          ? 'bg-surface-hover font-semibold text-text-primary'
+                          : 'text-text-secondary hover:bg-surface-hover/70 hover:text-text-primary'
                       }`}
                     >
                       <i className={`fas ${SECTION_ICONS[s]} w-4 text-center`} aria-hidden="true" />

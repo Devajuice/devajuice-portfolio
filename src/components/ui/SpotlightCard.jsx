@@ -37,7 +37,7 @@ export function SpotlightCard({
         mouseY.set(-1000);
       }}
       className={cn(
-        'group relative overflow-hidden rounded-xl border border-border bg-surface p-6 text-inherit no-underline shadow-subtle transition-colors duration-300 hover:border-border-hover',
+        'group relative overflow-hidden rounded-xl border border-border/80 bg-surface/75 p-6 text-inherit no-underline shadow-subtle backdrop-blur-xl transition-colors duration-300 hover:border-border-hover hover:bg-surface/85',
         className
       )}
       {...props}

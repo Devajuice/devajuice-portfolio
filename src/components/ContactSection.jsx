@@ -16,30 +16,47 @@ const SOCIALS = [
 ];
 
 const FIELD_CLASSES =
-  'focus-ring w-full rounded-md border border-border bg-surface py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-subtle transition-colors focus:border-border-hover';
+  'focus-ring w-full rounded-md border border-border bg-surface/80 py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-subtle transition-colors focus:border-border-hover';
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [errors, setErrors] = useState({});
   const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState(null);
   const submittingRef = useRef(false);
   const showToast = useToast();
 
-  const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const validate = (values) => {
+    const next = {};
+    if (!values.name.trim()) next.name = 'Please enter your name.';
+    if (!values.email.trim()) next.email = 'Please enter your email address.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) next.email = 'Please enter a valid email address.';
+    if (!values.message.trim()) next.message = 'Please enter a message.';
+    return next;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: '' } : prev));
+    setStatus(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submittingRef.current) return;
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      const msg = Object.values(nextErrors)[0];
+      setStatus({ type: 'warning', message: msg });
+      showToast(msg, 'warning');
+      return;
+    }
     const { name, email, message } = form;
-    if (!name || !email || !message) {
-      showToast('Please fill in all fields.', 'warning');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showToast('Please enter a valid email address.', 'error');
-      return;
-    }
     submittingRef.current = true;
     setSending(true);
+    setStatus({ type: 'info', message: 'Sending your message…' });
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -54,13 +71,19 @@ export default function ContactSection() {
       const result = await res.json();
       if (res.ok && result.success) {
         playSound('success');
-        showToast("Message sent! I'll get back to you soon.", 'success');
+        const msg = "Message sent! I'll get back to you soon.";
+        showToast(msg, 'success');
+        setStatus({ type: 'success', message: msg });
         setForm({ name: '', email: '', message: '' });
       } else {
-        showToast('Failed to send. Please try again.', 'error');
+        const msg = 'Failed to send. Please try again.';
+        showToast(msg, 'error');
+        setStatus({ type: 'error', message: msg });
       }
     } catch {
-      showToast('An error occurred. Please try again later.', 'error');
+      const msg = 'An error occurred. Please try again later.';
+      showToast(msg, 'error');
+      setStatus({ type: 'error', message: msg });
     } finally {
       submittingRef.current = false;
       setSending(false);
@@ -72,11 +95,7 @@ export default function ContactSection() {
       .writeText('devajuice@zohomail.in')
       .then(() => {
         playSound('success');
-        showToast(
-          '<i class="fas fa-copy" style="margin-right:6px"></i> Email address copied!',
-          'success',
-          2000
-        );
+        showToast('Email address copied!', 'success', 2000);
       })
       .catch(() => {
         showToast('Could not copy — please copy manually.', 'error');
@@ -113,63 +132,75 @@ export default function ContactSection() {
               readOnly
             />
 
-            <div className="relative">
-              <User
-                className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-subtle"
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                required
-                aria-label="Your name"
-                autoComplete="name"
-                value={form.name}
-                onChange={handleChange}
-                className={FIELD_CLASSES}
-              />
+            <div>
+              <div className="relative">
+                <User
+                  className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-subtle"
+                  aria-hidden="true"
+                />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  required
+                  aria-label="Your name"
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? 'contact-name-error' : undefined}
+                  autoComplete="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className={`${FIELD_CLASSES} ${errors.name ? 'border-amber-500/50' : ''}`}
+                />
+              </div>
+              {errors.name && <p id="contact-name-error" className="mt-1 text-xs text-amber-500">{errors.name}</p>}
             </div>
 
-            <div className="relative">
-              <AtSign
-                className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-subtle"
-                aria-hidden="true"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Your Email"
-                required
-                aria-label="Your email address"
-                autoComplete="email"
-                value={form.email}
-                onChange={handleChange}
-                className={FIELD_CLASSES}
-              />
+            <div>
+              <div className="relative">
+                <AtSign
+                  className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-subtle"
+                  aria-hidden="true"
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  required
+                  aria-label="Your email address"
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? 'contact-email-error' : undefined}
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className={`${FIELD_CLASSES} ${errors.email ? 'border-amber-500/50' : ''}`}
+                />
+              </div>
+              {errors.email && <p id="contact-email-error" className="mt-1 text-xs text-amber-500">{errors.email}</p>}
             </div>
 
-            <div className="relative">
-              <MessageSquare
-                className="pointer-events-none absolute top-3.5 left-3 h-4 w-4 text-text-subtle"
-                aria-hidden="true"
-              />
-              <textarea
-                name="message"
-                rows={4}
-                placeholder="Your Message"
-                required
-                aria-label="Your message"
-                value={form.message}
-                onChange={handleChange}
-                className={`${FIELD_CLASSES} resize-y`}
-              />
+            <div>
+              <div className="relative">
+                <MessageSquare
+                  className="pointer-events-none absolute top-3.5 left-3 h-4 w-4 text-text-subtle"
+                  aria-hidden="true"
+                />
+                <textarea
+                  name="message"
+                  rows={4}
+                  placeholder="Your Message"
+                  required
+                  aria-label="Your message"
+                  aria-invalid={Boolean(errors.message)}
+                  aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                  value={form.message}
+                  onChange={handleChange}
+                  className={`${FIELD_CLASSES} resize-y ${errors.message ? 'border-amber-500/50' : ''}`}
+                />
+              </div>
+              {errors.message && <p id="contact-message-error" className="mt-1 text-xs text-amber-500">{errors.message}</p>}
             </div>
+            <p className="text-xs text-text-subtle">I usually reply within a few days. You can also email me directly.</p>
 
-            {/* The icon must go through `leftIcon`. Button wraps `children` in a
-                single <span>, so an inline <Send/> inside it becomes one flex
-                item: the size `gap` never applies and the SVG sits on the text
-                baseline instead of being centred by items-center. */}
             <Button
               type="submit"
               isLoading={sending}
@@ -179,6 +210,23 @@ export default function ContactSection() {
             >
               Send Message
             </Button>
+            {status && (
+              <p
+                className={`text-sm ${
+                  status.type === 'success'
+                    ? 'text-live'
+                    : status.type === 'error'
+                      ? 'text-rose-500'
+                      : status.type === 'warning'
+                        ? 'text-amber-500'
+                        : 'text-text-secondary'
+                }`}
+                role="status"
+                aria-live="polite"
+              >
+                {status.message}
+              </p>
+            )}
           </form>
         </SpotlightCard>
 
@@ -197,7 +245,7 @@ export default function ContactSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Visit my ${s.label} profile`}
-                className="focus-ring group flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3 text-sm font-medium text-text-primary no-underline transition-colors hover:border-border-hover hover:bg-surface-hover"
+                className="focus-ring group flex min-h-11 items-center justify-between rounded-md border border-border bg-surface/70 px-4 py-3 text-sm font-medium text-text-primary no-underline backdrop-blur-sm transition-colors hover:border-border-hover hover:bg-surface-hover"
               >
                 <span className="flex items-center gap-3">
                   <i className={`${s.icon} w-4 text-center`} aria-hidden="true" />
@@ -214,7 +262,7 @@ export default function ContactSection() {
               type="button"
               onClick={handleCopyEmail}
               aria-label="Copy my email address to clipboard"
-              className="focus-ring flex cursor-pointer items-center justify-between rounded-md border border-border bg-surface px-4 py-3 text-sm font-medium text-text-primary transition-colors hover:border-border-hover hover:bg-surface-hover"
+              className="focus-ring flex min-h-11 cursor-pointer items-center justify-between rounded-md border border-border bg-surface/70 px-4 py-3 text-sm font-medium text-text-primary backdrop-blur-sm transition-colors hover:border-border-hover hover:bg-surface-hover"
             >
               <span className="flex items-center gap-3">
                 <Copy className="h-4 w-4" aria-hidden="true" />
@@ -227,7 +275,7 @@ export default function ContactSection() {
               href="/assets/docs/Devajith_Resume.pdf"
               download="Devajith_Resume.pdf"
               aria-label="Download my Resume"
-              className="focus-ring flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3 text-sm font-medium text-text-primary no-underline transition-colors hover:border-border-hover hover:bg-surface-hover"
+              className="focus-ring flex min-h-11 items-center justify-between rounded-md border border-border bg-surface/70 px-4 py-3 text-sm font-medium text-text-primary no-underline backdrop-blur-sm transition-colors hover:border-border-hover hover:bg-surface-hover"
             >
               <span className="flex items-center gap-3">
                 <FileDown className="h-4 w-4" aria-hidden="true" />

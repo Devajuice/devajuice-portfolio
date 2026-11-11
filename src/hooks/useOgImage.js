@@ -1,21 +1,12 @@
 /**
- * useOgImage — builds the OG image URL for a given page.
+ * useOgImage — returns the OG image URL for the site.
  *
- * Usage:
- *   const ogImage = useOgImage({ title: 'About Me', description: '...', author: 'Dev' });
- *   // Returns: https://your-site.vercel.app/api/og?title=About+Me&description=...&author=Dev
+ * The dynamic /api/og generator is not deployed; social previews should use the
+ * static image directly so crawlers receive an image URL without redirects.
  */
-export function useOgImage({ title = '', description = '', author = '' } = {}) {
+export function useOgImage() {
   const base =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : 'https://devajuice-portfolio.vercel.app'; // fallback for SSR / meta tags
+    typeof window !== 'undefined' ? window.location.origin : 'https://devajuice.com';
 
-  const params = new URLSearchParams({
-    ...(title && { title }),
-    ...(description && { description }),
-    ...(author && { author }),
-  });
-
-  return `${base}/api/og?${params.toString()}`;
+  return `${base}/og-image-v2.png`;
 }

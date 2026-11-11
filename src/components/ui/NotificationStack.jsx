@@ -79,10 +79,9 @@ export function NotificationStack({ notifications = [], onDismiss, maxVisible = 
                   className={cn('mt-0.5 h-4 w-4 shrink-0', TONE[item.type] ?? TONE.info)}
                   aria-hidden="true"
                 />
-                <span
-                  className="min-w-0 flex-1 text-sm leading-snug break-words text-text-primary"
-                  dangerouslySetInnerHTML={{ __html: item.message }}
-                />
+                <span className="min-w-0 flex-1 text-sm leading-snug break-words text-text-primary">
+                  {item.message}
+                </span>
                 <button
                   className="focus-ring -mt-0.5 shrink-0 cursor-pointer rounded p-0.5 text-text-subtle transition-colors hover:text-text-primary"
                   aria-label="Dismiss notification"

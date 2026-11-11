@@ -3,52 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Devajith | Developer Portfolio</title>
+    <title>Devajith | Student, Developer & Data Analyst</title>
 
     <!-- SEO -->
     <meta
       name="description"
-      content="Devajith — Student, Developer, and Data Analyst passionate about creating efficient solutions."
+      content="Portfolio of Devajith — student, developer, and data analyst building web projects, data-driven solutions, and interactive experiences."
     />
     <meta
       name="keywords"
-      content="Devajith, Developer, Portfolio, Web Development, Python, Data Analysis, Kerala"
+      content="Devajith, developer portfolio, web developer, React, Python, data analysis, projects, Kerala"
     />
     <meta name="author" content="Devajith" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://devajuice.com" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="canonical" href="https://devajuice.com/" />
 
     <!-- Open Graph -->
     <meta property="og:url" content="https://devajuice.com/" />
+    <meta property="og:site_name" content="Devajith Portfolio" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Devajith — Portfolio" />
-    <meta property="og:description" content="Building cool things on the web." />
+    <meta property="og:title" content="Devajith | Student, Developer & Data Analyst" />
+    <meta property="og:description" content="Explore Devajith's projects, skills, and ways to get in touch." />
     <meta property="og:image" content="https://devajuice.com/og-image-v2.png" />
+    <meta property="og:image:alt" content="Devajith portfolio preview" />
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta property="twitter:domain" content="devajuice.com" />
     <meta property="twitter:url" content="https://devajuice.com/" />
-    <meta name="twitter:title" content="Devajith — Portfolio" />
-    <meta name="twitter:description" content="Building cool things on the web." />
+    <meta name="twitter:title" content="Devajith | Student, Developer & Data Analyst" />
+    <meta name="twitter:description" content="Explore Devajith's projects, skills, and ways to get in touch." />
     <meta name="twitter:image" content="https://devajuice.com/og-image-v2.png" />
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Devajith",
-        "url": "https://devajuice.com",
-        "image": "https://devajuice.com/og-image-v2.png",
-        "jobTitle": "Student, Developer, and Data Analyst",
-        "description": "Devajith — Student, Developer, and Data Analyst passionate about creating efficient solutions.",
-        "sameAs": [
-          "https://github.com/devajuice",
-          "https://www.linkedin.com/in/devajith-jijush-5741ab39b/",
-          "https://instagram.com/devajuice"
-        ],
-        "knowsAbout": ["Web Development", "Python", "Data Analysis", "React", "JavaScript"]
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Devajith Portfolio",
+            "url": "https://devajuice.com/",
+            "inLanguage": "en"
+          },
+          {
+            "@type": "Person",
+            "name": "Devajith",
+            "url": "https://devajuice.com/",
+            "image": "https://devajuice.com/og-image-v2.png",
+            "jobTitle": "Student, Developer, and Data Analyst",
+            "description": "Student, developer, and data analyst building web projects and data-driven solutions.",
+            "sameAs": [
+              "https://github.com/devajuice",
+              "https://www.linkedin.com/in/devajith-jijush-5741ab39b/",
+              "https://instagram.com/devajuice"
+            ],
+            "knowsAbout": ["Web Development", "Python", "Data Analysis", "React", "JavaScript"]
+          }
+        ]
       }
     </script>
 
@@ -58,12 +71,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Devajith" />
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-    <link rel="preconnect" href="https://ws.audioscrobbler.com" />
 
     <!-- Font Awesome -->
     <link
@@ -84,11 +97,32 @@
         background: #111113;
         color-scheme: dark;
       }
+      html[data-theme='light'] {
+        background: #f7f7f8;
+        color-scheme: light;
+      }
       body {
         margin: 0;
         font-family: 'DM Sans', system-ui, sans-serif;
       }
     </style>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var theme =
+            saved === 'light' || saved === 'dark'
+              ? saved
+              : window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', theme === 'light' ? '#f7f7f8' : '#111113');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <noscript>

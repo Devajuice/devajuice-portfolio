@@ -1,6 +1,6 @@
 # Devajith | Developer Portfolio 🌟
 
-A modern, responsive single-page portfolio website featuring a monochrome design system on Tailwind CSS v4, smooth animations, a gooey mobile menu, live Last.fm music integration with full-bleed album art, a playground of self-contained browser toys, and interactive easter eggs. Built with React and Vite.
+A modern, responsive single-page portfolio website featuring a monochrome design system on Tailwind CSS v4, light/dark theme support, glassmorphism UI, smooth animations, a gooey mobile menu, live Last.fm music integration, section progress navigation, and interactive easter eggs. Built with React and Vite.
 
 ![Website Preview](https://img.shields.io/badge/Status-Live-success)
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
@@ -12,79 +12,69 @@ A modern, responsive single-page portfolio website featuring a monochrome design
 
 ### 🎨 Design & UX
 
-- **Dark-Only Theme** — One palette, declared once, with no toggle and no flash-of-wrong-theme script: `index.html` paints `#111113` before React mounts and `color-scheme: dark` makes native UI (scrollbars, form controls, autofill) match. Anything needing a literal colour (WebGL shader, canvas confetti, animated favicon) hardcodes the dark value rather than branching at runtime
-- **EasyUI Design System** — Every colour, radius and glass surface is a CSS custom property declared in a Tailwind v4 `@theme` block, so tokens are real utilities (`bg-surface`, `text-muted`) rather than magic strings. `public/404.css` hand-mirrors the same tokens for the static 404 page
-- **Monochrome Design** — Black/white palette with a single green accent reserved for the "live" music state, so colour carries meaning
-- **Responsive Design** — Seamlessly adapts to desktop, tablet, and mobile devices
-- **Floating Pill Navbar** — Centered glassmorphism pill on desktop with a sliding active-section indicator; the mobile drawer is a gooey menu (see below). With seven sections the pill breaks at `lg` rather than `md`, and its tablist scrolls horizontally as a backstop so a tab can never clip
-- **DM Sans Typography** — Modern, clean font used across the entire site
-- **Per-Section Error Boundary** — A failure in any section degrades that section only, instead of blanking the whole page
-- **Site Footer** — 4-column grid layout (Brand, Quick Links, Connect, Resources) with tagline, tech stack chips, navigation links, email contact, resume download, social icon links, and keyboard shortcuts hint; responsive 4→2→1 column grid on mobile
-- **Custom 404 Page** — Styled error page matching the portfolio design with glitch animation, served via Vercel routing
-- **Locale-Aware Timezone Display** — Hero section shows the current IST time and how far ahead/behind it is from the visitor's local timezone, updating every 30 seconds
-- **No-JS Fallback** — A `<noscript>` banner informs users if JavaScript is disabled and reveals the home section statically
+- **Light/Dark Theme** — Theme-aware design tokens with a toggle (persisted in `localStorage`, respects system preference on first visit) and an early theme bootstrap in `index.html` to reduce flash-of-wrong-theme. Theme-aware UI colors are applied across navigation, controls, cards, shader, favicon, and confetti
+- **Glassmorphism UI** — Translucent, blurred surfaces across the navbar pill, floating controls, section progress indicators, cards, and panels for a consistent glass look in both themes
+- **EasyUI Design System** — Colors, radii, shadows, and motion tokens are defined as CSS custom properties (Tailwind v4 `@theme` + theme overrides), exposed as reusable utilities/classes. `public/404.css` remains standalone for the static error page
+- **Monochrome Design** — Neutral palette with a green accent reserved for the live now-playing state
+- **Responsive Design** — Adapts to desktop, tablet, and mobile with touch-friendly controls and mobile-specific layout/performance tuning
+- **Floating Pill Navbar** — Glassy desktop pill navigation with active indicator; mobile drawer uses a gooey menu effect. With six sections the desktop pill breaks at `lg` and the tablist can scroll horizontally as a fallback
+- **Section Orientation** — Desktop section progress rail and mobile section progress indicator for quick orientation/navigation between sections
+- **Desktop Now-Playing & Ambient Panel** — Floating desktop control panel shows current music state/track and provides ambient/sound and theme controls in one place
+- **DM Sans Typography** — Clean, modern typography across the site
+- **Per-Section Error Boundary** — A failure in any section degrades that section only
+- **Site Footer** — 4-column responsive layout with brand, quick links, contact/resources, and social links
+- **Custom 404 Page** — Styled error page served via Vercel routing
+- **Locale-Aware Timezone Display** — Hero section shows current IST time and relative offset from the visitor’s timezone
+- **No-JS Fallback** — `<noscript>` banner for users without JavaScript
 
 ### 🎭 Animations & Interactions
 
-- **Smooth Page Transitions** — Sections fade and slide in the correct direction (forward or backward) before the next one fades in, with a locked transition state to prevent glitches
-- **Browser Back/Forward Support** — `hashchange` listener keeps the active section in sync with the browser's navigation history so the back and forward buttons work correctly
-- **Staggered Content Animations** — Cards, headings, and text elements cascade in with a delay when a section becomes active
-- **Typewriter Effect** — Hero subtitle cycles through "Student", "Developer", and "Gamer" with a blinking accent cursor
-- **Navbar Entrance** — Navigation pill springs down into view on page load
-- **Gooey Mobile Menu** — The mobile drawer melts open via an SVG `feGaussianBlur` + alpha-contrast `feColorMatrix` filter. Because a goo filter collapses its subtree to a single flat colour, the menu is two aligned layers: a filtered one-colour blob layer with an invisible copy of each row's text and icon for sizing, and the real text on an unfiltered layer above it. The panel is `position: relative` so the blob layer's `inset: 0` anchors to it instead of escaping to the fixed header
-- **Hover Effects** — Interactive lift animations on cards, nav items, and buttons
-- **Magnetic Buttons** — Hero CTA buttons subtly follow the cursor on hover; reattached automatically on each section change without a MutationObserver
-- **Shared Motion Tokens** — Springs and easings come from `src/lib/motion-tokens.js` so every transition in the site shares one timing vocabulary instead of per-component curves
-- **Mobile Swipe Gestures** — Swipe left/right on touch devices to navigate between sections, with a live edge hint pill showing the destination
+- **Smooth Page Transitions** — Section transitions slide/fade with direction-aware enter/exit states and transition locking to prevent glitches (lighter/faster on small screens)
+- **Browser Back/Forward Support** — Hash-based section state stays in sync with browser navigation
+- **Staggered Content Animations** — Content animates in on reveal/section entry
+- **Typewriter Effect** — Hero subtitle cycles through roles with a blinking cursor
+- **Gooey Mobile Menu** — Mobile drawer uses an SVG goo filter with layered blob/text rendering for the liquid merge effect
+- **Hover/Press Effects** — Interactive feedback on cards, nav items, controls, and buttons
+- **Magnetic Buttons** — Hero CTA buttons follow the cursor subtly on hover
+- **Shared Motion Tokens** — Shared springs/easings from `src/lib/motion-tokens.js`
+- **Mobile Swipe Gestures** — Swipe left/right between sections with a direction hint; includes a one-time mobile onboarding tip on coarse-pointer devices
 
 ### 🌌 Visual Effects
 
-- **WebGL Dot Shader Background** — A full-screen `DotShader` canvas behind the content, driven by a `uMouse`/`uTime` uniform pair, with light-on-dark dots so they stay visible against the dark surface. Pauses when the tab is hidden to save GPU/battery
-- **Full-Bleed Album Art** — The About card and the home now-playing pill render the cover as a scaled, blurred, saturated backdrop clipped by the container's own `overflow-hidden` radius. No edge masks: at pill height a gradient mask reads as a blotchy vignette rather than a cover
-- **Thin Glass Veil** — The frosted layer over the artwork is 22% surface tint with `blur(10px) saturate(220%)`, enough tint for contrast and enough saturation that the artwork reads as colour rather than a grey wash. The veil inherits its container radius so it cannot show as a hard rectangle where `backdrop-filter` is unsupported
-- **Animated Favicon** — Canvas-drawn `</>` logo with an orbiting glow dot that plays for 3 seconds on load then stops to avoid ongoing repaints; drawn light-on-dark to match the site
+- **WebGL Dot Shader Background** — Full-screen animated dot background (theme-aware colors) with reduced intensity/interaction on coarse-pointer devices and runtime respect for reduced motion
+- **Full-Bleed Album Art** — Now-playing surfaces use blurred, scaled album artwork backdrops clipped by their containers
+- **Glass Surfaces** — Backdrop blur/saturation and translucent layers used across navigation, cards, controls, and overlays
+- **Animated Favicon** — Canvas-drawn animated favicon on load (theme-aware), then stops to avoid ongoing repaints
 
 ### 🐣 Easter Eggs
 
 - **Konami Code** — Type ↑ ↑ ↓ ↓ ← → ← → B A to trigger an achievement-style popup with confetti rain and a +30 Gamer Points badge
 
-### 🎵 Music Integration
+### 🎵 Music & Ambient Controls
 
-- **Live Now-Playing Pill** — Hero section displays a loading skeleton while data is fetching, then shows a green pill with animated equalizer bars when actively scrobbling, or grey when showing the last played track
-- **Last.fm API** — Track name, artist, and album fetched in real-time from Last.fm. The browser never calls Last.fm directly: `src/utils/lastfm.js` requests `/api/nowplaying`, served by `api/nowplaying.js` in production and by a Vite middleware in dev and preview, so the API key stays server-side
-- **Graceful Degradation** — With no key or an unreachable API the pill renders *Unavailable* instead of breaking the hero layout
-- **iTunes Cover Art** — Album artwork fetched from the iTunes Search API (CORS-friendly, no key required) at up to 3000×3000 resolution, with Last.fm image as fallback
-- **Smart Art Caching** — Bounded in-memory cache (max 100 entries, oldest evicted first) so iTunes is only called when the artist/album changes; repeated polls reuse cached art
-- **Parallel Fetching** — `track.getInfo` and iTunes cover art lookups fire in parallel using `Promise.allSettled`, not sequentially
-- **Animated Equalizer Bars** — 4 bars animate when live, sit flat when idle — appear in both the hero pill and the About section music widget
-- **Live/Recent Badge** — About section shows a green "Live" or grey "Recent" badge next to the track name
-- **Auto-Refresh** — Updates every 30 seconds (live tracks) or 120 seconds (last played)
-- **Background Ambient Music** — Optional procedurally generated ambient piano music using the Web Audio API, with a look-ahead scheduler. Pauses automatically when the tab is hidden
+- **Live Now-Playing (Hero + About)** — Displays current/recent Last.fm track with loading/unavailable states, animated equalizer, and live/recent styling
+- **Desktop Control Panel** — Floating desktop panel shows current music state/track and provides ambient/sound and theme controls
+- **Last.fm via Server Proxy** — The browser requests `/api/nowplaying` (Vite middleware in dev/preview, serverless function in production) so the Last.fm API key stays server-side
+- **iTunes Cover Art** — Album artwork fetched from iTunes Search API (no key required), with Last.fm image fallback and bounded in-memory caching
+- **Parallel Fetching** — Track info and artwork lookups run in parallel where possible
+- **Adaptive Refresh** — Now-playing polling adapts by state (live vs recent/error) to reduce unnecessary wakeups
+- **Background Ambient Music** — Optional procedurally generated ambient audio (Web Audio API), toggled with sound controls and paused/resumed with tab visibility
 
 ### 📬 Contact Features
 
 - **Functional Contact Form** — Web3Forms integration with honeypot spam protection (no backend needed)
-- **Double-Submit Guard** — A `ref`-based guard prevents concurrent or accidental duplicate submissions
-- **Form Validation** — Client-side validation for all fields including email format check
-- **Copy Email Button** — One-click button copies your email address to the clipboard with a success toast, alongside the social links
-- **Toast Notifications** — Non-intrusive slide-in toasts for form success, errors, and navigation feedback; renders through a stacked notification pile so rapid-fire messages never overlap
-- **World Clock** — Airport-board split-flap clock in the footer showing the local time in Dubai, London, and Tokyo, with a scrolling glyph animation that honours `prefers-reduced-motion`
-- **Social Media Links** — Quick access to LinkedIn, GitHub, and Instagram
-
-### 🎛️ Playground
-
-A grab-bag page for self-contained toys, reachable at `/#playground`. Everything runs locally —
-no network requests, no accounts, nothing persisted beyond the clock's city list.
-
-- **Editable World Clock** — The footer's split-flap clock with its city editor switched on. Pick up to five of the 32 available cities and the selection is written to `localStorage`, so it survives reloads. Corrupt or stale stored values fall back to the default three instead of breaking the page
-- **Step Sequencer** — A 16-step, 4-voice drum machine (kick, hat, clap, bass) with three tempos, randomize, and clear. It shares the module-level `AudioContext` from `src/utils/audio.js` rather than opening its own, and uses the standard look-ahead scheduler — notes are placed against `ctx.currentTime` while a coarse 25ms timer only refills the queue, so the rhythm does not jitter when a tick lands late
-- **Random Toys** — Dice (1–4d6), coin flip, a weekend-project picker, and a decision maker with twelve grouped verdicts (yes / do-something-smaller / no) rather than a yes-no coin flip, so it can express the actually-useful middle answer. Consecutive asks never repeat
+- **Double-Submit Guard** — Prevents concurrent/duplicate submissions
+- **Client-side Validation** — Required fields and email format validation with inline field-level error messages plus status/toast feedback
+- **Inline Status Feedback** — Success/error/warning/info feedback shown near the submit action in addition to toasts
+- **Copy Email Button** — One-click copy to clipboard with feedback
+- **Toast Notifications** — Stacked notification toasts for actions and navigation feedback (plain-text rendering)
+- **Social/Resource Links** — Quick access to GitHub, LinkedIn, Instagram, email, and resume download
 
 ### ⌨️ Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| `1` – `7` | Jump to section (in `SECTIONS` order) |
+| `1` – `6` | Jump to section (in `SECTIONS` order) |
 | `B` | Back to top |
 | `?` | Open/close shortcuts overlay |
 | `Esc` | Close overlays / mobile menu |
@@ -94,45 +84,37 @@ extends them automatically instead of leaving a gap that silently shifts the lat
 
 ### ⚡ Performance & Accessibility
 
-- **PWA Ready** — `manifest.json` enables "Add to Home Screen" on Android/iOS with app shortcuts for Projects and Contact
-- **Theme Color** — a single `theme-color` meta tag sets the browser chrome to the site's background; `color-scheme: dark` is declared so form controls and scrollbars render dark too
-- **Fast Loading** — Vite-bundled output, deferred script loading, preconnect hints for all external origins, and no render-blocking resources
-- **SEO Optimised** — Full meta tags, Open Graph (with image dimensions), Twitter Card, canonical URL, JSON-LD structured data (Person schema), and a clean `sitemap.xml`
-- **Accessibility** — Skip link, ARIA labels, keyboard navigation, focus traps on overlays (`role="dialog"`), `aria-live` regions for dynamic content, and `aria-hidden` on the mobile nav dropdown when closed so hidden buttons are invisible to screen readers and excluded from the tab order
-- **Reduced Motion** — Respects `prefers-reduced-motion` — disables the WebGL background and CSS transitions, and `DotShader` listens for changes at runtime rather than only reading the preference once on mount
-- **Tab Visibility** — The background shader and ambient music both pause when the tab is hidden, resuming when you return
-- **Deduplicated Init** — Initial section is computed once at module level from `window.location.hash` and shared across all state initialisers, avoiding redundant hash reads
-- **Auto Footer Year** — Copyright year updates automatically
+- **Installable web app basics** — `manifest.json`, meta/theme tags, and icons enable "Add to Home Screen" on supported platforms (no service worker/offline caching yet) with app shortcuts for Projects and Contact
+- **Theme-aware chrome** — Initial theme is applied early in `index.html`; `theme-color` and `color-scheme` are updated for light/dark modes
+- **Fast Loading** — Vite-bundled output, lazy-loaded sections, and targeted preconnect hints (fonts/icons); Last.fm requests go through `/api/nowplaying` (no direct client preconnect to Last.fm)
+- **SEO & Sharing** — Meta tags, Open Graph/Twitter cards, canonical URL, JSON-LD structured data (`WebSite` + `Person`), and sitemap/robots configuration
+- **Accessibility** — Skip link, semantic landmarks, keyboard navigation, focus-visible styles, labeled controls, focus traps for overlays, and live/status announcements for dynamic UI (including section/form feedback)
+- **Reduced Motion & Device Tuning** — Respects `prefers-reduced-motion`; `DotShader` adapts at runtime and is tuned down on coarse-pointer/mobile devices
+- **Tab Visibility** — Background shader/ambient audio pause or reduce work when the tab is hidden and resume appropriately
+- **Resilient UI** — Per-section error boundaries and graceful fallbacks for unavailable music/network states
 
 ## 🎨 Color Theme
 
-Dark only. Every token is declared once in the `@theme` block in `src/index.css` —
-there is no light variant and no `.dark` class to toggle. `public/404.css` mirrors
-the same set by hand, so keep the two in sync.
+The site supports **light and dark themes** with a toggle (persisted in `localStorage`, system preference on first visit).
+
+- **Dark theme** tokens are defined in the Tailwind v4 `@theme` block in `src/index.css`
+- **Light theme** overrides are defined under `:root[data-theme='light']` in `src/index.css`
+- `index.html` applies the initial theme early (before React mounts) to reduce flash
+
+Key tokens (dark defaults):
 
 | Token | Value |
 |-------|-------|
 | `--color-bg` | `#111113` |
 | `--color-surface` | `#1c1c1f` |
 | `--color-surface-hover` | `#202023` |
-| `--color-surface-raised` | `#18181a` |
 | `--color-border` | `#29292c` |
-| `--color-border-hover` | `#343438` |
 | `--color-text-primary` | `#f2f2f3` |
 | `--color-text-secondary` | `#a1a1a6` |
 | `--color-text-muted` | `#6f6f75` |
-| `--color-text-subtle` | `#4d4d52` |
-| `--color-accent` | `#f2f2f3` |
 | `--color-live` | `#4ade80` |
 
-The accent is intentionally the same as `text-primary` — the palette is monochrome,
-and green appears only where it means something (the live now-playing state).
-`--art-alpha` (`0.9`) controls how far the blurred album art pushes its own colour
-into the glass surface.
-
-Because the theme can no longer change at runtime, anything that needs a literal
-colour (the WebGL shader, canvas confetti, the animated favicon) hardcodes the dark
-value directly instead of branching on a hook.
+`--art-alpha` controls album-art backdrop strength and is tuned per theme (higher in dark mode, lower in light mode). Theme-aware visuals (e.g. shader, favicon/confetti accents) use runtime theme state where needed.
 
 ## 📂 Project Structure
 
@@ -169,16 +151,11 @@ devajith-portfolio/
     │   ├── ContactSection.jsx   # Contact form + copy-email button
     │   ├── EasterEgg.jsx
     │   ├── ErrorBoundary.jsx    # Per-section failure isolation
-    │   ├── Footer.jsx           # 4-column grid + world clock
+    │   ├── Footer.jsx           # 4-column responsive footer
     │   ├── HomeSection.jsx      # Hero + now-playing pill
     │   ├── HobbiesSection.jsx
     │   ├── KeyboardShortcuts.jsx
     │   ├── Navigation.jsx       # PillNavigation desktop bar + gooey mobile drawer, SECTIONS
-    │   ├── PlaygroundSection.jsx # Accordion shell for the self-contained toys
-    │   ├── playground/
-    │   │   ├── WorldClockToy.jsx # Editable clock + localStorage city persistence
-    │   │   ├── SequencerToy.jsx  # 16-step Web Audio drum machine
-    │   │   └── RandomToys.jsx    # Dice, coin flip, project ideas, decision maker
     │   ├── ProjectsSection.jsx
     │   ├── projects.jsx         # Project data config — edit here to add/update projects
     │   ├── SkillsSection.jsx
@@ -186,7 +163,7 @@ devajith-portfolio/
     │   ├── ToastContext.js
     │   ├── useToast.js
     │   └── ui/                  # EasyUI primitives
-    │       ├── AirportMatrixClock.jsx # Split-flap world clock (footer + playground)
+    │       ├── LiveBadge.jsx
     │       ├── Button.jsx
     │       ├── DotShader.jsx      # WebGL background
     │       ├── Equalizer.jsx
@@ -248,8 +225,7 @@ unprocessed CSS, so token-derived values such as the auto-generated
 `music-style-check` measures artwork visibility by **screenshotting the region
 with and without artwork** and comparing pixels, because asserting that the
 backdrop CSS exists says nothing about whether the artwork is actually visible
-through the glass tint. It also asserts that the dark palette is the one actually
-resolved, since the site is dark-only and nothing toggles it at runtime.
+through the glass tint. Its palette assertions may need updating if you change theme defaults/tokens.
 
 `ui-polish-check` measures the goo menu geometrically: it compares each blob's
 bounding box against the corresponding text row and fails if they drift in
@@ -351,7 +327,7 @@ than sleeping, so it does not measure the skeleton.
 
 > The included `vercel.json` handles routing so unknown URLs correctly show the 404 page instead of a blank Vercel error. The `/api/nowplaying` serverless function proxies Last.fm requests so the API key is never exposed in the browser bundle.
 >
-> **OG images:** `vercel.json` rewrites `/api/og` and `/api/og.png` to `api/og.png.js`. There is no dynamic `@vercel/og` generator in the repo, so that function explains the situation instead of falling through to Vercel's generic error: a browser opening the URL gets a readable page naming the missing generator, while link-preview scrapers are redirected to the static `og-image-v2.png` in `public/`. To serve generated cards, re-add a `@vercel/og` handler at `api/og.png.js` (the dependency is already installed).
+> **OG images:** `/api/og` and `/api/og.png` are routed to `api/og.png.js`. The site currently uses the static `og-image-v2.png` for social previews (and `useOgImage` returns the static image URL) for reliability; the OG route remains in place as a fallback/endpoint.
 
 ### Deploy to Netlify
 
@@ -373,27 +349,25 @@ than sleeping, so it does not measure the skeleton.
 
 | Section | Description |
 |---------|-------------|
-| **Home** | Hero with typewriter subtitle, locale-aware timezone display, CTA buttons, and live Last.fm now-playing pill |
+| **Home** | Hero with typewriter subtitle, locale-aware timezone display, CTA buttons, and live/recent now-playing pill |
 | **About** | Personal bio, education timeline, and currently listening music widget with album art and live badge |
 | **Projects** | Clickable project cards — data lives in `src/components/projects.jsx` |
 | **Skills** | Animated progress bars for programming languages, frameworks & tools, and data science technologies. Bars re-animate every time the section is visited |
 | **Hobbies** | Gaming, music, and tech exploration |
-| **Playground** | Self-contained toys: the editable world clock (picks persist to `localStorage`), a 16-step Web Audio sequencer, and random toys (dice, coin flip, project ideas, decision maker). Nothing here makes a network request |
-| **Contact** | Contact form via Web3Forms, copy-email button, and social media links |
+| **Contact** | Contact form via Web3Forms with inline validation/status feedback, copy-email button, and social/resource links |
 
 ### Adding a new section
 
 There is no router — `SECTIONS` in `src/components/Navigation.jsx` is the single source of
 truth, and a "page" is just an entry in it. Adding one wires up the desktop pill, the mobile
-drawer, the footer quick-links, the `?` shortcuts modal, arrow-key navigation, hash deep-linking
-(`/#playground`), and the entrance animations at once.
+drawer, the footer quick-links, the `?` shortcuts modal, arrow-key navigation, hash deep-linking, and the entrance animations at once.
 
 1. Add the id to `SECTIONS`, plus `SECTION_LABELS` and `SECTION_ICONS` entries.
 2. `lazy()` the component in `App.jsx` and render a `<section id="…" className={getStateClasses('…')}>`.
 3. `npm run render-check` asserts these three lists agree — a section listed in `SECTIONS` but
    missing from `App.jsx` renders a nav item that navigates nowhere, with no error otherwise.
 
-With seven tabs the desktop pill no longer fits an 768px row, so it (and the burger that
+With six tabs the desktop pill can still get tight on smaller laptop widths, so it (and the burger that
 replaces it) breaks at `lg` rather than `md`. The tablist also scrolls horizontally as a
 backstop, and tabs are `whitespace-nowrap` so labels can't wrap onto two lines.
 
@@ -401,9 +375,11 @@ backstop, and tabs are `whitespace-nowrap` so labels can't wrap onto two lines.
 
 ### Changing Theme Colors
 
-Edit the tokens in the `@theme` block in `src/index.css`, and mirror any change into
-the `:root` block in `public/404.css` (the static 404 page cannot reach the SPA's
-Tailwind bundle):
+Edit theme tokens in `src/index.css`:
+- Dark defaults in the `@theme` block
+- Light overrides in `:root[data-theme='light']`
+
+If you also want the static 404 page to match, update `public/404.css` separately (it does not consume the SPA token bundle).
 
 ```css
 @theme {
@@ -521,12 +497,10 @@ No JSX changes needed — `ProjectsSection.jsx` renders the array automatically.
    </ErrorBoundary>
    ```
 
-   Steps 1–3 are the whole job. The `1`–`7` shortcuts, the `?` overlay's key list,
-   and the arrow-key/swipe order all read from `SECTIONS`, so they extend
-   automatically.
+   Steps 1–3 are the whole job. The number-key shortcuts, the `?` overlay's key list,
+   and the arrow-key/swipe order all read from `SECTIONS`, so they extend automatically.
 
-4. Run `npm run check`. A `PlaygroundSection`-style render check is worth adding,
-   and there is a standing assertion that every id in `SECTIONS` has a matching
+4. Run `npm run check`. There is a standing assertion that every id in `SECTIONS` has a matching
    `<section>` in `App.jsx` plus `SECTION_LABELS`/`SECTION_ICONS` entries —
    without it, a step-3 omission renders a nav item that navigates nowhere and
    raises no error anywhere.
@@ -565,7 +539,6 @@ Replace the string with your real email address.
 | Google Fonts (DM Sans) | Typography |
 | Web3Forms | Contact form backend |
 | react-helmet-async | Dynamic `<head>` / OG meta tag management |
-| `@vercel/og` | OG image generation |
 | Vercel | Hosting, routing, and serverless API proxy |
 | `puppeteer-core` + `vite-node` | Test harness driving a real browser / SSR render |
 
