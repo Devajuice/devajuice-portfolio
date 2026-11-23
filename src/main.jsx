@@ -1,19 +1,18 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css";
-import { HelmetProvider } from "react-helmet-async";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import App from './App';
+import './index.css';
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-
-// Only enable StrictMode in development to catch bugs
-// In production, disable it to avoid double-rendering overhead
-const isDev = import.meta.env.DEV;
-
-const app = (
-  <HelmetProvider>
-    <App />
-  </HelmetProvider>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <HelmetProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </HelmetProvider>
+  </React.StrictMode>
 );
-
-root.render(isDev ? <React.StrictMode>{app}</React.StrictMode> : app);

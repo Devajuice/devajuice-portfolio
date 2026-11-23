@@ -93,7 +93,7 @@ export function PillNavigation({
     >
       <div
         role="tablist"
-        className="inline-flex max-w-full items-center overflow-x-auto rounded-full border border-transparent bg-surface/45 p-1 shadow-elevated backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-surface/35"
+        className="inline-flex max-w-full items-center overflow-x-auto rounded-full border border-border bg-surface/80 p-1 shadow-sm backdrop-blur-xl"
       >
         {items.map((item) => {
           const active = item.id === activeId;
@@ -111,18 +111,18 @@ export function PillNavigation({
               onClick={() => selectMain(item.id)}
                 className={cn(
                   'focus-ring relative flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition-colors sm:min-h-8 sm:py-1.5',
-                  active ? 'font-semibold text-bg' : 'text-text-secondary hover:text-text-primary'
+                  active ? 'font-semibold text-accent-invert' : 'text-text-muted hover:text-text'
                 )}
             >
               {active && !reducedMotion && (
                 <motion.span
                   layoutId="easyui-pill-main-indicator"
                   transition={motionTransitions.springMorph}
-                  className="absolute inset-0 rounded-full bg-text-primary shadow-elevated"
+                  className="absolute inset-0 rounded-full bg-accent shadow-sm"
                 />
               )}
               {active && reducedMotion && (
-                <span className="absolute inset-0 rounded-full bg-text-primary" />
+                <span className="absolute inset-0 rounded-full bg-accent" />
               )}
 
               <span className="relative z-10">{item.label}</span>
@@ -131,7 +131,7 @@ export function PillNavigation({
                 <ChevronDown
                   className={cn(
                     'relative z-10 h-3 w-3 transition-transform duration-200',
-                    active ? 'text-bg' : 'text-text-subtle',
+                    active ? 'text-accent-invert' : 'text-text-subtle',
                     active && submenuOpen && 'rotate-180'
                   )}
                 />
@@ -152,7 +152,7 @@ export function PillNavigation({
             transition={motionTransitions.springGentle}
             role="menu"
             aria-label={`${activeItem.label} submenu`}
-            className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-surface/80 p-1 shadow-elevated backdrop-blur-xl"
+            className="inline-flex items-center gap-1 rounded-full border border-border bg-surface/80 p-1 shadow-sm backdrop-blur-xl"
           >
             {(activeItem.children || []).map((subItem) => {
               const isSubActive = subItem.id === activeSubId;
@@ -168,15 +168,15 @@ export function PillNavigation({
                   className={cn(
                     'focus-ring relative flex min-h-8 cursor-pointer items-center rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors',
                     isSubActive
-                      ? 'font-semibold text-text-primary'
-                      : 'text-text-subtle hover:text-text-secondary'
+                      ? 'font-semibold text-text'
+                      : 'text-text-subtle hover:text-text-muted'
                   )}
                 >
                   {isSubActive && !reducedMotion && (
                     <motion.span
                       layoutId="easyui-pill-sub-indicator"
                       transition={motionTransitions.springMorph}
-                      className="absolute inset-0 rounded-full border border-border bg-surface-hover shadow-subtle"
+                      className="absolute inset-0 rounded-full border border-border bg-surface-hover shadow-sm"
                     />
                   )}
                   {isSubActive && reducedMotion && (

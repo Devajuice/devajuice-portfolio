@@ -38,3 +38,4 @@ dist/
 Thumbs.db
 ehthumbs.db
 vite.config.js.timestamp-*.mjs
+backup/

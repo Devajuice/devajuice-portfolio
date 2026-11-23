@@ -4,39 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Devajith | Student, Developer & Data Analyst</title>
-
-    <!-- SEO -->
     <meta
       name="description"
       content="Portfolio of Devajith — student, developer, and data analyst building web projects, data-driven solutions, and interactive experiences."
-    />
-    <meta
-      name="keywords"
-      content="Devajith, developer portfolio, web developer, React, Python, data analysis, projects, Kerala"
     />
     <meta name="author" content="Devajith" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="color-scheme" content="dark light" />
     <link rel="canonical" href="https://devajuice.com/" />
 
-    <!-- Open Graph -->
     <meta property="og:url" content="https://devajuice.com/" />
     <meta property="og:site_name" content="Devajith Portfolio" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Devajith | Student, Developer & Data Analyst" />
     <meta property="og:description" content="Explore Devajith's projects, skills, and ways to get in touch." />
     <meta property="og:image" content="https://devajuice.com/og-image-v2.png" />
-    <meta property="og:image:alt" content="Devajith portfolio preview" />
-
-    <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="devajuice.com" />
-    <meta property="twitter:url" content="https://devajuice.com/" />
     <meta name="twitter:title" content="Devajith | Student, Developer & Data Analyst" />
     <meta name="twitter:description" content="Explore Devajith's projects, skills, and ways to get in touch." />
     <meta name="twitter:image" content="https://devajuice.com/og-image-v2.png" />
 
-    <!-- JSON-LD Structured Data -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#111111" />
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -51,135 +42,43 @@
             "@type": "Person",
             "name": "Devajith",
             "url": "https://devajuice.com/",
-            "image": "https://devajuice.com/og-image-v2.png",
             "jobTitle": "Student, Developer, and Data Analyst",
-            "description": "Student, developer, and data analyst building web projects and data-driven solutions.",
             "sameAs": [
               "https://github.com/devajuice",
               "https://www.linkedin.com/in/devajith-jijush-5741ab39b/",
               "https://instagram.com/devajuice"
-            ],
-            "knowsAbout": ["Web Development", "Python", "Data Analysis", "React", "JavaScript"]
+            ]
           }
         ]
       }
     </script>
 
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#111113" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Devajith" />
-    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
-
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-
-    <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap"
-      rel="stylesheet"
-    />
-
     <style>
-      html {
-        background: #111113;
-        color-scheme: dark;
-      }
-      html[data-theme='light'] {
-        background: #f7f7f8;
-        color-scheme: light;
-      }
-      body {
-        margin: 0;
-        font-family: 'DM Sans', system-ui, sans-serif;
-      }
+      html { background: #111111; color-scheme: dark; }
+      html[data-theme='light'] { background: #fafafa; color-scheme: light; }
+      body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; }
     </style>
     <script>
       (function () {
         try {
           var saved = localStorage.getItem('theme');
-          var theme =
-            saved === 'light' || saved === 'dark'
-              ? saved
-              : window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
-                ? 'light'
-                : 'dark';
+          var theme = saved === 'light' || saved === 'dark' ? saved :
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
           document.documentElement.dataset.theme = theme;
           document.documentElement.style.colorScheme = theme;
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', theme === 'light' ? '#f7f7f8' : '#111113');
+          if (meta) meta.setAttribute('content', theme === 'light' ? '#fafafa' : '#111111');
         } catch (e) {}
       })();
     </script>
   </head>
   <body>
     <noscript>
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          font-family: 'DM Sans', system-ui, sans-serif;
-          background: #111113;
-          color: #f2f2f3;
-          text-align: center;
-          padding: 2rem;
-          gap: 1.25rem;
-        "
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="52"
-          height="52"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#f2f2f3"
-          stroke-width="1.75"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
-        <h1 style="font-size: 1.6rem; font-weight: 700; margin: 0; letter-spacing: -0.02em">
-          JavaScript Required
-        </h1>
-        <p style="color: #a1a1a6; max-width: 360px; margin: 0; line-height: 1.7; font-size: 1rem">
-          This portfolio is built with React and needs JavaScript to run. Please enable JavaScript
-          in your browser settings and refresh the page.
-        </p>
-        <a
-          href="https://www.enable-javascript.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="
-            margin-top: 0.5rem;
-            padding: 0.6rem 1.4rem;
-            background: #f2f2f3;
-            color: #111113;
-            border-radius: 9999px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-          "
-        >
-          How to enable JavaScript →
-        </a>
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;font-family:system-ui,sans-serif;background:#111;color:#fafafa;text-align:center">
+        <div>
+          <h1 style="margin:0 0 .75rem;font-size:1.5rem">JavaScript Required</h1>
+          <p style="margin:0;color:#a1a1aa">This portfolio needs JavaScript to run.</p>
+        </div>
       </div>
     </noscript>
     <div id="root"></div>
