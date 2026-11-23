@@ -1,285 +1,96 @@
-/* ══════════════════════════════════════════════════════════════════════════
-   404 PAGE — EasyUI design tokens + page styles
-
-   Self-contained on purpose: this is a static page outside the React app, so it
-   cannot depend on the SPA's hashed Tailwind bundle. Tokens below mirror
-   src/index.css `@theme`; keep the two in sync. Dark only, same as the SPA.
-   ══════════════════════════════════════════════════════════════════════════ */
-
 :root {
-  --color-bg: #111113;
-  --color-surface: #1c1c1f;
-  --color-surface-hover: #202023;
-  --color-surface-raised: #18181a;
-
-  --color-border: #29292c;
-  --color-border-hover: #343438;
-  --color-border-subtle: #18181a;
-
-  --color-text-primary: #f2f2f3;
-  --color-text-secondary: #a1a1a6;
-  --color-text-muted: #6f6f75;
-  --color-text-subtle: #4d4d52;
-
-  --color-accent: #f2f2f3;
-  --color-accent-ring: rgb(242 242 243 / 0.2);
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-
-  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.18), 0 0 0 1px rgb(242 242 243 / 0.02);
-  --shadow-elevated: 0 10px 25px -8px rgb(0 0 0 / 0.22), 0 0 0 1px rgb(242 242 243 / 0.04);
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-hover: #f7f7f5;
+  --border: #e9e9e7;
+  --text: #37352f;
+  --muted: #787774;
+  --accent: #37352f;
+  --accent-invert: #ffffff;
 }
-
-/* ── Reset ── */
-* {
-  box-sizing: border-box;
+:root[data-theme='dark'] {
+  --bg: #191919;
+  --surface: #202020;
+  --surface-hover: #2a2a2a;
+  --border: #2f2f2f;
+  --text: #f0efed;
+  --muted: #9b9b9b;
+  --accent: #f0efed;
+  --accent-invert: #191919;
 }
-html {
-  background: var(--color-bg);
-  color-scheme: dark;
-  -webkit-text-size-adjust: 100%;
-}
+* { box-sizing: border-box; }
+html { background: var(--bg); color-scheme: light dark; }
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
-  font-family: 'DM Sans', system-ui, sans-serif;
-  letter-spacing: -0.02em;
-  line-height: 1.6;
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  background: var(--bg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
-::selection {
-  background: rgb(242 242 243 / 0.06);
-  color: var(--color-text-primary);
-}
-*:focus-visible {
-  outline: 1px solid var(--color-accent-ring);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* ── Dot Shader background (pure CSS stand-in for the WebGL canvas) ── */
-body::before {
-  content: '';
+.bg-grid {
   position: fixed;
   inset: 0;
-  z-index: -1;
   pointer-events: none;
-  background-image: radial-gradient(circle, var(--color-accent) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.14;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
-
-/* ── Layout ── */
-.error-wrapper {
+.wrap {
+  position: relative;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 48px 24px;
   text-align: center;
+  padding: 2rem;
 }
-
-/* ── 404 number ── */
-.error-code {
-  font-size: clamp(6rem, 20vw, 11rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-bottom: 0.75rem;
-  color: var(--color-text-primary);
-  user-select: none;
-  animation:
-    staggerFadeUp 0.5s var(--ease-out) 0.05s both,
-    glitch 6s ease-in-out infinite;
+.code {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
-
-/* ── Floating icon badge ── */
-.error-icon-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 9999px;
-  box-shadow: var(--shadow-subtle);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  margin-bottom: 1.5rem;
-  animation:
-    staggerFadeUp 0.5s var(--ease-out) 0.15s both,
-    floatBadge 3s ease-in-out infinite;
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 600;
 }
-.error-icon-badge i {
-  color: var(--color-accent);
+.desc {
+  margin: 1rem 0 0;
+  max-width: 32rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--muted);
 }
-
-/* ── Text ── */
-.error-title {
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  color: var(--color-text-primary);
-  margin-bottom: 1rem;
-  animation: staggerFadeUp 0.5s var(--ease-out) 0.22s both;
-}
-.error-description {
-  font-size: 1.05rem;
-  color: var(--color-text-muted);
-  line-height: 1.8;
-  margin-bottom: 2.5rem;
-  max-width: 440px;
-  animation: staggerFadeUp 0.5s var(--ease-out) 0.3s both;
-}
-
-/* ── Magnetic-style buttons ── */
-.error-actions {
+.actions {
+  margin-top: 1.75rem;
   display: flex;
   gap: 0.75rem;
-  justify-content: center;
   flex-wrap: wrap;
-  animation: staggerFadeUp 0.5s var(--ease-out) 0.38s both;
+  justify-content: center;
 }
-.btn-magnetic {
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.4rem;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: var(--color-accent);
-  color: var(--color-bg);
-  text-decoration: none;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  cursor: pointer;
-  box-shadow: var(--shadow-subtle);
-  transition:
-    transform 0.25s var(--ease-out),
-    opacity 0.2s ease,
-    background-color 0.2s ease;
-}
-.btn-magnetic:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-.btn-magnetic:active {
-  transform: scale(0.96);
-}
-.btn-magnetic--secondary {
-  background: transparent;
-  border-color: var(--color-border);
-  color: var(--color-text-primary);
-}
-.btn-magnetic--secondary:hover {
-  background: var(--color-surface);
-  border-color: var(--color-border-hover);
-}
-
-/* ── Logo top-left ── */
-.page-logo {
-  position: fixed;
-  top: 22px;
-  left: 24px;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 9999px;
-  box-shadow: var(--shadow-subtle);
-  font-size: 0.95rem;
-  font-weight: 700;
-  font-style: italic;
-  color: var(--color-text-primary);
   text-decoration: none;
-  transition: border-color 0.2s ease;
+  transition: background-color .15s ease, border-color .15s ease, opacity .15s ease;
 }
-.page-logo:hover {
-  border-color: var(--color-border-hover);
-}
-.page-logo i {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
-
-/* ── Keyframes ── */
-@keyframes staggerFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes floatBadge {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-@keyframes glitch {
-  0%,
-  92%,
-  100% {
-    transform: translate(0);
-  }
-  93% {
-    transform: translate(-3px, 1px);
-  }
-  94% {
-    transform: translate(3px, -1px);
-  }
-  95% {
-    transform: translate(0);
-  }
-  96% {
-    transform: translate(-2px, 2px);
-  }
-  97% {
-    transform: translate(2px, 0);
-  }
-}
-
-/* ── Reduced motion ── */
+.btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--text) 35%, transparent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); color: var(--accent-invert); }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface-hover); }
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ── Mobile ── */
-@media (max-width: 480px) {
-  .error-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  .btn-magnetic {
-    width: 100%;
-    max-width: 280px;
-  }
+  * { transition-duration: 0.01ms !important; }
 }
