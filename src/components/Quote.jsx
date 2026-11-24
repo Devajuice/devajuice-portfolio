@@ -16,10 +16,12 @@ export default function Quote() {
   return (
     <figure className="mx-auto max-w-2xl text-center min-h-[5.5rem]">
       <div key={index} className="quote-swap">
-        <blockquote className="text-sm leading-relaxed text-text-secondary sm:text-base">
+        <blockquote className="text-[15px] leading-relaxed text-text-secondary sm:text-base">
           “{quote.text}”
         </blockquote>
-        <figcaption className="mt-2 text-xs text-text-muted sm:text-sm">— {quote.author}</figcaption>
+        <figcaption className="mt-3 font-mono text-[11px] tracking-[0.04em] text-text-muted uppercase">
+          — {quote.author}
+        </figcaption>
       </div>
     </figure>
   );

@@ -58,22 +58,37 @@ export const experiences = [
 ];
 
 export const techStack = [
-  { name: 'Python', icon: 'https://cdn.simpleicons.org/python' },
-  { name: 'JavaScript', icon: 'https://cdn.simpleicons.org/javascript' },
-  { name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript' },
-  { name: 'React', icon: 'https://cdn.simpleicons.org/react' },
-  { name: 'HTML5', icon: 'https://cdn.simpleicons.org/html5' },
-  { name: 'CSS', icon: 'https://cdn.simpleicons.org/css' },
-  { name: 'Tailwind CSS', icon: 'https://cdn.simpleicons.org/tailwindcss' },
-  { name: 'Node.js', icon: 'https://cdn.simpleicons.org/nodedotjs' },
-  { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite' },
-  { name: 'Git', icon: 'https://cdn.simpleicons.org/git' },
-  { name: 'GitHub', icon: 'https://cdn.simpleicons.org/github' },
-  { name: 'VS Code', icon: 'https://cdn.simpleicons.org/visualstudiocode' },
-  { name: 'Pandas', icon: 'https://cdn.simpleicons.org/pandas' },
-  { name: 'NumPy', icon: 'https://cdn.simpleicons.org/numpy' },
-  { name: 'scikit-learn', icon: 'https://cdn.simpleicons.org/scikitlearn' },
-  { name: 'Vercel', icon: 'https://cdn.simpleicons.org/vercel' },
+  {
+    label: 'Frontend',
+    items: [
+      { name: 'React', icon: 'https://cdn.simpleicons.org/react' },
+      { name: 'JavaScript', icon: 'https://cdn.simpleicons.org/javascript' },
+      { name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript' },
+      { name: 'HTML5', icon: 'https://cdn.simpleicons.org/html5' },
+      { name: 'CSS', icon: 'https://cdn.simpleicons.org/css' },
+      { name: 'Tailwind CSS', icon: 'https://cdn.simpleicons.org/tailwindcss' },
+      { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite' },
+    ],
+  },
+  {
+    label: 'Backend & Data',
+    items: [
+      { name: 'Python', icon: 'https://cdn.simpleicons.org/python' },
+      { name: 'Node.js', icon: 'https://cdn.simpleicons.org/nodedotjs' },
+      { name: 'Pandas', icon: 'https://cdn.simpleicons.org/pandas' },
+      { name: 'NumPy', icon: 'https://cdn.simpleicons.org/numpy' },
+      { name: 'scikit-learn', icon: 'https://cdn.simpleicons.org/scikitlearn' },
+    ],
+  },
+  {
+    label: 'Tools & Platform',
+    items: [
+      { name: 'Git', icon: 'https://cdn.simpleicons.org/git' },
+      { name: 'GitHub', icon: 'https://cdn.simpleicons.org/github' },
+      { name: 'VS Code', icon: 'https://cdn.simpleicons.org/visualstudiocode' },
+      { name: 'Vercel', icon: 'https://cdn.simpleicons.org/vercel' },
+    ],
+  },
 ];
 
 export const quotes = [

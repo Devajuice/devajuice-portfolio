@@ -2,10 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { Send, ArrowDownToLine, MapPin } from 'runeicons-react';
 import { GithubIcon, LinkedinIcon, InstagramIcon } from '../components/BrandIcons';
 import { profile, about, experiences } from '../data/site';
-
-const actionBtn = 'focus-ring inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors';
-const primaryBtn = `${actionBtn} bg-accent text-accent-invert hover:opacity-90`;
-const secondaryBtn = `${actionBtn} border border-border bg-surface text-text hover:bg-surface-hover`;
+import Reveal from '../components/Reveal';
 
 export default function About() {
   return (
@@ -15,63 +12,64 @@ export default function About() {
         <meta name="description" content={about.short} />
       </Helmet>
 
-      <div className="reveal max-w-3xl">
+      <Reveal className="max-w-3xl">
         <p className="section-label">About</p>
         <h1 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">A bit more about me</h1>
-        <p className="mt-4 text-sm leading-relaxed text-text-muted sm:text-base">{about.short}</p>
-      </div>
+        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-text-secondary sm:text-base">{about.short}</p>
+      </Reveal>
 
-      <div className="mt-8 grid gap-4">
-        <section className="card reveal p-4 sm:p-5">
+      <div className="mt-10 grid gap-4">
+        <Reveal as="section" className="card p-5 sm:p-6">
           <h2 className="text-lg font-semibold tracking-tight text-text">Background</h2>
-          <div className="mt-3 space-y-3 text-sm leading-relaxed text-text-muted">
+          <div className="mt-4 space-y-4 text-[15px] leading-relaxed text-text-secondary">
             {about.paragraphs.map((p) => <p key={p}>{p}</p>)}
           </div>
-        </section>
+        </Reveal>
 
-        <section className="card reveal p-4 sm:p-5">
+        <Reveal as="section" className="card p-5 sm:p-6" delay={0.04}>
           <h2 className="text-lg font-semibold tracking-tight text-text">Education</h2>
-          <div className="mt-4 space-y-4">
+          <div className="mt-5 space-y-5">
             {about.education.map((item) => (
-              <div key={item.title} className="border-l border-border pl-4">
+              <div key={item.title} className="relative border-l border-border pl-5">
+                <span className="absolute top-1.5 -left-[4.5px] h-2 w-2 rounded-full bg-text-subtle" aria-hidden="true" />
                 <h3 className="font-medium text-text">{item.title}</h3>
-                <p className="mt-1 text-sm text-text-muted">{item.subtitle}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{item.description}</p>
+                <p className="mt-1 font-mono text-[12px] text-text-muted">{item.subtitle}</p>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">{item.description}</p>
               </div>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {experiences.length > 0 && (
-          <section className="card reveal p-4 sm:p-5">
+          <Reveal as="section" className="card p-5 sm:p-6" delay={0.08}>
             <h2 className="text-lg font-semibold tracking-tight text-text">Experience</h2>
-            <div className="mt-4 space-y-4">
+            <div className="mt-5 space-y-5">
               {experiences.map((exp) => (
-                <div key={`${exp.company}-${exp.role}`} className="flex flex-col gap-1 border-l border-border pl-4 sm:flex-row sm:items-start sm:justify-between">
+                <div key={`${exp.company}-${exp.role}`} className="flex flex-col gap-2 border-l border-border pl-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <a href={exp.url} target="_blank" rel="noopener noreferrer" className="font-medium text-text hover:underline">{exp.company}</a>
-                    <p className="text-sm text-text-muted">{exp.role}</p>
+                    <a href={exp.url} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-sm font-medium text-text underline-offset-4 hover:underline">{exp.company}</a>
+                    <p className="mt-0.5 text-sm text-text-muted">{exp.role}</p>
                     <p className="text-sm text-text-muted">{exp.location}</p>
                   </div>
-                  <p className="shrink-0 text-sm text-text-muted">{exp.period}</p>
+                  <p className="shrink-0 font-mono text-[12px] text-text-muted">{exp.period}</p>
                 </div>
               ))}
             </div>
-          </section>
+          </Reveal>
         )}
 
-        <section className="card reveal p-4 sm:p-5">
+        <Reveal as="section" className="card p-5 sm:p-6" delay={0.12}>
           <h2 className="text-lg font-semibold tracking-tight text-text">Let&apos;s connect</h2>
-          <p className="mt-2 text-sm leading-relaxed text-text-muted">Have an idea, opportunity, or just want to say hi? Feel free to reach out.</p>
-          <p className="mt-3 inline-flex items-center gap-2 text-sm text-text-muted"><MapPin size={16} /> {profile.location}</p>
-          <div className="mt-4 flex flex-wrap gap-2.5">
-            <a href={`mailto:${profile.email}`} className={primaryBtn}><Send size={16} /> Email</a>
-            <a href={profile.resume} download={profile.resumeName} className={secondaryBtn}><ArrowDownToLine size={16} /> Resume</a>
-            <a href={profile.github} target="_blank" rel="noopener noreferrer" className={secondaryBtn}><GithubIcon className="h-4 w-4" /> GitHub</a>
-            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className={secondaryBtn}><LinkedinIcon className="h-4 w-4" /> LinkedIn</a>
-            <a href={profile.instagram} target="_blank" rel="noopener noreferrer" className={secondaryBtn}><InstagramIcon className="h-4 w-4" /> Instagram</a>
+          <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">Have an idea, opportunity, or just want to say hi? Feel free to reach out.</p>
+          <p className="mt-4 inline-flex items-center gap-2 font-mono text-[12px] text-text-muted"><MapPin size={14} aria-hidden="true" /> {profile.location}</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a href={`mailto:${profile.email}`} className="btn-primary focus-ring"><Send size={15} /> Email</a>
+            <a href={profile.resume} download={profile.resumeName} className="btn-secondary focus-ring"><ArrowDownToLine size={15} /> Resume</a>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className="btn-secondary focus-ring"><GithubIcon className="h-4 w-4" /> GitHub</a>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="btn-secondary focus-ring"><LinkedinIcon className="h-4 w-4" /> LinkedIn</a>
+            <a href={profile.instagram} target="_blank" rel="noopener noreferrer" className="btn-secondary focus-ring"><InstagramIcon className="h-4 w-4" /> Instagram</a>
           </div>
-        </section>
+        </Reveal>
       </div>
     </>
   );

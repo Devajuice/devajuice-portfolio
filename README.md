@@ -1,20 +1,19 @@
 # Devajith Portfolio
 
-A modern, compact personal portfolio built with React, Vite, and Tailwind CSS. It features a Notion-inspired look, Geist Mono typography, light/dark theme switching, real routes, live Last.fm now-playing, rotating quotes, and a data-driven content structure.
+A modern, minimal personal portfolio built with React, Vite, and Tailwind CSS. It features a dark-first refined aesthetic, Geist typography, light/dark theme switching, real routes, live Last.fm now-playing, a GitHub contributions heatmap, and data-driven content.
 
 ## Features
 
 - **Multi-page routing** — Real routes with React Router: `/`, `/about`, `/projects`.
-- **Notion-inspired UI** — Clean, compact layout with subtle grid background, soft surfaces, and Geist Mono.
+- **Refined minimal UI** — Dark-first design with subtle grid/atmosphere background, soft surfaces, scroll progress, and polished spacing.
 - **Light/Dark theme** — Theme toggle with persisted preference, early theme bootstrap in `index.html`, and smooth theme transitions.
-- **Pill navigation** — EasyUI-style animated pill navigation on desktop, with a responsive mobile menu.
-- **Live Now Playing** — Last.fm current/recent track via `/api/nowplaying` proxy (server-side key), with graceful loading/error states.
-- **GitHub activity** — Home page section showing recent public repositories from GitHub.
-- **Data-driven content** — Profile, about, experience, tech stack, quotes, and projects live in `src/data/`.
-- **Future-ready experience section** — Experience renders automatically when entries are added to `src/data/site.js`.
-- **Rotating quotes** — Small quote set with animated transitions.
-- **Accessibility polish** — Skip link, focus styles, semantic landmarks, labels, and reduced-motion support.
-- **Vercel-ready SPA routing** — `vercel.json` rewrites app routes to `index.html`.
+- **Typography system** — Geist Variable for body/headings and Geist Mono for labels, technical details, and UI accents.
+- **Pill navigation** — Animated active pill navigation on desktop, with an accessible responsive mobile menu.
+- **Live Now Playing** — Last.fm current/recent track via `/api/nowplaying` proxy (server-side key), with loading/error states and a YouTube Music search link.
+- **GitHub contributions** — Home page heatmap showing the current year’s GitHub contributions (auto-updates as the year changes).
+- **Data-driven content** — Profile, about, experience, grouped tech stack, quotes, and projects live in `src/data/`.
+- **Motion & accessibility** — Subtle reveal animations, reduced-motion support, skip link, focus styles, semantic landmarks, and keyboard-friendly navigation.
+- **SEO/crawler basics** — Metadata, Open Graph/Twitter tags, JSON-LD, robots.txt, sitemap, favicon links, and SPA rewrites.
 
 ## Tech Stack
 
@@ -22,8 +21,8 @@ A modern, compact personal portfolio built with React, Vite, and Tailwind CSS. I
 - [Vite 5](https://vitejs.dev/)
 - [Tailwind CSS v4](https://tailwindcss.com/)
 - [React Router](https://reactrouter.com/)
-- [Rune Icons](https://www.runeicons.com/)
 - [Framer Motion](https://www.framer.com/motion/)
+- [Rune Icons](https://www.runeicons.com/)
 - [react-helmet-async](https://github.com/staylor/react-helmet-async)
 - [Last.fm API](https://www.last.fm/api) (proxied server-side)
 - [Vercel](https://vercel.com/) for hosting/serverless API
@@ -35,9 +34,12 @@ A modern, compact personal portfolio built with React, Vite, and Tailwind CSS. I
 ├── api/
 │   └── nowplaying.js          # Vercel serverless Last.fm proxy
 ├── public/
-│   └── assets/                # Images, icons, resume, static files
+│   ├── assets/                # Images, icons, resume, static files
+│   ├── manifest.json
+│   ├── robots.txt
+│   └── sitemap.xml
 ├── src/
-│   ├── components/            # UI components (Navbar, Footer, cards, etc.)
+│   ├── components/            # UI components (Navbar, Footer, cards, widgets, etc.)
 │   ├── data/                  # Editable content (site.js, projects.js)
 │   ├── hooks/                 # Theme, now playing, timezone hooks
 │   ├── lib/                   # Utilities and motion tokens
@@ -46,7 +48,6 @@ A modern, compact personal portfolio built with React, Vite, and Tailwind CSS. I
 │   ├── App.jsx                # Routes/app shell wiring
 │   ├── index.css              # Theme tokens and global styles
 │   └── main.jsx               # App entry
-├── .npmrc                     # legacy-peer-deps for Vercel/npm install
 ├── index.html
 ├── vercel.json
 └── vite.config.js
@@ -101,7 +102,7 @@ npm run preview
 
 Most content can be updated in data files:
 
-- **Profile, bio, education, experience, tech stack, quotes, socials**: `src/data/site.js`
+- **Profile, bio, education, experience, tech stack groups, quotes, socials**: `src/data/site.js`
 - **Projects**: `src/data/projects.js`
 
 ### Add experience
@@ -136,8 +137,8 @@ The Experience section appears automatically when the array has entries.
 ## Notes
 
 - The browser calls `/api/nowplaying`; the Last.fm key stays server-side.
+- GitHub contributions are fetched client-side from the public GitHub contributions API and show the current year automatically.
 - `backup/pre-remake/` contains a local backup from before the remake and is gitignored.
-- For GitHub commit attribution, make sure `git config user.name` and `user.email` match your GitHub account and verified email.
 
 ## License
 

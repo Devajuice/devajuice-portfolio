@@ -13,7 +13,7 @@ export function useTheme() {
     document.documentElement.style.colorScheme = theme;
     localStorage.setItem('theme', theme);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#fafafa' : '#111111');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#fafaf9' : '#111214');
   }, [theme]);
 
   const toggleTheme = useCallback(() => {

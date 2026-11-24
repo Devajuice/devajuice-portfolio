@@ -8,11 +8,12 @@ import { featuredProjects } from '../data/projects';
 import NowPlaying from '../components/NowPlaying';
 import ProjectCard from '../components/ProjectCard';
 import GitHubActivity from '../components/GitHubActivity';
+import Reveal from '../components/Reveal';
 
 function Section({ eyebrow, title, action, children, className = '' }) {
   return (
-    <section className={`reveal py-7 sm:py-9 ${className}`}>
-      <div className="mb-4 flex items-end justify-between gap-3">
+    <Reveal as="section" className={`py-8 sm:py-10 ${className}`}>
+      <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           {eyebrow && <p className="section-label">{eyebrow}</p>}
           <h2 className="section-title">{title}</h2>
@@ -20,13 +21,11 @@ function Section({ eyebrow, title, action, children, className = '' }) {
         {action}
       </div>
       {children}
-    </section>
+    </Reveal>
   );
 }
 
-const actionBtn = 'focus-ring inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors';
-const primaryBtn = `${actionBtn} bg-accent text-accent-invert hover:opacity-90`;
-const secondaryBtn = `${actionBtn} border border-border bg-surface text-text hover:bg-surface-hover`;
+const iconLinkClass = 'focus-ring muted-link inline-flex rounded-lg p-2 transition-colors hover:bg-surface-hover';
 
 export default function Home({ music }) {
   const timezone = useTimezone();
@@ -37,64 +36,81 @@ export default function Home({ music }) {
         <meta name="description" content={profile.headline} />
       </Helmet>
 
-      <section className="reveal pb-8 pt-2 sm:pb-10 sm:pt-4">
-        <div className="grid items-center gap-6 md:grid-cols-[1fr_auto] md:gap-10">
-          <div className="order-2 max-w-2xl md:order-1">
-            <p className="mb-4 inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-text-muted">
-              <span className="mr-2 h-1.5 w-1.5 rounded-full bg-live" aria-hidden="true" />
+      <section className="pb-10 pt-2 sm:pb-14 sm:pt-4">
+        <div className="grid items-center gap-8 md:grid-cols-[1fr_auto] md:gap-12">
+          <Reveal className="order-2 max-w-2xl md:order-1" y={16}>
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 font-mono text-[11px] tracking-[0.04em] text-text-muted">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-30" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-live" />
+              </span>
               {profile.availability}
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight text-text sm:text-5xl">
+
+            <h1 className="text-balance text-4xl font-semibold tracking-tight text-text sm:text-5xl md:text-[3.5rem] md:leading-[1.08]">
               Hi, I&apos;m {profile.name}
             </h1>
-            <p className="mt-2 text-sm text-text-secondary sm:text-base">{profile.role}</p>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-text-muted">
+            <p className="mt-3 font-mono text-[13px] tracking-[0.02em] text-text-muted sm:text-sm">
+              {profile.role}
+            </p>
+            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-text-secondary sm:text-base">
               {profile.headline}
             </p>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2.5">
-              <a href={`mailto:${profile.email}`} className={primaryBtn}>
-                <Send size={16} /> Let&apos;s Talk
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a href={`mailto:${profile.email}`} className="btn-primary focus-ring">
+                <Send size={15} /> Let&apos;s Talk
               </a>
-              <a href={profile.resume} download={profile.resumeName} className={secondaryBtn}>
-                <ArrowDownToLine size={16} /> Resume
+              <a href={profile.resume} download={profile.resumeName} className="btn-secondary focus-ring">
+                <ArrowDownToLine size={15} /> Resume
               </a>
-              <div className="ml-1 flex items-center gap-1 text-text-muted">
-                <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="focus-ring muted-link rounded-md p-2 hover:bg-surface-hover"><GithubIcon className="h-4 w-4" /></a>
-                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="focus-ring muted-link rounded-md p-2 hover:bg-surface-hover"><LinkedinIcon className="h-4 w-4" /></a>
-                <a href={profile.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="focus-ring muted-link rounded-md p-2 hover:bg-surface-hover"><InstagramIcon className="h-4 w-4" /></a>
+              <div className="flex items-center gap-0.5 text-text-muted sm:ml-1">
+                <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className={iconLinkClass}><GithubIcon className="h-[18px] w-[18px]" /></a>
+                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={iconLinkClass}><LinkedinIcon className="h-[18px] w-[18px]" /></a>
+                <a href={profile.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={iconLinkClass}><InstagramIcon className="h-[18px] w-[18px]" /></a>
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-muted sm:text-sm">
-              <p className="inline-flex items-center gap-2"><MapPin size={16} /> {profile.location}</p>
-              <p className="inline-flex items-center gap-2"><Clock size={16} /> {timezone.time} {timezone.label ? `· ${timezone.label.split('·')[0].trim()}` : 'IST'}</p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[12px] text-text-muted">
+              <p className="inline-flex items-center gap-2"><MapPin size={14} aria-hidden="true" /> {profile.location}</p>
+              <p className="inline-flex items-center gap-2">
+                <Clock size={14} aria-hidden="true" />
+                <span>{timezone.time}</span>
+                <span className="text-text-subtle">·</span>
+                <span>{timezone.label ? timezone.label.split('·')[0].trim() : 'IST'}</span>
+              </p>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="order-1 mx-auto md:order-2 md:mx-0">
-            <div className="h-28 w-28 overflow-hidden rounded-full border border-border bg-surface shadow-sm sm:h-36 sm:w-36 md:h-44 md:w-44">
-              <img
-                src="/assets/images/profile.webp"
-                alt={`${profile.name} portrait`}
-                className="h-full w-full object-cover object-[center_20%] transition-transform duration-500 hover:scale-[1.03]"
-                loading="eager"
-                decoding="async"
-              />
+          <Reveal className="order-1 mx-auto md:order-2 md:mx-0" delay={0.08} y={10}>
+            <div className="relative">
+              <div aria-hidden="true" className="absolute -inset-3 rounded-full border border-border/50" />
+              <div className="h-32 w-32 overflow-hidden rounded-full border border-border bg-surface shadow-md sm:h-40 sm:w-40 md:h-48 md:w-48">
+                <img
+                  src="/assets/images/profile.webp"
+                  alt={`${profile.name} portrait`}
+                  className="h-full w-full object-cover object-[center_20%] grayscale transition duration-500 ease-out [@media(hover:hover)]:hover:scale-[1.03] [@media(hover:hover)]:hover:grayscale-0"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      <NowPlaying music={music} />
+      <Reveal>
+        <NowPlaying music={music} />
+      </Reveal>
 
       <Section
         eyebrow="About"
         title="A bit about me"
-        action={<Link to="/about" className="muted-link inline-flex items-center gap-1 text-sm">More about me <ChevronRight size={16} /></Link>}
+        action={<Link to="/about" className="muted-link focus-ring inline-flex items-center gap-1 rounded-md px-1 py-0.5 font-mono text-[12px]">More about me <ChevronRight size={14} aria-hidden="true" /></Link>}
       >
-        <div className="card p-4 sm:p-5">
-          <p className="max-w-3xl text-sm leading-relaxed text-text-muted">{about.short}</p>
+        <div className="card p-5 sm:p-6">
+          <p className="max-w-3xl text-[15px] leading-relaxed text-text-secondary">{about.short}</p>
         </div>
       </Section>
 
@@ -102,16 +118,16 @@ export default function Home({ music }) {
         <Section eyebrow="Experience" title="Where I've worked">
           <div className="space-y-3">
             {experiences.map((exp) => (
-              <div key={`${exp.company}-${exp.role}`} className="card flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <article key={`${exp.company}-${exp.role}`} className="card card-hover flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
                 <div>
-                  <a href={exp.url} target="_blank" rel="noopener noreferrer" className="font-medium text-text hover:underline">{exp.company}</a>
-                  <p className="text-sm text-text-muted">{exp.role}</p>
+                  <a href={exp.url} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-sm font-medium text-text underline-offset-4 hover:underline">{exp.company}</a>
+                  <p className="mt-0.5 text-sm text-text-muted">{exp.role}</p>
                 </div>
-                <div className="text-sm text-text-muted sm:text-right">
+                <div className="font-mono text-[12px] text-text-muted sm:text-right">
                   <p>{exp.period}</p>
                   <p>{exp.location}</p>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </Section>
@@ -120,11 +136,13 @@ export default function Home({ music }) {
       <Section
         eyebrow="Featured"
         title="Projects"
-        action={<Link to="/projects" className="muted-link inline-flex items-center gap-1 text-sm">Show all projects <ChevronRight size={16} /></Link>}
+        action={<Link to="/projects" className="muted-link focus-ring inline-flex items-center gap-1 rounded-md px-1 py-0.5 font-mono text-[12px]">All projects <ChevronRight size={14} aria-hidden="true" /></Link>}
       >
-        <div className="grid gap-3 md:grid-cols-2">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
+        <div className="grid gap-4 md:grid-cols-2">
+          {featuredProjects.map((project, i) => (
+            <Reveal key={project.slug} delay={i * 0.05}>
+              <ProjectCard project={project} />
+            </Reveal>
           ))}
         </div>
       </Section>
@@ -134,25 +152,35 @@ export default function Home({ music }) {
       </Section>
 
       <Section eyebrow="Skills" title="Tech Stack">
-        <div className="flex flex-wrap gap-2">
-          {techStack.map((tech) => (
-            <div key={tech.name} className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-text-secondary">
-              <img src={tech.icon} alt="" className="h-3.5 w-3.5" loading="lazy" />
-              <span>{tech.name}</span>
+        <div className="space-y-5">
+          {techStack.map((group) => (
+            <div key={group.label}>
+              <p className="mb-2.5 font-mono text-[11px] font-medium tracking-[0.08em] text-text-muted uppercase">{group.label}</p>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((tech) => (
+                  <div
+                    key={tech.name}
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface/70 px-3 py-2 font-mono text-[11px] text-text-secondary transition-colors duration-150 hover:border-border-hover hover:bg-surface-hover hover:text-text"
+                  >
+                    <img src={tech.icon} alt="" className="h-3.5 w-3.5 opacity-80" loading="lazy" />
+                    <span>{tech.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
       </Section>
 
       <Section eyebrow="Contact" title="Let's talk">
-        <div className="card p-4 sm:p-5">
-          <p className="max-w-2xl text-sm leading-relaxed text-text-muted">
+        <div className="card p-5 sm:p-6">
+          <p className="max-w-2xl text-[15px] leading-relaxed text-text-secondary">
             Have a project, opportunity, or question? I&apos;d love to hear from you.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2.5">
-            <a href={`mailto:${profile.email}`} className={primaryBtn}><Send size={16} /> Email me</a>
-            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className={secondaryBtn}><LinkedinIcon className="h-4 w-4" /> LinkedIn</a>
-            <a href={profile.github} target="_blank" rel="noopener noreferrer" className={secondaryBtn}><GithubIcon className="h-4 w-4" /> GitHub</a>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a href={`mailto:${profile.email}`} className="btn-primary focus-ring"><Send size={15} /> Email me</a>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="btn-secondary focus-ring"><LinkedinIcon className="h-4 w-4" /> LinkedIn</a>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className="btn-secondary focus-ring"><GithubIcon className="h-4 w-4" /> GitHub</a>
           </div>
         </div>
       </Section>

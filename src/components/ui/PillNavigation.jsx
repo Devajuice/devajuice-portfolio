@@ -109,31 +109,33 @@ export function PillNavigation({
               tabIndex={active ? 0 : -1}
               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
               onClick={() => selectMain(item.id)}
-                className={cn(
-                  'focus-ring relative flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-xs font-medium transition-colors sm:min-h-8 sm:py-1.5',
-                  active ? 'font-semibold text-accent-invert' : 'text-text-muted hover:text-text'
-                )}
+              className={cn(
+                'focus-ring relative isolate flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 font-mono text-[11px] font-medium tracking-[0.03em] transition-colors duration-200 sm:min-h-8 sm:py-1.5',
+                active ? 'font-semibold text-accent-invert' : 'text-text-muted hover:text-text'
+              )}
             >
               {active && !reducedMotion && (
                 <motion.span
-                  layoutId="easyui-pill-main-indicator"
-                  transition={motionTransitions.springMorph}
-                  className="absolute inset-0 rounded-full bg-accent shadow-sm"
+                  layoutId="pill-active-indicator"
+                  transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="pointer-events-none absolute inset-0 !z-0 rounded-full bg-accent shadow-sm"
+                  style={{ zIndex: 0, backgroundColor: 'var(--color-accent)' }}
                 />
               )}
               {active && reducedMotion && (
-                <span className="absolute inset-0 rounded-full bg-accent" />
+                <span className="pointer-events-none absolute inset-0 rounded-full bg-accent" style={{ zIndex: 0, backgroundColor: 'var(--color-accent)' }} />
               )}
 
-              <span className="relative z-10">{item.label}</span>
+              <span className="relative" style={{ zIndex: 1 }}>{item.label}</span>
 
               {itemHasChildren && (
                 <ChevronDown
                   className={cn(
-                    'relative z-10 h-3 w-3 transition-transform duration-200',
+                    'relative h-3 w-3 transition-transform duration-200',
                     active ? 'text-accent-invert' : 'text-text-subtle',
                     active && submenuOpen && 'rotate-180'
                   )}
+                  style={{ zIndex: 1 }}
                 />
               )}
             </motion.button>
@@ -166,7 +168,7 @@ export function PillNavigation({
                   whileTap={reducedMotion ? undefined : { scale: 0.95 }}
                   onClick={() => selectSub(subItem.id)}
                   className={cn(
-                    'focus-ring relative flex min-h-8 cursor-pointer items-center rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors',
+                    'focus-ring relative isolate flex min-h-8 cursor-pointer items-center rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors',
                     isSubActive
                       ? 'font-semibold text-text'
                       : 'text-text-subtle hover:text-text-muted'
@@ -176,11 +178,11 @@ export function PillNavigation({
                     <motion.span
                       layoutId="easyui-pill-sub-indicator"
                       transition={motionTransitions.springMorph}
-                      className="absolute inset-0 rounded-full border border-border bg-surface-hover shadow-sm"
+                      className="pointer-events-none absolute inset-0 !z-0 rounded-full border border-border bg-surface-hover shadow-sm"
                     />
                   )}
                   {isSubActive && reducedMotion && (
-                    <span className="absolute inset-0 rounded-full border border-border bg-surface-hover" />
+                    <span className="pointer-events-none absolute inset-0 z-0 rounded-full border border-border bg-surface-hover" />
                   )}
 
                   <span className="relative z-10">{subItem.label}</span>
