@@ -10,9 +10,9 @@ const LASTFM_PH = '2a96cbd8b46e442fc41c2b86b821562f';
 // this one URL means it stays server-side in every environment.
 
 // ─── In-memory cache ─────────────────────────────────────────────────────────
-// Live tracks:    cache 30 s  (user might change song soon)
+// Live tracks:     cache 30 s  (user might change song soon)
 // Non-live tracks: cache 120 s (won't change until next play)
-// Art lookups:    capped at 100 entries — evicts oldest when full (Fix #3)
+// Art lookups:     capped at 100 entries — evicts oldest when full
 let _cache = null; // { data, ts, isLive }
 let _artCache = new Map(); // "artist|album" → artUrl  (max 100 entries)
 let _inflight = null; // deduplicates concurrent calls
@@ -22,14 +22,8 @@ const RECENT_TTL = 120_000;
 const FETCH_TIMEOUT = 6_000;
 const ART_CACHE_MAX = 100;
 
-// Fix #6: module-level track name so fetchiTunesCoverArt can use it in the
-// fallback search even when called with only artist + album args
-let _currentTrackName = '';
-
-// Fix #3: bounded art cache setter — evicts the oldest key once the cap is hit
 function setArtCache(key, url) {
   if (_artCache.size >= ART_CACHE_MAX) {
-    // Map iteration order is insertion order, so .keys().next() is the oldest
     _artCache.delete(_artCache.keys().next().value);
   }
   _artCache.set(key, url);
@@ -51,15 +45,12 @@ function getBestImage(images) {
   return '';
 }
 
-// ─── iTunes cover art with session cache ─────────────────────────────────────
-// Scores a result: +2 exact artist match, +2 exact album match, +1 partial each.
-// Higher score = better match. Falls back to track search if album search misses.
 function _scoreResult(r, artist, album) {
   let score = 0;
   const ra = (r.artistName || '').toLowerCase();
   const rc = (r.collectionName || '').toLowerCase();
-  const al = artist.toLowerCase(),
-    ab = album.toLowerCase();
+  const al = artist.toLowerCase();
+  const ab = album.toLowerCase();
   if (ra === al) score += 2;
   else if (ra.includes(al) || al.includes(ra)) score += 1;
   if (rc === ab) score += 2;
@@ -68,15 +59,13 @@ function _scoreResult(r, artist, album) {
 }
 
 function _toMaxResArt(url) {
-  // iTunes serves artwork up to 3000×3000 — replace the size token for the best quality
   return url ? url.replace(/\d+x\d+bb/, '3000x3000bb') : '';
 }
 
-async function fetchiTunesCoverArt(artist, album) {
+async function fetchiTunesCoverArt(artist, album, trackName = '') {
   const key = `${artist}|${album}`.toLowerCase();
   if (_artCache.has(key)) return _artCache.get(key);
   try {
-    // Primary: album search
     const q = encodeURIComponent(`${artist} ${album}`);
     const res = await fetchWithTimeout(
       `https://itunes.apple.com/search?term=${q}&entity=album&limit=8`
@@ -86,7 +75,6 @@ async function fetchiTunesCoverArt(artist, album) {
 
     let url = '';
     if (data.results?.length) {
-      // Pick highest-scoring result; fall through to track search only on zero score
       const best = data.results
         .map((r) => ({ r, score: _scoreResult(r, artist, album) }))
         .sort((a, b) => b.score - a.score)[0];
@@ -95,10 +83,8 @@ async function fetchiTunesCoverArt(artist, album) {
       }
     }
 
-    // Fix #6: fallback searches by artist + track NAME, not album — album may be
-    // empty or wrong at this point, but `name` (the track title) is always known
-    if (!url && album !== artist) {
-      const qt = encodeURIComponent(`${artist} ${_currentTrackName}`);
+    if (!url && (album !== artist || trackName)) {
+      const qt = encodeURIComponent(`${artist} ${trackName || album}`);
       const res2 = await fetchWithTimeout(
         `https://itunes.apple.com/search?term=${qt}&entity=musicTrack&limit=5`
       );
@@ -113,7 +99,6 @@ async function fetchiTunesCoverArt(artist, album) {
       }
     }
 
-    // Fix #3: use bounded setter instead of direct Map.set
     setArtCache(key, url);
     return url;
   } catch {
@@ -121,85 +106,119 @@ async function fetchiTunesCoverArt(artist, album) {
   }
 }
 
+function trackUrl(track) {
+  const name = track?.name || '';
+  const artist = track?.artist?.name || track?.artist?.['#text'] || track?.artist || '';
+  return `https://music.youtube.com/search?q=${encodeURIComponent(`${name} ${artist}`.trim())}`;
+}
+
+function normalizeRawTrack(track) {
+  const isLive = track?.['@attr']?.nowplaying === 'true';
+  const name = track?.name || 'Unknown Track';
+  const artist = track?.artist?.name || track?.artist?.['#text'] || 'Unknown Artist';
+  const album = track?.album?.['#text'] || '';
+  const lastfmArt = getBestImage(track?.image);
+  const uts = Number.parseInt(track?.date?.uts, 10);
+  return {
+    isLive,
+    name,
+    artist,
+    album,
+    art: lastfmArt,
+    url: trackUrl(track),
+    playedAt: Number.isFinite(uts) ? uts * 1000 : null,
+  };
+}
+
+async function enrichTrack(track) {
+  const needsInfo = !track.album || !track.art;
+  const [infoResult, itunesResult] = await Promise.allSettled([
+    needsInfo
+      ? fetchWithTimeout(
+          `/api/nowplaying?method=track.getInfo` +
+            `&artist=${encodeURIComponent(track.artist)}` +
+            `&track=${encodeURIComponent(track.name)}`
+        )
+          .then((r) => r.json())
+          .catch(() => null)
+      : Promise.resolve(null),
+    fetchiTunesCoverArt(track.artist, track.album || track.name, track.name),
+  ]);
+
+  let album = track.album;
+  let lastfmArt = track.art;
+  if (infoResult.status === 'fulfilled' && infoResult.value?.track?.album) {
+    const info = infoResult.value.track.album;
+    album = album || info.title || '';
+    lastfmArt = lastfmArt || getBestImage(info.image);
+  }
+  album = album || 'Unknown Album';
+
+  let art =
+    itunesResult.status === 'fulfilled' && itunesResult.value
+      ? itunesResult.value
+      : await fetchiTunesCoverArt(track.artist, album, track.name);
+  art = art || lastfmArt;
+
+  return { ...track, album, art };
+}
+
 // ─── Public API ──────────────────────────────────────────────────────────────
-export async function fetchNowPlaying() {
-  // Return cached result if still fresh
+export async function fetchNowPlaying({ limit = 5 } = {}) {
+  const safeLimit = Number.isFinite(limit) ? Math.min(10, Math.max(1, limit)) : 5;
   if (_cache) {
     const ttl = _cache.isLive ? LIVE_TTL : RECENT_TTL;
-    if (Date.now() - _cache.ts < ttl) return _cache.data;
+    if (Date.now() - _cache.ts < ttl && _cache.limit >= safeLimit) return _cache.data;
   }
-  // Deduplicate: if a fetch is already in-flight, share that Promise
   if (_inflight) return _inflight;
-  _inflight = _doFetch().finally(() => {
+  _inflight = _doFetch(safeLimit).finally(() => {
     _inflight = null;
   });
   return _inflight;
 }
 
-async function _doFetch() {
+async function _doFetch(limit) {
   try {
-    const res = await fetchWithTimeout(`/api/nowplaying`);
+    const res = await fetchWithTimeout(`/api/nowplaying?limit=${limit}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.message);
 
-    const track = data.recenttracks?.track?.[0];
-    if (!track) {
-      const empty = { isLive: false, name: '', artist: '', album: '', art: '' };
-      _cache = { data: empty, ts: Date.now(), isLive: false };
+    const rawTracks = data.recenttracks?.track;
+    const tracks = (Array.isArray(rawTracks) ? rawTracks : rawTracks ? [rawTracks] : [])
+      .slice(0, limit)
+      .map(normalizeRawTrack);
+
+    if (tracks.length === 0) {
+      const empty = {
+        isLive: false,
+        name: '',
+        artist: '',
+        album: '',
+        art: '',
+        recentTracks: [],
+      };
+      _cache = { data: empty, ts: Date.now(), isLive: false, limit };
       return empty;
     }
 
-    const isLive = track['@attr']?.nowplaying === 'true';
-    const name = track.name || 'Unknown Track';
-    const artist = track.artist?.name || track.artist?.['#text'] || 'Unknown Artist';
-    let album = track.album?.['#text'] || '';
-    let lastfmArt = getBestImage(track.image);
-
-    // Fix #6: store track name at module level so fetchiTunesCoverArt fallback
-    // can search by track title instead of (possibly empty/wrong) album name
-    _currentTrackName = name;
-
-    const needsInfo = !album || !lastfmArt;
-
-    // Fire track.getInfo and iTunes lookup in PARALLEL (not sequentially)
-    const [infoResult, itunesResult] = await Promise.allSettled([
-      needsInfo
-        ? fetchWithTimeout(
-            `/api/nowplaying?method=track.getInfo` +
-              `&artist=${encodeURIComponent(artist)}` +
-              `&track=${encodeURIComponent(name)}`
-          )
-            .then((r) => r.json())
-            .catch(() => null)
-        : Promise.resolve(null),
-      // Start iTunes lookup immediately with whatever album name we have
-      fetchiTunesCoverArt(artist, album || name),
-    ]);
-
-    if (infoResult.status === 'fulfilled' && infoResult.value?.track?.album) {
-      const info = infoResult.value.track.album;
-      album = album || info.title || '';
-      lastfmArt = lastfmArt || getBestImage(info.image);
-    }
-
-    album = album || 'Unknown Album';
-
-    // If speculative iTunes used empty album, retry with resolved name
-    let art =
-      itunesResult.status === 'fulfilled' && itunesResult.value
-        ? itunesResult.value
-        : await fetchiTunesCoverArt(artist, album);
-
-    art = art || lastfmArt;
-
-    const result = { isLive, name, artist, album, art };
-    _cache = { data: result, ts: Date.now(), isLive };
+    const recentTracks = await Promise.all(tracks.map((t) => enrichTrack(t)));
+    const current = recentTracks[0];
+    const result = {
+      isLive: current.isLive,
+      name: current.name,
+      artist: current.artist,
+      album: current.album,
+      art: current.art,
+      url: current.url,
+      recentTracks,
+    };
+    _cache = { data: result, ts: Date.now(), isLive: current.isLive, limit };
     return result;
   } catch {
     // A missing API key is reported by the /api/nowplaying handler (dev proxy or
     // serverless function), so no extra warning is needed here. Don't cache
     // errors, so a fixed key recovers on the next poll.
-    return { error: true };
+    return { error: true, recentTracks: [] };
   }
 }

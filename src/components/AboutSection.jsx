@@ -6,11 +6,11 @@ import { Music, GraduationCap } from 'lucide-react';
 const EDUCATION = [
   {
     id: 'bca',
-    title: 'Bachelor of Computer Applications',
-    subtitle: '2026 – Present · Current',
+    title: 'Bachelor of Computer Application',
+    subtitle: '2026 – 2029 · Specialization in Cloud Computing',
     icon: 'fa-university',
     current: true,
-    desc: 'Pursuing a degree focused on computer science and cloud computing, building a strong foundation in algorithms, data structures, and modern cloud computing.',
+    desc: 'Pursuing a degree in computer application with a specialization in cloud computing, building a strong foundation in algorithms, data structures, and modern cloud technologies.',
   },
   {
     id: 'hse',

@@ -83,9 +83,11 @@ function lastfmDevApi(env) {
         `&api_key=${apiKey}&artist=${encodeURIComponent(artist)}` +
         `&track=${encodeURIComponent(track)}&format=json&username=${LASTFM_USERNAME}`;
     } else if (method === "user.getrecenttracks") {
+      const rawLimit = Number.parseInt(params.get("limit"), 10);
+      const limit = Number.isFinite(rawLimit) ? Math.min(10, Math.max(1, rawLimit)) : 1;
       target =
         `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks` +
-        `&user=${LASTFM_USERNAME}&api_key=${apiKey}&format=json&limit=1&extended=1`;
+        `&user=${LASTFM_USERNAME}&api_key=${apiKey}&format=json&limit=${limit}&extended=1`;
     } else {
       sendError(400, {
         title: "Unsupported method",

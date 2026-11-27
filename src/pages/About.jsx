@@ -1,10 +1,17 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Send, ArrowDownToLine, MapPin } from 'runeicons-react';
+import { Send, ArrowDownToLine, MapPin, ChevronDown } from 'runeicons-react';
 import { GithubIcon, LinkedinIcon, InstagramIcon } from '../components/BrandIcons';
 import { profile, about, experiences } from '../data/site';
 import Reveal from '../components/Reveal';
 
 export default function About() {
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  const toggleGroup = (label) => {
+    setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
   return (
     <>
       <Helmet>
@@ -58,7 +65,85 @@ export default function About() {
           </Reveal>
         )}
 
-        <Reveal as="section" className="card p-5 sm:p-6" delay={0.12}>
+        {about.interests?.length > 0 && (
+          <Reveal as="section" className="card p-5 sm:p-6" delay={0.12}>
+            <h2 className="text-lg font-semibold tracking-tight text-text">Beyond code</h2>
+            <div className="mt-5 space-y-6">
+              {about.interests.map((group) => {
+                const items = group.items || [];
+                const limit = 4;
+                const hasMore = items.length > limit;
+                const isExpanded = !!expandedGroups[group.label];
+                const visibleItems = hasMore && !isExpanded ? items.slice(0, limit) : items;
+
+                return (
+                  <div key={group.label}>
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-[15px] font-semibold text-text">{group.label}</p>
+                      {hasMore && (
+                        <button
+                          type="button"
+                          onClick={() => toggleGroup(group.label)}
+                          className="focus-ring inline-flex items-center gap-1 rounded-md px-2 py-1 text-[12px] font-medium text-text-muted transition hover:text-text"
+                          aria-expanded={isExpanded}
+                        >
+                          {isExpanded ? 'Show less' : `Show all (${items.length})`}
+                          <ChevronDown size={14} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} aria-hidden="true" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                      {visibleItems.map((item, i) => {
+                        const label = item.title ? `${item.title} ${group.label === 'Reading' ? 'cover' : 'poster'}` : `${group.label} ${group.label === 'Reading' ? 'cover' : 'poster'}`;
+                        const content = (
+                          <>
+                            <div className="aspect-[2/3] overflow-hidden rounded-xl border border-border bg-surface-hover">
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={label}
+                                  className="h-full w-full object-cover transition duration-300 ease-out [@media(hover:hover)]:group-hover:scale-[1.03]"
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center px-3 text-center">
+                                  <span className="font-mono text-[11px] leading-relaxed text-text-subtle">Add poster</span>
+                                </div>
+                              )}
+                            </div>
+                            <figcaption className="mt-2 truncate text-[12px] text-text-muted" title={item.title}>
+                              {item.title || 'Untitled'}
+                            </figcaption>
+                          </>
+                        );
+
+                        return (
+                          <figure key={`${group.label}-${item.title}-${i}`} className="min-w-0">
+                            {item.url ? (
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group focus-ring block rounded-xl"
+                              >
+                                {content}
+                              </a>
+                            ) : (
+                              <div className="group">{content}</div>
+                            )}
+                          </figure>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Reveal>
+        )}
+
+        <Reveal as="section" className="card p-5 sm:p-6" delay={about.interests?.length > 0 ? 0.16 : 0.12}>
           <h2 className="text-lg font-semibold tracking-tight text-text">Let&apos;s connect</h2>
           <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">Have an idea, opportunity, or just want to say hi? Feel free to reach out.</p>
           <p className="mt-4 inline-flex items-center gap-2 font-mono text-[12px] text-text-muted"><MapPin size={14} aria-hidden="true" /> {profile.location}</p>

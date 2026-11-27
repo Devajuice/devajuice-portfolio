@@ -45,10 +45,12 @@ export default async function handler(req, res) {
 
   let url;
   if (method === 'user.getrecenttracks') {
+    const rawLimit = Number.parseInt(req.query?.limit, 10);
+    const limit = Number.isFinite(rawLimit) ? Math.min(10, Math.max(1, rawLimit)) : 1;
     url =
       `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks` +
       `&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}` +
-      `&format=json&limit=1&extended=1`;
+      `&format=json&limit=${limit}&extended=1`;
   } else if (method === 'track.getInfo') {
     const { artist, track } = req.query;
     if (!artist || !track) {
